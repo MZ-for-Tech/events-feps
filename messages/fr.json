@@ -1,0 +1,109 @@
+{
+  "Home": {
+    "systemName": "Hub Événementiel FEPS",
+    "directoryOverview": "En Direct & À Venir",
+    "activeRecords": "Événements Actifs",
+    "upcomingSeminars": "Séminaires Prévus",
+    "recentAdditions": "Nouvelles Activités",
+    "heroSubtitle": "Vivez au rythme de notre campus. Découvrez les séminaires, ateliers et événements culturels qui façonnent l'avenir à la Faculté d'Économie et de Sciences Politiques.",
+    "upcomingEntries": "Événements à la Une",
+    "viewCalendar": "Explorer l'Agenda",
+    "seeAll": "Voir Tout"
+  },
+  "Nav": {
+    "home": "Accueil",
+    "admin": "Administration",
+    "signIn": "Se connecter",
+    "signOut": "Se déconnecter"
+  },
+  "Footer": {
+    "aboutTitle": "FEPS Hub",
+    "aboutDesc": "Le système d'information officiel sur les événements de la Faculté d'Économie et des Sciences Politiques, Université du Caire.",
+    "aboutDescAr": "كلية الاقتصاد والعلوم السياسية — جامعة القاهرة",
+    "quickLinks": "Liens rapides",
+    "socialMedia": "Suivez-nous",
+    "helpSupport": "Aide & Support",
+    "faq": "FAQ",
+    "legalPrivacy": "Légal & Confidentialité",
+    "termsOfUse": "Conditions d'Utilisation",
+    "privacyPolicy": "Politique de Confidentialité",
+    "home": "Accueil",
+    "events": "Événements",
+    "officialWebsite": "Site Officiel",
+    "contact": "Contact",
+    "address": "Faculté d'Économie et des Sciences Politiques, Université du Caire, Giza, Égypte",
+    "copyright": "© {year} FEPS, Université du Caire. Tous droits réservés.",
+    "poweredBy": "Propulsé par FEPS"
+  },
+  "Login": {
+    "welcome": "Bienvenue",
+    "subtitle": "Connectez-vous au système d'événements FEPS",
+    "emailLabel": "Adresse e-mail",
+    "emailPlaceholder": "you@feps.edu.eg",
+    "passwordLabel": "Mot de passe",
+    "passwordPlaceholder": "••••••••",
+    "signIn": "Se connecter",
+    "signingIn": "Connexion en cours…",
+    "error": "Adresse e-mail ou mot de passe incorrect.",
+    "quickLogin": "Connexion rapide (Test)"
+  },
+  "Admin": {
+    "approve": "Approuver",
+    "approving": "...",
+    "reject": "Rejeter",
+    "rejecting": "..."
+  },
+  "Report": {
+    "university": "Université du Caire",
+    "faculty": "Faculté d'Économie et de Sciences Politiques",
+    "department": "Département des Systèmes d'Information",
+    "datePrefix": "Date : ",
+    "summaryPrefix": "Ce rapport résume les événements et activités prévus pour ",
+    "description": "Ce qui suit est un registre complet des événements académiques et institutionnels enregistrés dans le système d'information de la faculté. Ce document sert de dossier officiel pour la révision administrative et managériale.",
+    "colDateTime": "Date et Heure",
+    "colEventLocation": "Titre et Lieu de l'Événement",
+    "colCategory": "Catégorie",
+    "noEvents": "Aucun événement enregistré pour cette période.",
+    "locPrefix": "Lieu : ",
+    "footer": "Document Officiel - Faculté d'Économie et de Sciences Politiques - Généré automatiquement",
+    "pagePrefix": "Page ",
+    "pageOf": " sur ",
+    "reportTitle": "Registre Mensuel des Événements",
+    "months": {
+      "0": "Janvier",
+      "1": "Février",
+      "2": "Mars",
+      "3": "Avril",
+      "4": "Mai",
+      "5": "Juin",
+      "6": "Juillet",
+      "7": "Août",
+      "8": "Septembre",
+      "9": "Octobre",
+      "10": "Novembre",
+      "11": "Décembre"
+    }
+  },
+  "EventsPage": {
+    "facultyName": "Faculté d'économie et de sciences politiques",
+    "pageTitle": "Calendrier des événements",
+    "pageDescription": "Suivez toutes les conférences, séminaires, ateliers et activités étudiantes organisés par la faculté.",
+    "manageEvents": "Gérer les événements"
+  },
+  "EventDetail": {
+    "backToEvents": "Retour aux événements",
+    "adminMode": "Mode administrateur",
+    "academicEvent": "Événement académique FEPS",
+    "eventDetails": "À propos de l'événement",
+    "eventProgram": "Programme de l'événement",
+    "officialAgenda": "Document de programme officiel",
+    "downloadFallback": "Si l'aperçu ne s'affiche pas, vous pouvez le télécharger.",
+    "downloadFile": "Télécharger",
+    "quickFacts": "Faits saillants",
+    "date": "Date",
+    "until": "Jusqu'au : ",
+    "time": "Heure",
+    "location": "Lieu",
+    "draftPreview": "Aperçu : Cet événement n'est pas encore publié. Vous le voyez car vous êtes administrateur."
+  }
+}

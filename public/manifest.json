@@ -1,0 +1,37 @@
+{
+  "name": "FEPS Events Information System",
+  "short_name": "FEPS Events",
+  "description": "Faculty of Economics and Political Science official academic events platform",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#f8f9fa",
+  "theme_color": "#1a3a6e",
+  "icons": [
+    {
+      "src": "/feps-logo.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "/feps-logo.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ],
+  "shortcuts": [
+    {
+      "name": "Admin Events",
+      "short_name": "Events",
+      "description": "Manage Academic Events",
+      "url": "/en/admin/events"
+    },
+    {
+      "name": "Reports",
+      "short_name": "Reports",
+      "description": "Generate Event Reports",
+      "url": "/en/admin/reports"
+    }
+  ]
+}
