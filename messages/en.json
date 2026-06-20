@@ -18,7 +18,8 @@
     "home": "Home",
     "admin": "Admin",
     "signIn": "Sign In",
-    "signOut": "Sign Out"
+    "signOut": "Sign Out",
+    "tour": "Tour"
   },
   "Footer": {
     "aboutTitle": "FEPS Hub",
@@ -198,5 +199,43 @@
     "templateDetailed": "Detailed (Agenda)",
     "exportCsv": "Export to CSV",
     "detailedAgendaPrefix": "Event Agenda & Details:"
+  },
+  "Tour": {
+    "startTour": "Start Tour",
+    "step": "Step",
+    "of": "/",
+    "next": "Next",
+    "prev": "Prev",
+    "done": "Done",
+    
+    "homeNavTarget": "Navigation & Brand",
+    "homeNavDesc": "Welcome to the FEPS Events Hub. Use this bar to navigate the site.",
+    "homeStatsTitle": "Live Indicators",
+    "homeStatsContent": "See the total number of active events and upcoming seminars at a glance.",
+    "homeFeedTitle": "Featured Events",
+    "homeFeedContent": "Scroll through the most recent and highlighted upcoming events.",
+    "homeLangTitle": "Language Switcher",
+    "homeLangContent": "Instantly switch the interface language between English, Arabic, and French.",
+
+    "eventsCalendarTitle": "Interactive Calendar",
+    "eventsCalendarContent": "Browse through the faculty's events visually month by month.",
+    "eventsSearchTitle": "Search Engine",
+    "eventsSearchContent": "Type keywords to quickly find specific events or seminars.",
+    "eventsFiltersTitle": "Category Filters",
+    "eventsFiltersContent": "Filter the directory by specific event types like Workshops, Seminars, or Cultural events.",
+
+    "adminSidebarTitle": "Control Panel",
+    "adminSidebarContent": "Navigate between events management, reports, and user access controls.",
+    "adminCreateTitle": "Add New Event",
+    "adminCreateContent": "Click here to add a new academic event, upload an agenda, and set locations.",
+    "adminPublishTitle": "Quick Publish Toggle",
+    "adminPublishContent": "Instantly publish a draft or unpublish an event from the public calendar with one click.",
+    "adminActionsTitle": "Edit & Delete",
+    "adminActionsContent": "Use these tools to modify an event's details or remove it permanently from the system.",
+
+    "adminReportFiltersTitle": "Report Parameters",
+    "adminReportFiltersContent": "Select the exact date range, event type, and status to include in your official report.",
+    "adminReportGenerateTitle": "Generate Official PDF",
+    "adminReportGenerateContent": "Click here to render and download a formal, printable PDF document of the events ledger."
   }
 }

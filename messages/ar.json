@@ -18,7 +18,8 @@
     "home": "الرئيسية",
     "admin": "الإدارة",
     "signIn": "تسجيل الدخول",
-    "signOut": "تسجيل الخروج"
+    "signOut": "تسجيل الخروج",
+    "tour": "جولة"
   },
   "Footer": {
     "aboutTitle": "FEPS Hub",
@@ -198,5 +199,43 @@
     "templateDetailed": "مفصل (جدول الأعمال)",
     "exportCsv": "تصدير إلى CSV",
     "detailedAgendaPrefix": "برنامج وتفاصيل الفعالية:"
+  },
+  "Tour": {
+    "startTour": "بدء الجولة",
+    "step": "خطوة",
+    "of": "/",
+    "next": "التالي",
+    "prev": "السابق",
+    "done": "فهمت",
+    
+    "homeNavTarget": "القائمة الرئيسية",
+    "homeNavDesc": "مرحباً بك في ملتقى الفعاليات. استخدم هذه القائمة للتنقل في النظام.",
+    "homeStatsTitle": "مؤشرات مباشرة",
+    "homeStatsContent": "اطلع بسرعة على إجمالي الفعاليات النشطة والندوات القادمة في لمحة بصر.",
+    "homeFeedTitle": "الفعاليات المميزة",
+    "homeFeedContent": "تصفح أحدث الفعاليات القادمة والمميزة.",
+    "homeLangTitle": "تغيير اللغة",
+    "homeLangContent": "قم بتغيير لغة الواجهة بين العربية، والإنجليزية، والفرنسية بضغطة زر.",
+
+    "eventsCalendarTitle": "التقويم التفاعلي",
+    "eventsCalendarContent": "تصفح الفعاليات شهراً بشهر.",
+    "eventsSearchTitle": "محرك البحث",
+    "eventsSearchContent": "ابحث بالكلمات المفتاحية للوصول السريع لفعالية معينة.",
+    "eventsFiltersTitle": "تصنيفات الفعاليات",
+    "eventsFiltersContent": "قم بتصفية الفعاليات حسب النوع مثل ندوة، أو ورشة عمل.",
+
+    "adminSidebarTitle": "لوحة التحكم",
+    "adminSidebarContent": "تنقل بين إدارة الفعاليات والتقارير وصلاحيات المستخدمين.",
+    "adminCreateTitle": "إضافة فعالية جديدة",
+    "adminCreateContent": "اضغط هنا لإضافة فعالية جديدة مع تحديد الموقع والأجندة.",
+    "adminPublishTitle": "زر النشر السريع",
+    "adminPublishContent": "انشر المسودات أو قم بإلغاء نشر الفعاليات من التقويم العام بنقرة واحدة.",
+    "adminActionsTitle": "تعديل وحذف",
+    "adminActionsContent": "استخدم هذه الأدوات لتعديل تفاصيل الفعالية أو إزالتها من النظام.",
+
+    "adminReportFiltersTitle": "إعدادات التقرير",
+    "adminReportFiltersContent": "اختر النطاق الزمني ونوع الفعاليات وحالتها لتضمينها في التقرير الرسمي.",
+    "adminReportGenerateTitle": "توليد ملف PDF",
+    "adminReportGenerateContent": "اضغط هنا لاستخراج وتحميل مستند PDF رسمي جاهز للطباعة."
   }
 }

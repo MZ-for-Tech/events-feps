@@ -38,15 +38,22 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
         }
 
         console.log('[Auth] Success for user:', user.email);
-        return { id: user.id, name: user.name, email: user.email, role: user.role }
+        return { 
+          id: user.id, 
+          name: user.name, 
+          email: user.email, 
+          role: user.role,
+          permissions: (user as unknown as { permissions?: string | null }).permissions ? JSON.parse((user as unknown as { permissions: string }).permissions) : []
+        }
       },
     }),
   ],
   callbacks: {
     jwt({ token, user }) {
       if (user) {
-        token.role = (user as any).role
+        token.role = (user as unknown as { role: Role }).role
         token.id = user.id
+        token.permissions = (user as { permissions?: string[] }).permissions
       }
       return token
     },
@@ -54,6 +61,7 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
       if (session.user) {
         session.user.role = token.role as Role
         session.user.id = token.id as string
+        Object.assign(session.user, { permissions: (token.permissions as string[]) || [] })
       }
       return session
     },

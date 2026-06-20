@@ -8,7 +8,7 @@ export async function GET(req: NextRequest) {
     const month = searchParams.get('month')
     const year = searchParams.get('year')
 
-    let where: any = { published: true }
+    const where: Record<string, unknown> = { published: true }
 
     if (month && year) {
       const start = new Date(parseInt(year), parseInt(month) - 1, 1)
@@ -28,17 +28,21 @@ export async function GET(req: NextRequest) {
   }
 }
 
+import { hasPermission, PERMISSIONS } from '@/lib/permissions'
+import { logAction } from '@/lib/logger'
+
 export async function POST(req: NextRequest) {
   const session = await auth()
-  if (!session?.user) {
+  
+  if (!hasPermission(session, PERMISSIONS.EVENTS_CREATE)) {
     return new NextResponse('Unauthorized', { status: 401 })
   }
 
   try {
     const data = await req.json()
-    const { title, titleAr, type, startDate, endDate, location, description, agendaText, imageUrl, agendaFile, published } = data
+    const { title, titleAr, titleFr, categoryId, startDate, endDate, location, description, agendaText, imageUrl, agendaFile, published } = data
 
-    if (!title || !type || !startDate) {
+    if (!title || !categoryId || !startDate) {
       return new NextResponse('Missing required fields', { status: 400 })
     }
 
@@ -46,7 +50,8 @@ export async function POST(req: NextRequest) {
       data: {
         title,
         titleAr: titleAr || null,
-        type,
+        titleFr: titleFr || null,
+        categoryId,
         startDate: new Date(startDate),
         endDate: endDate ? new Date(endDate) : null,
         location: location || null,
@@ -54,9 +59,11 @@ export async function POST(req: NextRequest) {
         agendaText: agendaText || null,
         imageUrl: imageUrl || null,
         agendaFile: agendaFile || null,
-        published: published ?? false,
+        published: hasPermission(session, PERMISSIONS.EVENTS_PUBLISH) ? (published ?? false) : false,
       },
     })
+
+    await logAction(session!.user!.id, 'EVENT_CREATED', 'EVENT', event.id, JSON.stringify({ title: event.title }))
 
     return NextResponse.json(event, { status: 201 })
   } catch (error) {

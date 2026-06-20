@@ -9,7 +9,7 @@
  * ever sees the text.
  */
 
-// @ts-ignore – no types for this package
+// @ts-expect-error type missing for this library: arabic-reshaper types are incomplete
 import { convertArabic } from 'arabic-reshaper'
 
 /**
