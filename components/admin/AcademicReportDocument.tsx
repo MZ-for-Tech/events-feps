@@ -1,7 +1,7 @@
+/* eslint-disable jsx-a11y/alt-text */
 import React from 'react'
 import { Document, Page, Text, View, StyleSheet, Image, Font } from '@react-pdf/renderer'
 import { CalendarEvent } from '../calendar/types'
-import { EVENT_TYPE_META } from '../EventCard'
 import { reshapeArabic } from '../../lib/arabicShaper'
 
 Font.register({
@@ -308,7 +308,7 @@ export default function AcademicReportDocument({ events, reportTitle, monthYear,
               </View>
             ) : (
               events.map((ev, i) => {
-                const meta = EVENT_TYPE_META[ev.type]
+                const meta = ev.category || { nameAr: 'غير محدد', nameEn: 'Unknown', nameFr: 'Inconnu' }
                 
                 let dateStr: string
                 let timeStr: string
@@ -331,7 +331,7 @@ export default function AcademicReportDocument({ events, reportTitle, monthYear,
                     {isAr ? (
                       <>
                         <View style={styles.tableCol}>
-                          <Text style={{ ...styles.tableCell, textAlign: 'right' }}>{ar(meta.labelAr)}</Text>
+                          <Text style={{ ...styles.tableCell, textAlign: 'right' }}>{ar(meta.nameAr)}</Text>
                         </View>
                         <View style={styles.tableColLarge}>
                           <Text style={{ ...styles.tableCell, fontFamily: boldFont, textAlign: 'right' }}>{ar(ev.title)}</Text>
@@ -350,10 +350,10 @@ export default function AcademicReportDocument({ events, reportTitle, monthYear,
                         </View>
                         <View style={styles.tableColLarge}>
                           <Text style={{ ...styles.tableCell, fontFamily: boldFont, textAlign: 'left' }}>{ev.title}</Text>
-                          {ev.location && <Text style={{ ...styles.tableCell, color: '#444', marginTop: 0, textAlign: 'left' }}>{translations.locPrefix}{ev.location}</Text>}
+                          {ev.location && <Text style={{ ...styles.tableCell, color: '#444', marginTop: 0, textAlign: 'left' }}>{ev.location}</Text>}
                         </View>
                         <View style={{ ...styles.tableCol, borderRightWidth: 0 }}>
-                          <Text style={{ ...styles.tableCell, textAlign: 'left' }}>{meta.label}</Text>
+                          <Text style={{ ...styles.tableCell, textAlign: 'left' }}>{meta.nameEn}</Text>
                         </View>
                       </>
                     )}
@@ -368,7 +368,7 @@ export default function AcademicReportDocument({ events, reportTitle, monthYear,
               <Text style={{ fontSize: 10, textAlign: 'center', color: '#666', fontFamily: baseFont }}>{translations.noEvents}</Text>
             ) : (
               events.map((ev, i) => {
-                const meta = EVENT_TYPE_META[ev.type]
+                const meta = ev.category || { nameAr: 'غير محدد', nameEn: 'Unknown', nameFr: 'Inconnu', color: '#1A3A6E', bg: 'rgba(26,58,110,0.1)' }
                 let dateStr: string
                 let timeStr: string
                 
@@ -384,7 +384,7 @@ export default function AcademicReportDocument({ events, reportTitle, monthYear,
                   timeStr = new Date(ev.startDate).toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' })
                 }
 
-                let agendaCells: any[] = []
+                let agendaCells: Array<{ day?: string; startTime?: string; endTime?: string; text?: string }> = []
                 if (ev.agendaText) {
                   try {
                     const parsed = JSON.parse(ev.agendaText)
@@ -399,7 +399,7 @@ export default function AcademicReportDocument({ events, reportTitle, monthYear,
                     <Text style={{ ...styles.eventTitle, fontFamily: boldFont, textAlign: isAr ? 'right' : 'left' }}>{ar(isAr ? (ev.titleAr || ev.title) : ev.title)}</Text>
                     
                     <Text style={{ ...styles.eventMeta, textAlign: isAr ? 'right' : 'left' }}>
-                      {ar(isAr ? meta.labelAr : meta.label)} | {dateStr} - {timeStr}
+                      {ar(isAr ? meta.nameAr : meta.nameEn)} | {dateStr} - {timeStr}
                       {ev.location ? ` | ${ar(translations.locPrefix + ev.location)}` : ''}
                     </Text>
 

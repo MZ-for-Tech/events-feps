@@ -4,7 +4,7 @@ import React, { useState, useEffect } from 'react'
 import dynamic from 'next/dynamic'
 import { CalendarEvent } from '../calendar/types'
 import { Download, Eye, FileSpreadsheet } from 'lucide-react'
-import { EVENT_TYPE_META, EventType } from '../EventCard'
+import { EventCategoryData } from '../EventCard'
 
 // Dynamically import react-pdf components to avoid SSR issues
 const PDFViewer = dynamic(() => import('@react-pdf/renderer').then(mod => mod.PDFViewer), {
@@ -26,6 +26,7 @@ interface AdminReportEvent extends CalendarEvent {
 
 interface Props {
   events: AdminReportEvent[]
+  categories: EventCategoryData[]
 }
 
 const HALL_OPTIONS = [
@@ -40,7 +41,7 @@ const HALL_OPTIONS = [
   'قاعة احمد الغندور',
 ]
 
-export default function ReportGenerator({ events }: Props) {
+export default function ReportGenerator({ events, categories }: Props) {
   const t = useTranslations('Report')
   const tAdmin = useTranslations('AdminReports')
   const tAdminEvents = useTranslations('AdminEvents')
@@ -58,6 +59,7 @@ export default function ReportGenerator({ events }: Props) {
   const [isClient, setIsClient] = useState(false)
 
   useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     setIsClient(true)
   }, [])
 
@@ -68,7 +70,7 @@ export default function ReportGenerator({ events }: Props) {
     if (endDate && evDate > new Date(endDate).getTime() + 86400000) return false
     
     // 2. Type filter
-    if (selectedType !== 'ALL' && ev.type !== selectedType) return false
+    if (selectedType !== 'ALL' && ev.category?.id !== selectedType) return false
     
     // 3. Status filter
     if (selectedStatus === 'PUBLISHED' && !ev.published) return false
@@ -128,8 +130,8 @@ export default function ReportGenerator({ events }: Props) {
     ].join(',')
 
     const rows = filteredEvents.map(ev => {
-      const typeMeta = EVENT_TYPE_META[ev.type as EventType]
-      const typeStr = `"${isAr ? typeMeta?.labelAr : typeMeta?.label}"`
+      const typeMeta = ev.category
+      const typeStr = `"${isAr ? typeMeta?.nameAr : typeMeta?.nameEn}"`
       const titleStr = `"${(ev.titleAr || ev.title).replace(/"/g, '""')}"`
       const dateStr = `"${new Date(ev.startDate).toLocaleString(isAr ? 'ar-EG' : 'en-US')}"`
       const locStr = `"${(ev.location || '').replace(/"/g, '""')}"`
@@ -161,7 +163,7 @@ export default function ReportGenerator({ events }: Props) {
         </p>
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 mb-8 bg-feps-ink/5 p-6 border border-feps-ink/10">
+      <div data-tour="admin-report-filters" className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 mb-8 bg-feps-ink/5 p-6 border border-feps-ink/10">
         
         {/* Date Filters */}
         <div className="flex flex-col gap-2">
@@ -192,8 +194,8 @@ export default function ReportGenerator({ events }: Props) {
             className="w-full p-2 border border-feps-ink/20 bg-feps-paper text-sm text-feps-ink focus:outline-none focus:border-feps-ink"
           >
             <option value="ALL">{tAdmin('statusAll')}</option>
-            {Object.entries(EVENT_TYPE_META).map(([key, meta]) => (
-              <option key={key} value={key}>{isAr ? meta.labelAr : meta.label}</option>
+            {categories.map((cat) => (
+              <option key={cat.id} value={cat.id}>{isAr ? cat.nameAr : locale === 'fr' ? cat.nameFr : cat.nameEn}</option>
             ))}
           </select>
         </div>
@@ -218,7 +220,7 @@ export default function ReportGenerator({ events }: Props) {
           <label className="text-xs font-bold text-feps-ink uppercase tracking-wider">{tAdmin('filterStatus')}</label>
           <select 
             value={selectedStatus}
-            onChange={e => setSelectedStatus(e.target.value as any)}
+            onChange={e => setSelectedStatus(e.target.value as 'ALL' | 'PUBLISHED' | 'DRAFT')}
             className="w-full p-2 border border-feps-ink/20 bg-feps-paper text-sm text-feps-ink focus:outline-none focus:border-feps-ink"
           >
             <option value="ALL">{tAdmin('statusAll')}</option>
@@ -232,7 +234,7 @@ export default function ReportGenerator({ events }: Props) {
           <label className="text-xs font-bold text-feps-ink uppercase tracking-wider">{tAdmin('templateType')}</label>
           <select 
             value={reportFormat}
-            onChange={e => setReportFormat(e.target.value as any)}
+            onChange={e => setReportFormat(e.target.value as 'SUMMARY' | 'DETAILED')}
             className="w-full p-2 border border-feps-ink/20 bg-feps-paper text-sm text-feps-ink focus:outline-none focus:border-feps-ink font-bold"
           >
             <option value="SUMMARY">{tAdmin('templateSummary')}</option>
@@ -259,6 +261,7 @@ export default function ReportGenerator({ events }: Props) {
           >
             {({ loading }) => (
               <button 
+                data-tour="admin-report-generate"
                 disabled={loading || filteredEvents.length === 0}
                 className={`flex items-center gap-2 px-6 py-3 font-bold text-sm transition-colors border ${
                   (loading || filteredEvents.length === 0)
