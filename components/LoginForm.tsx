@@ -96,10 +96,23 @@ export default function LoginForm() {
             <button
               key={role.label}
               type="button"
-              className="px-3 py-2 border border-feps-border text-feps-ink font-mono text-[0.65rem] uppercase tracking-widest hover:bg-feps-paper hover:border-feps-ink transition-colors"
-              onClick={() => {
-                setEmail(role.email)
-                setPassword(role.pass)
+              disabled={loading}
+              className="px-3 py-2 border border-feps-border text-feps-ink font-mono text-[0.65rem] uppercase tracking-widest hover:bg-feps-ink hover:text-feps-paper hover:border-feps-ink transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+              onClick={async () => {
+                setLoading(true)
+                setError('')
+                const res = await signIn('credentials', {
+                  email: role.email,
+                  password: role.pass,
+                  redirect: false,
+                })
+                setLoading(false)
+                if (res?.error) {
+                  setError(t('error'))
+                } else {
+                  router.push(`/${locale}/admin/events`)
+                  router.refresh()
+                }
               }}
             >
               {role.label}

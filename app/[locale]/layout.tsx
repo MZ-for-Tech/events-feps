@@ -5,6 +5,7 @@ import { getMessages } from 'next-intl/server'
 import Providers from '@/components/Providers'
 import Navbar from '@/components/Navbar'
 import Footer from '@/components/Footer'
+import GuidedTour from '@/components/GuidedTour'
 
 export const metadata: Metadata = {
   title: 'FEPS Hub — Faculty of Economics & Political Science',
@@ -54,6 +55,7 @@ export default async function RootLayout({
               {children}
             </main>
             <Footer />
+            <GuidedTour />
           </Providers>
         </NextIntlClientProvider>
       </body>

@@ -54,18 +54,18 @@ export default function Navbar() {
 
   return (
     <nav className="fixed top-0 left-0 right-0 h-16 bg-feps-navy border-b border-feps-navy-dark shadow-md z-50 flex items-center" role="navigation" aria-label="Main navigation">
-      <div className="container max-w-7xl mx-auto px-6 flex items-center justify-between h-full relative">
+      <div className="container max-w-7xl mx-auto px-4 sm:px-6 flex items-center justify-between h-full relative">
         {/* Brand */}
-        <Link href={`/${locale}`} className="flex items-center gap-4 text-white hover:text-feps-gold transition-colors" aria-label="FEPS Home" onClick={() => setMenuOpen(false)}>
-          <Image src="/feps-logo.png" alt="FEPS Logo" width={32} height={32} priority className="object-contain brightness-0 invert" />
+        <Link data-tour="nav-brand" href={`/${locale}`} className="flex items-center gap-3 sm:gap-4 text-white hover:text-feps-gold transition-colors shrink-0" aria-label="FEPS Home" onClick={() => setMenuOpen(false)}>
+          <Image src="/feps-logo.png" alt="FEPS Logo" width={32} height={32} priority className="object-contain brightness-0 invert w-7 h-7 sm:w-8 sm:h-8" />
           <div className="flex flex-col">
-            <span className="font-serif font-semibold text-lg leading-tight tracking-tight">FEPS</span>
-            <span className="font-mono text-[0.6rem] text-white/60 leading-tight tracking-widest uppercase">Events System</span>
+            <span className="font-serif font-semibold text-base sm:text-lg leading-tight tracking-tight">FEPS</span>
+            <span className="font-mono text-[0.5rem] sm:text-[0.6rem] text-white/60 leading-tight tracking-widest uppercase hidden sm:block">Events System</span>
           </div>
         </Link>
 
         {/* Desktop Nav */}
-        <div className="hidden md:flex items-center justify-center gap-8 absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 whitespace-nowrap">
+        <div className="hidden lg:flex flex-1 items-center justify-center gap-6 xl:gap-8 whitespace-nowrap px-4">
           {!isLoginPage && (
             <>
               <Link 
@@ -77,6 +77,7 @@ export default function Navbar() {
               </Link>
               <Link 
                 href={`/${locale}/events`} 
+                data-tour="nav-events"
                 className={`flex items-center gap-2 font-mono text-xs uppercase tracking-widest font-semibold transition-colors ${isActive('/events') ? 'text-feps-gold' : 'text-white/70 hover:text-white'}`}
               >
                 <CalendarDays size={14} />
@@ -97,9 +98,18 @@ export default function Navbar() {
         </div>
 
         {/* Right Section */}
-        <div className="flex items-center gap-6">
+        <div className="flex items-center gap-3 sm:gap-6 shrink-0">
+          {/* Tour Trigger Button */}
+          {!isLoginPage && (
+            <button
+              onClick={() => window.dispatchEvent(new Event('start-tour'))}
+              className="hidden sm:flex bg-feps-gold text-feps-navy px-3 py-1 font-mono text-xs font-bold hover:bg-white hover:text-feps-navy transition-colors items-center justify-center uppercase"
+            >
+              {t('tour')}
+            </button>
+          )}
           {/* Language Switcher */}
-          <div className="relative" aria-live="polite">
+          <div data-tour="nav-lang" className="relative" aria-live="polite">
             <select
               value={locale}
               onChange={e => {
@@ -107,20 +117,20 @@ export default function Navbar() {
                 window.location.href = `/${next}${currentPathWithoutLocale}`
               }}
               aria-label="Select language"
-              className="appearance-none bg-transparent border border-white/20 text-white font-mono text-xs px-3 py-1.5 pr-8 rounded-sm cursor-pointer outline-none hover:border-feps-gold focus:border-feps-gold transition-colors"
+              className="appearance-none bg-transparent border border-white/20 text-white font-mono text-xs px-2 sm:px-3 py-1.5 pr-6 sm:pr-8 rounded-sm cursor-pointer outline-none hover:border-feps-gold focus:border-feps-gold transition-colors"
             >
               <option value="en" className="text-feps-ink">EN</option>
               <option value="ar" className="text-feps-ink">عربي</option>
               <option value="fr" className="text-feps-ink">FR</option>
             </select>
-            <span className="absolute right-2.5 top-1/2 -translate-y-1/2 pointer-events-none text-feps-gold text-xs">▾</span>
+            <span className="absolute right-1.5 sm:right-2.5 top-1/2 -translate-y-1/2 pointer-events-none text-feps-gold text-[10px] sm:text-xs">▾</span>
           </div>
 
           {/* Desktop Auth */}
-          <div className="hidden md:flex items-center gap-4">
+          <div className="hidden lg:flex items-center gap-4">
             {session ? (
               <>
-                <span className="font-mono text-xs text-white/70">
+                <span className="font-mono text-xs text-white/70 truncate max-w-[150px]">
                   {session.user?.name}
                 </span>
                 <button 
@@ -146,7 +156,7 @@ export default function Navbar() {
 
           {!isLoginPage && (
             <button 
-              className="md:hidden text-white hover:text-feps-gold p-2 -mr-2" 
+              className="lg:hidden text-white hover:text-feps-gold p-2 -mr-2" 
               onClick={toggleMenu}
               aria-label="Toggle menu"
             >
@@ -158,7 +168,7 @@ export default function Navbar() {
 
       {/* Mobile Menu Overlay */}
       {menuOpen && (
-        <div className="md:hidden fixed top-16 left-0 right-0 bottom-0 bg-feps-navy border-t border-feps-navy-dark p-6 flex flex-col gap-6 z-40 overflow-y-auto">
+        <div className="lg:hidden fixed top-16 left-0 right-0 bottom-0 bg-feps-navy border-t border-feps-navy-dark p-6 flex flex-col gap-6 z-40 overflow-y-auto">
           <Link href={`/${locale}`} className="font-serif text-2xl text-white pb-4 border-b border-white/10 flex items-center gap-3 hover:text-feps-gold" onClick={toggleMenu}>
             <Home size={20} className="text-white/50" />
             {t('home')}
