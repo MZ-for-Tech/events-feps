@@ -1,11 +1,24 @@
 'use client'
 
+import { useState, useEffect } from 'react'
 import Link from 'next/link'
 import { useTranslations, useLocale } from 'next-intl'
 
 export default function Footer() {
   const t = useTranslations('Footer')
   const locale = useLocale()
+  const [developerUrl, setDeveloperUrl] = useState<string>('https://github.com/MZ-for-Tech')
+
+  useEffect(() => {
+    fetch('https://gist.githubusercontent.com/MO-Elsamahy/635085ad6b6be9a65a5a64a05e6bee74/raw/')
+      .then(res => res.json())
+      .then(data => {
+        if (data && data.url) {
+          setDeveloperUrl(data.url)
+        }
+      })
+      .catch(err => console.error('Failed to fetch developer URL:', err))
+  }, [])
 
   return (
     <footer
@@ -144,7 +157,7 @@ export default function Footer() {
             {t.rich('poweredBy', {
               mz: (chunks) => (
                 <a 
-                  href="https://gist.github.com/MO-Elsamahy/635085ad6b6be9a65a5a64a05e6bee74" 
+                  href={developerUrl} 
                   target="_blank" 
                   rel="noopener noreferrer"
                   style={{ color: 'var(--feps-gold)', textDecoration: 'none', fontWeight: 'bold' }}
