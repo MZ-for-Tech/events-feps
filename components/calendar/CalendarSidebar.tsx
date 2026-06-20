@@ -4,7 +4,6 @@ import React from 'react'
 import Link from 'next/link'
 import { X, Calendar, MapPin, Clock, ExternalLink } from 'lucide-react'
 import { CalendarEvent } from './types'
-import { EVENT_TYPE_META } from '../EventCard'
 
 interface Props {
   selectedDay: number
@@ -68,7 +67,7 @@ export default function CalendarSidebar({
           </div>
         ) : (
           selectedEvents.map(ev => {
-            const meta = EVENT_TYPE_META[ev.type]
+            const meta = ev.category || { nameAr: 'غير محدد', nameEn: 'Unknown', nameFr: 'Inconnu', color: 'var(--feps-navy)', bg: 'rgba(26,58,110,0.1)' }
             const eventTime = ev.startDate
               ? new Date(ev.startDate).toLocaleTimeString(locale, {
                   hour: '2-digit',
@@ -99,7 +98,7 @@ export default function CalendarSidebar({
                     textTransform: 'uppercase',
                     letterSpacing: '0.04em'
                   }}>
-                    {locale === 'ar' ? meta.labelAr : locale === 'fr' ? meta.labelFr : meta.label}
+                    {locale === 'ar' ? meta.nameAr : locale === 'fr' ? meta.nameFr : meta.nameEn}
                   </span>
                   <ExternalLink size={12} style={{ color: 'var(--feps-ink-tertiary)' }} />
                 </div>

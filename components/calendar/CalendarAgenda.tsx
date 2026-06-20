@@ -4,7 +4,6 @@ import React from 'react'
 import Link from 'next/link'
 import { MapPin, Clock, ExternalLink } from 'lucide-react'
 import { CalendarEvent } from './types'
-import { EVENT_TYPE_META } from '../EventCard'
 
 interface Props {
   events: CalendarEvent[]
@@ -28,7 +27,7 @@ export default function CalendarAgenda({ events, locale, isAr, isFr }: Props) {
       ) : (
         <div className="agenda-list">
           {events.map(ev => {
-            const meta = EVENT_TYPE_META[ev.type]
+            const meta = ev.category || { nameAr: 'غير محدد', nameEn: 'Unknown', nameFr: 'Inconnu', color: 'var(--feps-navy)', bg: 'rgba(26,58,110,0.1)' }
             const dateObj = new Date(ev.startDate)
             const dayNum = dateObj.getDate()
             const dayName = dateObj.toLocaleDateString(locale, { weekday: 'short' })
@@ -61,7 +60,7 @@ export default function CalendarAgenda({ events, locale, isAr, isFr }: Props) {
                         background: meta.bg,
                       }}
                     >
-                      {locale === 'ar' ? meta.labelAr : locale === 'fr' ? meta.labelFr : meta.label}
+                      {locale === 'ar' ? meta.nameAr : locale === 'fr' ? meta.nameFr : meta.nameEn}
                     </span>
                   </div>
                   

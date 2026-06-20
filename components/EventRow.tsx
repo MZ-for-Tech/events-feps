@@ -1,13 +1,13 @@
 import React from 'react'
 import Link from 'next/link'
 import { MapPin, Clock, ArrowRight } from 'lucide-react'
-import { EventType, EVENT_TYPE_META } from './EventCard'
+import { EventCategoryData } from './EventCard'
 
 export interface EventRowProps {
   id: string
   title: string
   titleAr?: string | null
-  type: EventType
+  category: EventCategoryData
   startDate: string | Date
   endDate?: string | Date | null
   location?: string | null
@@ -19,15 +19,14 @@ export default function EventRow({
   id,
   title,
   titleAr,
-  type,
+  category,
   startDate,
   location,
   locale = 'en',
 }: EventRowProps) {
-  const meta = EVENT_TYPE_META[type] || { label: type, labelAr: type, labelFr: type, color: 'var(--feps-navy)', bg: 'rgba(26,58,110,0.1)' }
   const start = new Date(startDate)
   const isAr = locale === 'ar'
-  const categoryLabel = locale === 'ar' ? meta.labelAr : locale === 'fr' ? meta.labelFr : meta.label
+  const categoryLabel = locale === 'ar' ? category.nameAr : locale === 'fr' ? category.nameFr : category.nameEn
 
   const month = start.toLocaleDateString(isAr ? 'ar-EG' : 'en-US', { month: 'short' })
   const day = start.toLocaleDateString(isAr ? 'ar-EG' : 'en-US', { day: '2-digit' })

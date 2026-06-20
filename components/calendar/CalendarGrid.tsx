@@ -2,7 +2,6 @@
 
 import React from 'react'
 import { CalendarEvent } from './types'
-import { EVENT_TYPE_META } from '../EventCard'
 
 interface Props {
   cells: (number | null)[]
@@ -82,7 +81,7 @@ export default function CalendarGrid({
                   {hasEvents && (
                     <div className="cell-events-list hide-mobile-only">
                       {dayEvents.slice(0, 2).map((ev) => {
-                        const meta = EVENT_TYPE_META[ev.type]
+                        const meta = ev.category || { nameAr: 'غير محدد', nameEn: 'Unknown', nameFr: 'Inconnu', color: 'var(--feps-navy)', bg: 'rgba(26,58,110,0.1)' }
                         return (
                           <div
                             key={ev.id}

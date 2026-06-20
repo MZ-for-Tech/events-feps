@@ -1,10 +1,10 @@
-import { EventType } from '../EventCard'
+import { EventCategoryData } from '../EventCard'
 
 export interface CalendarEvent {
   id: string
   title: string
   titleAr?: string | null
-  type: EventType
+  category: EventCategoryData
   startDate: string
   endDate?: string | null
   location?: string | null

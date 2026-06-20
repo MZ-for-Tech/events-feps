@@ -5,7 +5,7 @@ import { ChevronLeft, ChevronRight, Filter, Grid, List as ListIcon } from 'lucid
 import { useParams } from 'next/navigation'
 import './EventCalendar.css'
 
-import { EVENT_TYPE_META, EventType } from './EventCard'
+import { EventCategoryData } from './EventCard'
 import { CalendarEvent } from './calendar/types'
 import CalendarAgenda from './calendar/CalendarAgenda'
 import CalendarGrid from './calendar/CalendarGrid'
@@ -30,9 +30,10 @@ const MONTH_NAMES_FR = [
 
 interface Props {
   initialEvents: CalendarEvent[]
+  categories: EventCategoryData[]
 }
 
-export default function EventCalendar({ initialEvents }: Props) {
+export default function EventCalendar({ initialEvents, categories }: Props) {
   const params = useParams()
   const locale = (params?.locale as string) || 'en'
   const isAr = locale === 'ar'
@@ -44,7 +45,7 @@ export default function EventCalendar({ initialEvents }: Props) {
   const [selectedDay, setSelectedDay] = useState<number | null>(null)
   const [events, setEvents] = useState<CalendarEvent[]>(initialEvents)
   const [loading, setLoading] = useState(false)
-  const [selectedType, setSelectedType] = useState<EventType | 'ALL'>('ALL')
+  const [selectedType, setSelectedType] = useState<string>('ALL')
   const [viewMode, setViewMode] = useState<'GRID' | 'LIST'>('GRID')
 
   const sidebarRef = useRef<HTMLDivElement>(null)
@@ -57,7 +58,7 @@ export default function EventCalendar({ initialEvents }: Props) {
   const eventsByDay = useMemo(() => {
     const map = new Map<number, CalendarEvent[]>()
     events.forEach(ev => {
-      if (selectedType !== 'ALL' && ev.type !== selectedType) return
+      if (selectedType !== 'ALL' && ev.category.id !== selectedType) return
 
       const d = new Date(ev.startDate)
       if (d.getFullYear() === currentYear && d.getMonth() === currentMonth) {
@@ -73,7 +74,7 @@ export default function EventCalendar({ initialEvents }: Props) {
   const agendaEvents = useMemo(() => {
     return events
       .filter(ev => {
-        if (selectedType !== 'ALL' && ev.type !== selectedType) return false
+        if (selectedType !== 'ALL' && ev.category.id !== selectedType) return false
         const d = new Date(ev.startDate)
         return d.getFullYear() === currentYear && d.getMonth() === currentMonth
       })
@@ -118,7 +119,7 @@ export default function EventCalendar({ initialEvents }: Props) {
   return (
     <div>
       {/* Category Filter Bar */}
-      <div className="filter-header-row" style={{ display: 'flex', alignItems: 'center', gap: '0.4rem', marginBottom: '0.6rem', color: 'var(--feps-ink-secondary)', fontSize: '0.75rem', fontWeight: 600, fontFamily: 'var(--font-mono, monospace)', textTransform: 'uppercase', letterSpacing: '0.05em', direction: isAr ? 'rtl' : 'ltr' }}>
+      <div data-tour="events-filters" className="filter-header-row" style={{ display: 'flex', alignItems: 'center', gap: '0.4rem', marginBottom: '0.6rem', color: 'var(--feps-ink-secondary)', fontSize: '0.75rem', fontWeight: 600, fontFamily: 'var(--font-mono, monospace)', textTransform: 'uppercase', letterSpacing: '0.05em', direction: isAr ? 'rtl' : 'ltr' }}>
         <Filter size={12} style={{ color: 'var(--feps-ink-tertiary)' }} />
         <span>{isAr ? 'تصفية حسب التصنيف' : isFr ? 'Filtrer par catégorie' : 'Filter by Category'}</span>
       </div>
@@ -140,32 +141,32 @@ export default function EventCalendar({ initialEvents }: Props) {
         >
           {isAr ? 'الكل' : isFr ? 'Tout' : 'All'}
         </button>
-        {(Object.entries(EVENT_TYPE_META) as [EventType, typeof EVENT_TYPE_META[EventType]][]).map(([type, meta]) => {
-          const isActive = selectedType === type
+        {categories.map((cat) => {
+          const isActive = selectedType === cat.id
           return (
             <button
-              key={type}
-              onClick={() => setSelectedType(type)}
+              key={cat.id}
+              onClick={() => setSelectedType(cat.id)}
               className="filter-pill"
               style={
                 isActive
                   ? {
-                      backgroundColor: meta.bg,
-                      color: meta.color,
-                      borderColor: meta.color,
+                      backgroundColor: cat.bg,
+                      color: cat.color,
+                      borderColor: cat.color,
                       fontWeight: 800,
                     }
                   : {}
               }
             >
-              {locale === 'ar' ? meta.labelAr : locale === 'fr' ? meta.labelFr : meta.label}
+              {locale === 'ar' ? cat.nameAr : locale === 'fr' ? cat.nameFr : cat.nameEn}
             </button>
           )
         })}
       </div>
 
       {/* Calendar Toolbar */}
-      <div className="calendar-toolbar" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.5rem', flexWrap: 'wrap', gap: '1rem', direction: isAr ? 'rtl' : 'ltr' }}>
+      <div data-tour="events-search" className="calendar-toolbar" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.5rem', flexWrap: 'wrap', gap: '1rem', direction: isAr ? 'rtl' : 'ltr' }}>
         {/* Month Navigation */}
         <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
           <button className="nav-chevron-btn" onClick={() => navigate(isAr ? 1 : -1)} aria-label="Previous Month">
@@ -222,7 +223,7 @@ export default function EventCalendar({ initialEvents }: Props) {
             isFr={isFr} 
           />
         ) : (
-          <div className={`calendar-container ${selectedDay ? 'has-sidebar' : ''}`} style={{ direction: isAr ? 'rtl' : 'ltr' }}>
+          <div data-tour="events-calendar" className={`calendar-container ${selectedDay ? 'has-sidebar' : ''}`} style={{ direction: isAr ? 'rtl' : 'ltr' }}>
             {/* Calendar Grid Side */}
             <CalendarGrid
               cells={cells}

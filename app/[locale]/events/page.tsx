@@ -32,7 +32,12 @@ export default async function EventsPage({ params }: PageProps) {
         lte: end,
       },
     },
+    include: { category: true },
     orderBy: { startDate: 'asc' },
+  })
+
+  const categories = await prisma.eventCategory.findMany({
+    orderBy: { nameEn: 'asc' }
   })
 
   // Format dates to string for serialization across Server Component boundary
@@ -40,7 +45,7 @@ export default async function EventsPage({ params }: PageProps) {
     id: ev.id,
     title: ev.title,
     titleAr: ev.titleAr,
-    type: ev.type,
+    category: ev.category,
     startDate: ev.startDate.toISOString(),
     endDate: ev.endDate ? ev.endDate.toISOString() : null,
     location: ev.location,
@@ -81,7 +86,7 @@ export default async function EventsPage({ params }: PageProps) {
       {/* Main Content (Calendar Wrapper) */}
       <div className="container max-w-5xl py-6">
         <div className="bg-feps-surface border border-feps-border p-8">
-          <EventCalendar initialEvents={initialEvents} />
+          <EventCalendar initialEvents={initialEvents} categories={categories} />
         </div>
       </div>
     </div>
