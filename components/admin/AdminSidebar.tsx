@@ -3,7 +3,7 @@
 import React, { useState, useEffect } from 'react'
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
-import { Calendar, FileText, Users, Settings, Menu, X, ChevronRight, ChevronLeft } from 'lucide-react'
+import { Calendar, FileText, Users, Settings, Menu, X, ChevronRight, ChevronLeft, Activity } from 'lucide-react'
 import { useSession } from 'next-auth/react'
 import { useTranslations, useLocale } from 'next-intl'
 
@@ -32,37 +32,68 @@ export default function AdminSidebar() {
 
   // Close mobile menu on route change
   useEffect(() => {
-    setIsMobileOpen(false)
-  }, [pathname])
+    if (isMobileOpen) {
+      // eslint-disable-next-line react-hooks/set-state-in-effect
+      setIsMobileOpen(false)
+    }
+  }, [pathname, isMobileOpen])
 
-  const canManageUsers = role === 'SUPERADMIN' || role === 'MANAGER'
+  // Track page views
+  useEffect(() => {
+    if (!session?.user) return
+    fetch('/api/logs', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ action: 'PAGE_VIEW', details: pathname })
+    }).catch(() => {})
+  }, [pathname, session?.user])
+
+  const permissions = (session?.user as { permissions?: string[] })?.permissions || []
+  const canManageUsers = role === 'SUPERADMIN' || permissions.includes('users:manage')
+  const canManageReports = role === 'SUPERADMIN' || role === 'MANAGER' || permissions.includes('events:reports')
 
   const navItems = [
     {
       label: t('eventsManagement'),
-      href: '/admin/events',
+      href: `/${locale}/admin/events`,
       icon: <Calendar size={20} />,
       active: pathname.includes('/admin/events')
     },
-    {
+    ...(canManageReports ? [{
       label: t('reports'),
-      href: '/admin/reports',
+      href: `/${locale}/admin/reports`,
       icon: <FileText size={20} />,
       active: pathname.includes('/admin/reports')
-    },
+    }] : []),
     ...(canManageUsers ? [
       {
         label: t('userManagement'),
-        href: '/admin/users',
+        href: `/${locale}/admin/users`,
         icon: <Users size={20} />,
         active: pathname.includes('/admin/users')
+      }
+    ] : []),
+    ...(permissions.includes('categories:manage') || role === 'SUPERADMIN' ? [
+      {
+        label: isAr ? 'إدارة التصنيفات' : 'Categories Management',
+        href: `/${locale}/admin/categories`,
+        icon: <Settings size={20} />,
+        active: pathname.includes('/admin/categories')
+      }
+    ] : []),
+    ...(permissions.includes('logs:view') || role === 'SUPERADMIN' ? [
+      {
+        label: isAr ? 'سجل النشاطات' : 'Activity Logs',
+        href: `/${locale}/admin/logs`,
+        icon: <Activity size={20} />,
+        active: pathname.includes('/admin/logs')
       }
     ] : [])
   ]
 
   // Desktop Sidebar
-  const DesktopSidebar = () => (
-    <div className={`hidden lg:flex flex-col bg-feps-navy border-e border-feps-navy-dark px-4 py-6 shrink-0 transition-all duration-300 sticky top-16 h-[calc(100vh-4rem)] z-20 ${isCollapsed ? 'w-[80px]' : 'w-[280px]'}`}>
+  const desktopSidebar = (
+    <div data-tour="admin-sidebar" className={`hidden lg:flex flex-col bg-feps-navy border-e border-feps-navy-dark px-4 py-6 shrink-0 transition-all duration-300 sticky top-16 h-[calc(100vh-4rem)] z-20 ${isCollapsed ? 'w-[80px]' : 'w-[280px]'}`}>
       
       {/* Collapse Toggle */}
       <button 
@@ -130,7 +161,7 @@ export default function AdminSidebar() {
   )
 
   // Mobile Top Bar
-  const MobileHeader = () => (
+  const mobileHeader = (
     <div className="lg:hidden flex items-center justify-between bg-feps-navy px-4 py-3 border-b border-feps-navy-dark w-full shrink-0">
       <div className="font-bold text-white font-serif">{t('controlPanel')}</div>
       <button 
@@ -143,70 +174,68 @@ export default function AdminSidebar() {
   )
 
   // Mobile Drawer Overlay
-  const MobileDrawer = () => {
-    // Determine translation class based on language
-    const slideClass = isMobileOpen 
-      ? 'translate-x-0' 
-      : (isAr ? 'translate-x-full' : '-translate-x-full')
+  // Determine translation class based on language
+  const slideClass = isMobileOpen 
+    ? 'translate-x-0' 
+    : (isAr ? 'translate-x-full' : '-translate-x-full')
 
-    return (
-      <>
-        <div 
-          className={`fixed inset-0 bg-black/60 z-[100] transition-opacity duration-300 lg:hidden ${isMobileOpen ? 'opacity-100 visible' : 'opacity-0 invisible'}`}
-          onClick={() => setIsMobileOpen(false)}
-        />
-        <div 
-          className={`fixed top-0 bottom-0 ${isAr ? 'right-0' : 'left-0'} w-[280px] bg-feps-navy z-[101] flex flex-col p-6 shadow-2xl transition-transform duration-300 lg:hidden ${slideClass}`}
-        >
-          <div className="flex items-center justify-between mb-8">
-            <h3 className="font-mono text-xs uppercase tracking-widest text-white/60">
-              {t('controlPanel')}
-            </h3>
-            <button 
-              onClick={() => setIsMobileOpen(false)}
-              className="text-white/60 hover:text-white"
+  const mobileDrawer = (
+    <>
+      <div 
+        className={`fixed inset-0 bg-black/60 z-[100] transition-opacity duration-300 lg:hidden ${isMobileOpen ? 'opacity-100 visible' : 'opacity-0 invisible'}`}
+        onClick={() => setIsMobileOpen(false)}
+      />
+      <div 
+        className={`fixed top-0 bottom-0 ${isAr ? 'right-0' : 'left-0'} w-[280px] bg-feps-navy z-[101] flex flex-col p-6 shadow-2xl transition-transform duration-300 lg:hidden ${slideClass}`}
+      >
+        <div className="flex items-center justify-between mb-8">
+          <h3 className="font-mono text-xs uppercase tracking-widest text-white/60">
+            {t('controlPanel')}
+          </h3>
+          <button 
+            onClick={() => setIsMobileOpen(false)}
+            className="text-white/60 hover:text-white"
+          >
+            <X size={24} />
+          </button>
+        </div>
+
+        <nav className="flex flex-col gap-2">
+          {navItems.map(item => (
+            <Link
+              key={item.href}
+              href={item.href}
+              className={`
+                flex items-center gap-3 px-4 py-3 transition-all rounded-md
+                ${item.active 
+                  ? 'bg-white/10 text-feps-gold font-bold' 
+                  : 'text-white/70 font-medium hover:bg-white/5 hover:text-white'}
+              `}
             >
-              <X size={24} />
-            </button>
-          </div>
+              <div className={item.active ? 'text-feps-gold' : 'text-white/50'}>
+                {item.icon}
+              </div>
+              <span className="text-sm">{item.label}</span>
+            </Link>
+          ))}
+        </nav>
 
-          <nav className="flex flex-col gap-2">
-            {navItems.map(item => (
-              <Link
-                key={item.href}
-                href={item.href}
-                className={`
-                  flex items-center gap-3 px-4 py-3 transition-all rounded-md
-                  ${item.active 
-                    ? 'bg-white/10 text-feps-gold font-bold' 
-                    : 'text-white/70 font-medium hover:bg-white/5 hover:text-white'}
-                `}
-              >
-                <div className={item.active ? 'text-feps-gold' : 'text-white/50'}>
-                  {item.icon}
-                </div>
-                <span className="text-sm">{item.label}</span>
-              </Link>
-            ))}
-          </nav>
-
-          <div className="mt-auto p-4 border border-feps-navy-dark bg-feps-navy-dark/50 rounded-sm">
-            <div className="font-mono text-[10px] uppercase tracking-wider text-white/60 mb-1">{t('loggedInAs')}</div>
-            <div className="font-bold text-white text-sm">{session?.user?.name}</div>
-            <div className="font-mono text-xs font-bold text-feps-gold mt-2 uppercase">
-              {role}
-            </div>
+        <div className="mt-auto p-4 border border-feps-navy-dark bg-feps-navy-dark/50 rounded-sm">
+          <div className="font-mono text-[10px] uppercase tracking-wider text-white/60 mb-1">{t('loggedInAs')}</div>
+          <div className="font-bold text-white text-sm">{session?.user?.name}</div>
+          <div className="font-mono text-xs font-bold text-feps-gold mt-2 uppercase">
+            {role}
           </div>
         </div>
-      </>
-    )
-  }
+      </div>
+    </>
+  )
 
   return (
     <>
-      <MobileHeader />
-      <MobileDrawer />
-      <DesktopSidebar />
+      {mobileHeader}
+      {mobileDrawer}
+      {desktopSidebar}
     </>
   )
 }
