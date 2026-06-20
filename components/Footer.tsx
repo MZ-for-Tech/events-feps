@@ -141,7 +141,19 @@ export default function Footer() {
             {t('copyright', { year: new Date().getFullYear() })}
           </p>
           <p style={{ fontSize: '0.78rem' }}>
-            {t('poweredBy')}
+            {t.rich('poweredBy', {
+              mz: (chunks) => (
+                <a 
+                  href="https://gist.github.com/MO-Elsamahy/635085ad6b6be9a65a5a64a05e6bee74" 
+                  target="_blank" 
+                  rel="noopener noreferrer"
+                  style={{ color: 'var(--feps-gold)', textDecoration: 'none', fontWeight: 'bold' }}
+                  className="hover:text-white transition-colors"
+                >
+                  {chunks}
+                </a>
+              )
+            })}
           </p>
         </div>
       </div>

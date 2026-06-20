@@ -38,7 +38,7 @@
     "contact": "Contact",
     "address": "Faculty of Economics and Political Science, Cairo University, Giza, Egypt",
     "copyright": "© {year} FEPS, Cairo University. All rights reserved.",
-    "poweredBy": "Powered by FEPS"
+    "poweredBy": "Developed by <mz>MZ for Tech solutions</mz>"
   },
   "Login": {
     "pageLabel": "System Authentication",
