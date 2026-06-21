@@ -1,6 +1,6 @@
 import { prisma } from '@/lib/prisma'
 import EventCalendar from '@/components/EventCalendar'
-import { Calendar, ShieldAlert } from 'lucide-react'
+import { ShieldAlert } from 'lucide-react'
 import { auth } from '@/lib/auth'
 import Link from 'next/link'
 import { getTranslations } from 'next-intl/server'
@@ -11,7 +11,7 @@ interface PageProps {
 
 export default async function EventsPage({ params }: PageProps) {
   const { locale } = await params
-  const isAr = locale === 'ar'
+
   const t = await getTranslations({ locale, namespace: 'EventsPage' })
   const session = await auth()
   const isAdmin = !!session?.user

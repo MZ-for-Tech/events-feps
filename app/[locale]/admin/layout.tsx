@@ -15,10 +15,10 @@ export default async function AdminLayout({ children, params }: AdminLayoutProps
     redirect('/login')
   }
 
-  const { locale } = await params
+  await params
   
   return (
-    <div className="flex flex-col lg:flex-row w-full flex-1 min-h-[calc(100vh-6rem)] bg-feps-paper relative">
+    <div className="flex flex-col lg:flex-row w-full flex-1 min-h-[calc(100vh-6rem)] bg-feps-paper relative -mt-4 md:-mt-8">
       <AdminSidebar />
       <div className="flex-1 w-full p-4 lg:p-8">
         {children}

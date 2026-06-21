@@ -1,9 +1,10 @@
 'use client'
 
 import React, { useState } from 'react'
-import { Shield, Plus, Edit2, Trash2, CheckCircle, XCircle, AlertCircle, Loader, Check } from 'lucide-react'
+import { Shield, Plus, Edit2, Trash2, AlertCircle, Loader, Check } from 'lucide-react'
 import { PERMISSION_DEF } from '@/lib/permissions'
 import { useRouter } from 'next/navigation'
+import { useTranslations } from 'next-intl'
 
 interface User {
   id: string
@@ -23,6 +24,7 @@ interface Props {
 export default function AdminUsersClient({ initialUsers, locale, currentUserRole }: Props) {
   const isAr = locale === 'ar'
   const router = useRouter()
+  const t = useTranslations('AdminUsers')
   
   const [users, setUsers] = useState<User[]>(initialUsers)
   const [isModalOpen, setIsModalOpen] = useState(false)
@@ -116,7 +118,7 @@ export default function AdminUsersClient({ initialUsers, locale, currentUserRole
   }
 
   const handleDelete = async (id: string) => {
-    if (!confirm(isAr ? 'هل أنت متأكد من الحذف؟' : 'Are you sure you want to delete this user?')) return
+    if (!confirm(t('confirmDelete'))) return
     try {
       const res = await fetch(`/api/users/${id}`, { method: 'DELETE' })
       if (!res.ok) throw new Error('Failed to delete')
@@ -136,10 +138,10 @@ export default function AdminUsersClient({ initialUsers, locale, currentUserRole
         <div>
           <h1 className="text-3xl font-serif text-feps-navy flex items-center gap-3">
             <Shield size={28} />
-            {isAr ? 'إدارة النظام والصلاحيات' : 'System & Permissions Management'}
+            {t('systemAndPermissions')}
           </h1>
           <p className="text-feps-ink-secondary mt-2 text-sm">
-            {isAr ? 'تحكم كامل في حسابات المستخدمين وصلاحياتهم المخصصة.' : 'Full control over user accounts and granular permissions.'}
+            {t('subtitle')}
           </p>
         </div>
         <button
@@ -147,7 +149,7 @@ export default function AdminUsersClient({ initialUsers, locale, currentUserRole
           className="bg-feps-navy text-white px-6 py-3 font-bold uppercase tracking-widest text-sm flex items-center gap-2 hover:bg-black transition-colors"
         >
           <Plus size={18} />
-          {isAr ? 'إضافة مستخدم' : 'Add User'}
+          {t('addUser')}
         </button>
       </div>
 
@@ -155,9 +157,9 @@ export default function AdminUsersClient({ initialUsers, locale, currentUserRole
         <table className="w-full text-left rtl:text-right">
           <thead>
             <tr className="bg-feps-ink/5 border-b border-feps-ink/20">
-              <th className="p-4 font-bold text-xs uppercase tracking-widest text-feps-ink-secondary">{isAr ? 'المستخدم' : 'User'}</th>
-              <th className="p-4 font-bold text-xs uppercase tracking-widest text-feps-ink-secondary">{isAr ? 'الصلاحيات' : 'Permissions'}</th>
-              <th className="p-4 font-bold text-xs uppercase tracking-widest text-feps-ink-secondary text-center">{isAr ? 'إجراءات' : 'Actions'}</th>
+              <th className="p-4 font-bold text-xs uppercase tracking-widest text-feps-ink-secondary">{t('user')}</th>
+              <th className="p-4 font-bold text-xs uppercase tracking-widest text-feps-ink-secondary">{t('permissions')}</th>
+              <th className="p-4 font-bold text-xs uppercase tracking-widest text-feps-ink-secondary text-center">{t('actions')}</th>
             </tr>
           </thead>
           <tbody className="divide-y divide-feps-ink/10">
@@ -176,7 +178,7 @@ export default function AdminUsersClient({ initialUsers, locale, currentUserRole
                   <div className="flex flex-wrap gap-2">
                     {user.role === 'SUPERADMIN' ? (
                       <span className="text-xs text-feps-ink font-bold px-2 py-1 bg-feps-ink/10 border border-feps-ink/20">
-                        {isAr ? 'صلاحيات كاملة' : 'Full Access'}
+                        {t('fullAccess')}
                       </span>
                     ) : (
                       user.permissions.map(perm => {
@@ -197,7 +199,7 @@ export default function AdminUsersClient({ initialUsers, locale, currentUserRole
                       onClick={() => handleOpenEdit(user)}
                       className="text-feps-ink/50 hover:text-feps-navy transition-colors p-1"
                       disabled={user.role === 'SUPERADMIN' && currentUserRole !== 'SUPERADMIN'}
-                      title={isAr ? 'تعديل' : 'Edit'}
+                      title={t('edit')}
                     >
                       <Edit2 size={16} />
                     </button>
@@ -205,7 +207,7 @@ export default function AdminUsersClient({ initialUsers, locale, currentUserRole
                       <button
                         onClick={() => handleDelete(user.id)}
                         className="text-feps-ink/50 hover:text-red-600 transition-colors p-1"
-                        title={isAr ? 'حذف' : 'Delete'}
+                        title={t('delete')}
                       >
                         <Trash2 size={16} />
                       </button>
@@ -223,7 +225,7 @@ export default function AdminUsersClient({ initialUsers, locale, currentUserRole
           <div className="bg-white w-full max-w-2xl border-t-4 border-feps-navy shadow-xl max-h-[90vh] overflow-y-auto">
             <div className="p-6 md:p-8">
               <h2 className="text-2xl font-serif text-feps-navy mb-6">
-                {editingUser ? (isAr ? 'تعديل بيانات المستخدم' : 'Edit User') : (isAr ? 'مستخدم جديد' : 'New User')}
+                {editingUser ? t('editUser') : (t('newUser'))}
               </h2>
 
               {error && (
@@ -235,7 +237,7 @@ export default function AdminUsersClient({ initialUsers, locale, currentUserRole
               <form onSubmit={handleSubmit} className="space-y-6">
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                   <div>
-                    <label className="block text-xs font-bold uppercase tracking-widest text-feps-ink-secondary mb-2">{isAr ? 'الاسم' : 'Name'}</label>
+                    <label className="block text-xs font-bold uppercase tracking-widest text-feps-ink-secondary mb-2">{t('name')}</label>
                     <input
                       type="text"
                       required
@@ -245,7 +247,7 @@ export default function AdminUsersClient({ initialUsers, locale, currentUserRole
                     />
                   </div>
                   <div>
-                    <label className="block text-xs font-bold uppercase tracking-widest text-feps-ink-secondary mb-2">{isAr ? 'البريد الإلكتروني' : 'Email'}</label>
+                    <label className="block text-xs font-bold uppercase tracking-widest text-feps-ink-secondary mb-2">{t('email')}</label>
                     <input
                       type="email"
                       required
@@ -259,7 +261,7 @@ export default function AdminUsersClient({ initialUsers, locale, currentUserRole
 
                 <div>
                   <label className="block text-xs font-bold uppercase tracking-widest text-feps-ink-secondary mb-2">
-                    {isAr ? 'كلمة المرور' : 'Password'} {editingUser && (isAr ? '(اتركه فارغاً لعدم التغيير)' : '(Leave blank to keep unchanged)')}
+                    {t('password')} {editingUser && (isAr ? '(اتركه فارغاً لعدم التغيير)' : '(Leave blank to keep unchanged)')}
                   </label>
                   <input
                     type="password"
@@ -272,7 +274,7 @@ export default function AdminUsersClient({ initialUsers, locale, currentUserRole
                 </div>
 
                 <div className="border-t border-feps-ink/10 pt-6">
-                  <label className="block text-xs font-bold uppercase tracking-widest text-feps-ink-secondary mb-4">{isAr ? 'الصلاحيات המخصصة' : 'Granular Permissions'}</label>
+                  <label className="block text-xs font-bold uppercase tracking-widest text-feps-ink-secondary mb-4">{t('granularPermissions')}</label>
                   
                   <div className="space-y-3 bg-feps-ink/5 p-4 border border-feps-ink/10">
                     {PERMISSION_DEF.map(perm => (
@@ -297,7 +299,7 @@ export default function AdminUsersClient({ initialUsers, locale, currentUserRole
                   </div>
                   {formData.role === 'SUPERADMIN' && (
                     <p className="text-xs text-amber-600 mt-2 font-bold flex items-center gap-1">
-                      <AlertCircle size={12} /> {isAr ? 'هذا المستخدم يمتلك كافة الصلاحيات حالياً.' : 'This user currently has all permissions.'}
+                      <AlertCircle size={12} /> {t('allPermissionsAlert')}
                     </p>
                   )}
                 </div>
@@ -309,7 +311,7 @@ export default function AdminUsersClient({ initialUsers, locale, currentUserRole
                     className="flex-1 bg-feps-navy text-white py-3 font-bold uppercase tracking-widest hover:bg-black transition-colors disabled:opacity-50 flex items-center justify-center gap-2"
                   >
                     {loading && <Loader size={16} className="animate-spin" />}
-                    {isAr ? 'حفظ' : 'Save'}
+                    {t('save')}
                   </button>
                   <button
                     type="button"
@@ -317,7 +319,7 @@ export default function AdminUsersClient({ initialUsers, locale, currentUserRole
                     disabled={loading}
                     className="flex-1 bg-feps-ink/10 text-feps-ink py-3 font-bold uppercase tracking-widest hover:bg-feps-ink/20 transition-colors disabled:opacity-50"
                   >
-                    {isAr ? 'إلغاء' : 'Cancel'}
+                    {t('cancel')}
                   </button>
                 </div>
               </form>

@@ -1,11 +1,11 @@
-import { getMessages, getTranslations } from 'next-intl/server'
+import { getTranslations } from 'next-intl/server'
 import { prisma } from '@/lib/prisma'
 import ReportGenerator from '@/components/admin/ReportGenerator'
 
 export const dynamic = 'force-dynamic'
 
 export default async function AdminReportsPage() {
-  const messages = await getMessages()
+
   const t = await getTranslations('AdminReports')
   
   // Fetch all events for the report generator. In a real system you'd fetch by year to save payload size, 

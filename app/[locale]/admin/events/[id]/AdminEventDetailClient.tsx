@@ -2,6 +2,7 @@
 
 import React, { useState } from 'react'
 import { useRouter } from 'next/navigation'
+import { useTranslations } from 'next-intl'
 import Link from 'next/link'
 import { ArrowLeft, Save, Plus, Trash2, FileText, CheckCircle, BarChart3, HelpCircle, Loader, Eye, Clock, Edit2 } from 'lucide-react'
 import dynamic from 'next/dynamic'
@@ -31,6 +32,7 @@ export default function AdminEventDetailClient({ event, locale, surveyResponses 
   const canManageReports = role === 'SUPERADMIN' || role === 'MANAGER' || permissions.includes('events:reports')
   const canManageSurveys = role === 'SUPERADMIN' || role === 'MANAGER' || permissions.includes('events:reports')
   const isAr = locale === 'ar'
+  const t = useTranslations('AdminEventDetail')
   const [activeTab, setActiveTab] = useState<'details' | 'report' | 'survey' | 'analytics' | 'history'>('report')
 
   const lsKeyReport = `feps_draft_report_${event.id}`
@@ -116,7 +118,7 @@ export default function AdminEventDetailClient({ event, locale, surveyResponses 
     if (!isLoaded) return
     
     const timer = setTimeout(async () => {
-      setAutoSaveStatus(isAr ? 'جاري الحفظ التلقائي...' : 'Auto-saving...')
+      setAutoSaveStatus(t('autoSaving'))
       try {
         const res = await fetch(`/api/events/${event.id}`, {
           method: 'PATCH',
@@ -128,20 +130,20 @@ export default function AdminEventDetailClient({ event, locale, surveyResponses 
           })
         })
         if (res.ok) {
-          setAutoSaveStatus(isAr ? 'تم الحفظ التلقائي' : 'Auto-saved')
+          setAutoSaveStatus(t('autoSaved'))
           localStorage.removeItem(lsKeyReport)
           localStorage.removeItem(lsKeySurvey)
           setTimeout(() => setAutoSaveStatus(null), 3000)
         } else {
-          setAutoSaveStatus(isAr ? 'خطأ في الحفظ' : 'Error saving')
+          setAutoSaveStatus(t('errorSaving'))
         }
       } catch {
-        setAutoSaveStatus(isAr ? 'خطأ في الحفظ' : 'Error saving')
+        setAutoSaveStatus(t('errorSaving'))
       }
     }, 1500)
 
     return () => clearTimeout(timer)
-  }, [reportFields, surveyQuestions, surveyEnabled, isLoaded, event.id, isAr, lsKeyReport, lsKeySurvey])
+  }, [reportFields, surveyQuestions, surveyEnabled, isLoaded, event.id, isAr, lsKeyReport, lsKeySurvey, t])
 
   const handleAddReportField = () => {
     setReportFields([...reportFields, { id: Math.random().toString(36).substr(2, 9), title: '', content: '' }])
@@ -211,7 +213,7 @@ export default function AdminEventDetailClient({ event, locale, surveyResponses 
         })
       })
       if (res.ok) {
-        setSaveStatus(isAr ? 'تم الحفظ بنجاح' : 'Saved successfully')
+        setSaveStatus(t('savedSuccessfully'))
         localStorage.removeItem(lsKeyReport)
         localStorage.removeItem(lsKeySurvey)
         router.refresh()
@@ -232,13 +234,13 @@ export default function AdminEventDetailClient({ event, locale, surveyResponses 
         <div>
           <Link href={`/${locale}/admin/events`} className="text-feps-ink-secondary hover:text-feps-ink mb-4 inline-flex items-center gap-2 text-sm">
             <ArrowLeft size={16} className={isAr ? 'rotate-180' : ''} />
-            {isAr ? 'العودة للفعاليات' : 'Back to Events'}
+            {t('backToEvents')}
           </Link>
           <h1 className="font-serif text-3xl text-feps-ink mb-1">
             {event.title}
           </h1>
           <p className="font-mono text-sm text-feps-ink-secondary">
-            {isAr ? 'إدارة التقرير والاستبيان المخصص للفعالية' : 'Manage Custom Report and Survey for Event'}
+            {t('manageCustomReport')}
           </p>
         </div>
         <div className="flex items-center gap-4">
@@ -260,7 +262,7 @@ export default function AdminEventDetailClient({ event, locale, surveyResponses 
             className="flex items-center gap-2 bg-feps-ink text-feps-paper px-6 py-2 font-mono text-sm tracking-widest uppercase hover:bg-black transition-colors disabled:opacity-50"
           >
             {saving ? <Loader size={16} className="animate-spin" /> : <Save size={16} />}
-            {isAr ? 'حفظ التعديلات' : 'Save Changes'}
+            {t('saveChanges')}
           </button>
         </div>
       </div>
@@ -268,13 +270,13 @@ export default function AdminEventDetailClient({ event, locale, surveyResponses 
       <div className="border border-feps-ink/20 bg-feps-paper overflow-hidden">
         <div className="flex border-b border-feps-ink/20 overflow-x-auto">
           {[
-            { id: 'details', icon: <FileText size={16} />, label: isAr ? 'تفاصيل' : 'Details' },
-            ...(canManageReports ? [{ id: 'report', icon: <FileText size={16} />, label: isAr ? 'مُنشئ التقارير' : 'Report Builder' }] : []),
+            { id: 'details', icon: <FileText size={16} />, label: t('details') },
+            ...(canManageReports ? [{ id: 'report', icon: <FileText size={16} />, label: t('reportBuilder') }] : []),
             ...(canManageSurveys ? [
-              { id: 'survey', icon: <HelpCircle size={16} />, label: isAr ? 'مُنشئ الاستبيان' : 'Survey Builder' },
-              { id: 'analytics', icon: <BarChart3 size={16} />, label: isAr ? 'نتائج الاستبيان' : 'Survey Analytics' }
+              { id: 'survey', icon: <HelpCircle size={16} />, label: t('surveyBuilder') },
+              { id: 'analytics', icon: <BarChart3 size={16} />, label: t('surveyAnalytics') }
             ] : []),
-            { id: 'history', icon: <Clock size={16} />, label: isAr ? 'سجل التعديلات والملاحظات' : 'History & Notes' },
+            { id: 'history', icon: <Clock size={16} />, label: t('historyNotes') },
           ].map(tab => (
             <button
               key={tab.id}
@@ -297,16 +299,16 @@ export default function AdminEventDetailClient({ event, locale, surveyResponses 
             <div className="space-y-4">
               <div className="flex justify-between items-start">
                 <div className="space-y-4">
-                  <p><strong>{isAr ? 'العنوان:' : 'Title:'}</strong> {event.title}</p>
-                  <p><strong>{isAr ? 'المكان:' : 'Location:'}</strong> {event.location}</p>
-                  <p><strong>{isAr ? 'التاريخ:' : 'Date:'}</strong> {new Date(event.startDate).toLocaleString(isAr ? 'ar-EG' : 'en-US')}</p>
+                  <p><strong>{t('title')}</strong> {event.title}</p>
+                  <p><strong>{t('location')}</strong> {event.location}</p>
+                  <p><strong>{t('dateLabel')}</strong> {new Date(event.startDate).toLocaleString(isAr ? 'ar-EG' : 'en-US')}</p>
                 </div>
                 <button
                   onClick={() => router.push(`/${isAr ? 'ar' : 'en'}/admin/events?edit=${event.id}`)}
                   className="flex items-center gap-2 bg-feps-ink/5 text-feps-ink px-4 py-2 text-sm font-bold uppercase tracking-widest hover:bg-feps-ink hover:text-white transition-colors"
                 >
                   <Edit2 size={14} />
-                  {isAr ? 'تعديل التفاصيل' : 'Edit Details'}
+                  {t('editDetails')}
                 </button>
               </div>
             </div>
@@ -316,12 +318,12 @@ export default function AdminEventDetailClient({ event, locale, surveyResponses 
             <div>
               <div className="flex justify-between items-center mb-6">
                 <div>
-                  <h2 className="text-xl font-serif mb-1">{isAr ? 'هيكل التقرير' : 'Report Structure'}</h2>
-                  <p className="text-sm text-feps-ink-secondary">{isAr ? 'أضف الحقول المخصصة لتقرير هذه الفعالية' : 'Add custom fields for this event report'}</p>
+                  <h2 className="text-xl font-serif mb-1">{t('reportStructure')}</h2>
+                  <p className="text-sm text-feps-ink-secondary">{t('addCustomFields')}</p>
                 </div>
                 <div className="flex gap-2">
                   <button onClick={handleAddReportField} className="flex items-center gap-2 bg-feps-ink/5 text-feps-ink px-4 py-2 text-sm font-bold hover:bg-feps-ink/10 transition-colors">
-                    <Plus size={16} /> {isAr ? 'إضافة حقل' : 'Add Field'}
+                    <Plus size={16} /> {t('addField')}
                   </button>
                   <PDFDownloadLink
                     document={<SingleEventReportDocument event={event} reportFields={reportFields} isAr={isAr} />}
@@ -329,43 +331,43 @@ export default function AdminEventDetailClient({ event, locale, surveyResponses 
                     className="flex items-center gap-2 bg-feps-navy text-white px-4 py-2 text-sm font-bold hover:bg-feps-navy/90 transition-colors"
                   >
                     {({ loading }) => (
-                      <>{loading ? '...' : (isAr ? 'تنزيل PDF' : 'Download PDF')}</>
+                      <>{loading ? '...' : t('downloadPdf')}</>
                     )}
                   </PDFDownloadLink>
                   <button 
                     onClick={() => setShowPreview(!showPreview)}
                     className="flex items-center gap-2 bg-feps-ink/5 text-feps-ink px-4 py-2 text-sm font-bold hover:bg-feps-ink/10 transition-colors"
                   >
-                    <Eye size={16} /> {showPreview ? (isAr ? 'إخفاء المعاينة' : 'Hide Preview') : (isAr ? 'معاينة التقرير' : 'Preview Report')}
+                    <Eye size={16} /> {showPreview ? t('hidePreview') : t('previewReport')}
                   </button>
                 </div>
               </div>
               
               <div className="space-y-6">
                 {reportFields.length === 0 ? (
-                  <p className="text-center py-12 text-feps-ink/50 border-2 border-dashed border-feps-ink/20">{isAr ? 'لا توجد حقول حتى الآن' : 'No fields added yet'}</p>
+                  <p className="text-center py-12 text-feps-ink/50 border-2 border-dashed border-feps-ink/20">{t('noFieldsYet')}</p>
                 ) : reportFields.map((field) => (
                   <div key={field.id} className="border border-feps-ink/20 p-4 relative group">
                     <button onClick={() => handleRemoveReportField(field.id)} className="absolute top-4 right-4 rtl:left-4 rtl:right-auto text-red-500 hover:text-red-700">
                       <Trash2 size={16} />
                     </button>
                     <div className="mb-4 pr-8 rtl:pr-0 rtl:pl-8">
-                      <label className="block text-xs font-bold uppercase tracking-widest text-feps-ink-secondary mb-2">{isAr ? 'عنوان الحقل' : 'Field Title'}</label>
+                      <label className="block text-xs font-bold uppercase tracking-widest text-feps-ink-secondary mb-2">{t('fieldTitle')}</label>
                       <input 
                         type="text" 
                         value={field.title} 
                         onChange={e => handleUpdateReportField(field.id, 'title', e.target.value)}
                         className="w-full border-b border-feps-ink/20 bg-transparent text-lg font-bold focus:outline-none focus:border-feps-ink pb-1"
-                        placeholder={isAr ? 'مثال: النتائج والتوصيات' : 'e.g. Results and Recommendations'}
+                        placeholder={t('egResults')}
                       />
                     </div>
                     <div>
-                      <label className="block text-xs font-bold uppercase tracking-widest text-feps-ink-secondary mb-2">{isAr ? 'المحتوى' : 'Content'}</label>
+                      <label className="block text-xs font-bold uppercase tracking-widest text-feps-ink-secondary mb-2">{t('content')}</label>
                       <textarea 
                         value={field.content} 
                         onChange={e => handleUpdateReportField(field.id, 'content', e.target.value)}
                         className="w-full border border-feps-ink/20 bg-transparent p-3 min-h-[120px] focus:outline-none focus:border-feps-ink text-sm"
-                        placeholder={isAr ? 'اكتب المحتوى هنا...' : 'Write content here...'}
+                        placeholder={t('writeContentHere')}
                       />
                     </div>
                   </div>
@@ -386,13 +388,13 @@ export default function AdminEventDetailClient({ event, locale, surveyResponses 
             <div>
               <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-6 gap-4">
                 <div>
-                  <h2 className="text-xl font-serif mb-1">{isAr ? 'أسئلة الاستبيان' : 'Survey Questions'}</h2>
-                  <p className="text-sm text-feps-ink-secondary">{isAr ? 'صمم نموذج التقييم الخاص بالفعالية' : 'Design the evaluation form for this event'}</p>
+                  <h2 className="text-xl font-serif mb-1">{t('surveyQuestions')}</h2>
+                  <p className="text-sm text-feps-ink-secondary">{t('designEvalForm')}</p>
                 </div>
                 
                 <div className="flex flex-col items-end gap-4">
                   <label className="flex items-center gap-3 cursor-pointer bg-feps-paper border border-feps-ink/20 px-4 py-2 rounded shadow-sm">
-                    <span className="text-sm font-bold text-feps-ink">{isAr ? 'إتاحة الاستبيان للجمهور' : 'Enable Survey'}</span>
+                    <span className="text-sm font-bold text-feps-ink">{t('enableSurvey')}</span>
                     <div className="relative">
                       <input 
                         type="checkbox" 
@@ -406,7 +408,7 @@ export default function AdminEventDetailClient({ event, locale, surveyResponses 
                   
                   <div className="flex gap-2">
                     <button onClick={() => handleAddSurveyQuestion('text')} className="flex items-center gap-2 bg-feps-ink/5 text-feps-ink px-4 py-2 text-sm font-bold hover:bg-feps-ink/10 transition-colors">
-                      <Plus size={16} /> {isAr ? 'سؤال نصي' : 'Text Question'}
+                      <Plus size={16} /> {t('textQuestion')}
                     </button>
                     <button onClick={() => handleAddSurveyQuestion('choice')} className="flex items-center gap-2 bg-feps-ink/5 text-feps-ink px-4 py-2 text-sm font-bold hover:bg-feps-ink/10 transition-colors">
                       <Plus size={16} /> {isAr ? 'خيارات' : 'Choice Question'}
@@ -417,20 +419,20 @@ export default function AdminEventDetailClient({ event, locale, surveyResponses 
 
               <div className="space-y-6">
                 {surveyQuestions.length === 0 ? (
-                  <p className="text-center py-12 text-feps-ink/50 border-2 border-dashed border-feps-ink/20">{isAr ? 'لا توجد أسئلة حتى الآن' : 'No questions added yet'}</p>
+                  <p className="text-center py-12 text-feps-ink/50 border-2 border-dashed border-feps-ink/20">{t('noQuestionsYet')}</p>
                 ) : surveyQuestions.map((q, qIndex) => (
                   <div key={q.id} className="border border-feps-ink/20 p-4 relative bg-feps-ink/5">
                     <button onClick={() => handleRemoveSurveyQuestion(q.id)} className="absolute top-4 right-4 rtl:left-4 rtl:right-auto text-red-500 hover:text-red-700">
                       <Trash2 size={16} />
                     </button>
                     <div className="mb-4 pr-8 rtl:pr-0 rtl:pl-8">
-                      <label className="block text-xs font-bold uppercase tracking-widest text-feps-ink-secondary mb-2">{isAr ? `سؤال ${qIndex + 1}` : `Question ${qIndex + 1}`} ({q.type === 'text' ? (isAr ? 'نص' : 'Text') : (isAr ? 'خيارات' : 'Choices')})</label>
+                      <label className="block text-xs font-bold uppercase tracking-widest text-feps-ink-secondary mb-2">{isAr ? `سؤال ${qIndex + 1}` : `Question ${qIndex + 1}`} ({q.type === 'text' ? t('text') : t('choices')})</label>
                       <input 
                         type="text" 
                         value={q.text} 
                         onChange={e => handleUpdateSurveyQuestion(q.id, 'text', e.target.value)}
                         className="w-full border-b border-feps-ink/20 bg-feps-paper text-base font-bold focus:outline-none focus:border-feps-ink pb-1 px-2 mb-3"
-                        placeholder={isAr ? 'اكتب السؤال هنا' : 'Type your question here'}
+                        placeholder={t('typeQuestionHere')}
                       />
                       <label className="flex items-center gap-2 cursor-pointer w-fit">
                         <input 
@@ -439,7 +441,7 @@ export default function AdminEventDetailClient({ event, locale, surveyResponses 
                           onChange={e => handleUpdateSurveyQuestion(q.id, 'required', e.target.checked as unknown as string)}
                           className="w-4 h-4 text-feps-navy focus:ring-feps-navy border-gray-300 rounded"
                         />
-                        <span className="text-sm text-feps-ink-secondary">{isAr ? 'سؤال إجباري' : 'Required Question'}</span>
+                        <span className="text-sm text-feps-ink-secondary">{t('requiredQuestion')}</span>
                       </label>
                     </div>
                     {q.type === 'choice' && q.options && (
@@ -462,7 +464,7 @@ export default function AdminEventDetailClient({ event, locale, surveyResponses 
                           </div>
                         ))}
                         <button onClick={() => handleAddOption(q.id)} className="text-xs text-feps-navy font-bold hover:underline mt-2 flex items-center gap-1">
-                          <Plus size={12} /> {isAr ? 'إضافة خيار' : 'Add Option'}
+                          <Plus size={12} /> {t('addOption')}
                         </button>
                       </div>
                     )}
@@ -473,7 +475,7 @@ export default function AdminEventDetailClient({ event, locale, surveyResponses 
           )}
 
           {activeTab === 'analytics' && (
-            <SurveyAnalytics responses={surveyResponses} questions={surveyQuestions} isAr={isAr} />
+            <SurveyAnalytics responses={surveyResponses} questions={surveyQuestions} />
           )}
 
           {activeTab === 'history' && (
@@ -483,7 +485,7 @@ export default function AdminEventDetailClient({ event, locale, surveyResponses 
                   type="text"
                   value={newNote}
                   onChange={e => setNewNote(e.target.value)}
-                  placeholder={isAr ? 'أضف ملاحظة للفريق بخصوص هذه الفعالية...' : 'Add a note for the team regarding this event...'}
+                  placeholder={t('addNote')}
                   className="flex-1 border border-feps-ink/20 bg-white p-3 text-sm focus:outline-none focus:border-feps-navy"
                   onKeyDown={e => e.key === 'Enter' && handleAddNote()}
                 />
@@ -493,13 +495,13 @@ export default function AdminEventDetailClient({ event, locale, surveyResponses 
                   className="bg-feps-navy text-white px-6 py-3 font-bold uppercase tracking-widest text-sm hover:bg-black transition-colors disabled:opacity-50 flex items-center gap-2"
                 >
                   {submittingNote ? <Loader size={16} className="animate-spin" /> : <Plus size={16} />}
-                  {isAr ? 'إضافة' : 'Add'}
+                  {t('add')}
                 </button>
               </div>
 
               <div className="space-y-4 relative before:absolute before:inset-0 before:ml-5 rtl:before:ml-0 rtl:before:mr-5 before:-translate-x-px md:before:mx-auto md:before:translate-x-0 before:h-full before:w-0.5 before:bg-gradient-to-b before:from-transparent before:via-feps-ink/10 before:to-transparent">
                 {logs.length === 0 && logsLoaded ? (
-                  <p className="text-center text-feps-ink-secondary py-10">{isAr ? 'لا يوجد سجل تعديلات حتى الآن' : 'No history yet'}</p>
+                  <p className="text-center text-feps-ink-secondary py-10">{t('noHistory')}</p>
                 ) : !logsLoaded ? (
                   <p className="text-center text-feps-ink-secondary py-10"><Loader size={24} className="animate-spin mx-auto" /></p>
                 ) : (

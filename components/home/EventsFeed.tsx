@@ -15,13 +15,18 @@ export default function EventsFeed({ locale, upcomingEvents }: EventsFeedProps) 
   const t = useTranslations('Home')
 
   return (
-    <div className="container max-w-5xl py-12 md:py-16 relative z-10">
-      <div data-tour="events-feed" className="flex justify-between items-end mb-8 pb-4 border-b border-feps-border">
-        <div>
-          <h2 className="font-serif text-3xl font-normal text-feps-ink mb-2">{t('upcomingEntries')}</h2>
-          <p className="font-mono text-xs uppercase tracking-widest text-feps-ink-secondary">{t('latestActivities')}</p>
+    <div className="container max-w-7xl py-16 md:py-24 relative z-10">
+      <div data-tour="events-feed" className="flex justify-between items-end mb-12 pb-6 border-b-2 border-feps-navy">
+        <div className="flex items-center gap-6">
+          <div className="hidden sm:flex w-16 h-16 bg-feps-paper border border-feps-border items-center justify-center">
+            <Calendar size={28} strokeWidth={1.5} className="text-feps-navy" />
+          </div>
+          <div>
+            <h2 className="font-serif text-3xl md:text-4xl font-normal text-feps-navy mb-2">{t('upcomingEntries')}</h2>
+            <p className="font-mono text-xs uppercase tracking-widest text-feps-ink-secondary font-bold">{t('latestActivities')}</p>
+          </div>
         </div>
-        <Link href={`/${locale}/events`} className="group hidden sm:flex items-center gap-2 font-mono text-xs uppercase tracking-widest font-bold text-feps-navy hover:text-feps-gold transition-colors">
+        <Link href={`/${locale}/events`} className="group hidden sm:flex items-center gap-3 font-mono text-xs uppercase tracking-widest font-bold text-feps-navy hover:text-feps-gold transition-colors pb-2">
           {t('seeAll')} <ArrowRight size={16} className="group-hover:translate-x-1 transition-transform" />
         </Link>
       </div>

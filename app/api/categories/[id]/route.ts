@@ -33,7 +33,7 @@ export async function PATCH(
     await logAction(session.user.id, 'CATEGORY_UPDATED', 'CATEGORY', category.id, JSON.stringify({ action: `Updated category: ${category.nameEn}` }))
 
     return NextResponse.json(category)
-  } catch (error) {
+  } catch {
     return new NextResponse('Internal Server Error', { status: 500 })
   }
 }
@@ -61,7 +61,7 @@ export async function DELETE(
     await logAction(session.user.id, 'CATEGORY_DELETED', 'CATEGORY', id, JSON.stringify({ action: 'Deleted category' }))
 
     return new NextResponse(null, { status: 204 })
-  } catch (error) {
+  } catch {
     return new NextResponse('Internal Server Error', { status: 500 })
   }
 }

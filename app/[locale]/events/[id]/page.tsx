@@ -1,5 +1,7 @@
 export const dynamic = 'force-dynamic'
 
+import type { Metadata } from 'next'
+
 import { prisma } from '@/lib/prisma'
 import { auth } from '@/lib/auth'
 import { notFound } from 'next/navigation'
@@ -18,6 +20,37 @@ interface PageProps {
   params: Promise<{ locale: string; id: string }>
 }
 
+export async function generateMetadata(
+  { params }: PageProps
+): Promise<Metadata> {
+  const { locale, id } = await params
+  const t = await getTranslations({ locale, namespace: 'EventDetail' })
+  
+  const event = await prisma.event.findUnique({
+    where: { id },
+    include: { category: true }
+  })
+  
+  if (!event) return {}
+
+  const isAr = locale === 'ar'
+  const title = isAr && event.titleAr ? event.titleAr : event.title
+  const categoryLabel = event.category ? (isAr ? event.category.nameAr : locale === 'fr' ? event.category.nameFr : event.category.nameEn) : t('event')
+
+  const searchParams = new URLSearchParams()
+  searchParams.set('title', title)
+  searchParams.set('category', categoryLabel)
+
+  return {
+    title: `${title} | FEPS Hub`,
+    description: event.description,
+    openGraph: {
+      images: [`/api/og?${searchParams.toString()}`],
+    },
+  }
+}
+
+
 export default async function EventDetailPage({ params }: PageProps) {
   const { locale, id } = await params
   const isAr = locale === 'ar'
@@ -35,7 +68,7 @@ export default async function EventDetailPage({ params }: PageProps) {
     notFound()
   }
 
-  const categoryLabel = event.category ? (isAr ? event.category.nameAr : locale === 'fr' ? event.category.nameFr : event.category.nameEn) : 'Unknown Category'
+  const categoryLabel = event.category ? (isAr ? event.category.nameAr : locale === 'fr' ? event.category.nameFr : event.category.nameEn) : t('unknownCategory')
 
   const start = new Date(event.startDate)
   const end = event.endDate ? new Date(event.endDate) : null

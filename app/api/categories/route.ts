@@ -8,7 +8,7 @@ export async function GET() {
   try {
     const categories = await prisma.eventCategory.findMany()
     return NextResponse.json(categories)
-  } catch (error) {
+  } catch {
     return new NextResponse('Internal Server Error', { status: 500 })
   }
 }
@@ -40,7 +40,7 @@ export async function POST(req: NextRequest) {
     await logAction(session.user.id, 'CATEGORY_CREATED', 'CATEGORY', category.id, JSON.stringify({ action: `Created category: ${category.nameEn}` }))
 
     return NextResponse.json(category)
-  } catch (error) {
+  } catch {
     return new NextResponse('Internal Server Error', { status: 500 })
   }
 }

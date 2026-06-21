@@ -5,7 +5,7 @@
     "activeRecords": "Événements Actifs",
     "upcomingSeminars": "Séminaires Prévus",
     "recentAdditions": "Nouvelles Activités",
-    "heroSubtitle": "Vivez au rythme de notre campus. Découvrez les séminaires, ateliers et événements culturels qui façonnent l'avenir à la Faculté d'Économie et de Sciences Politiques.",
+    "heroSubtitle": "Le registre officiel des événements académiques et institutionnels. Explorez les séminaires de recherche, ateliers et conférences scientifiques à venir à la Faculté d'Économie et de Sciences Politiques.",
     "upcomingEntries": "Événements à la Une",
     "viewCalendar": "Explorer l'Agenda",
     "seeAll": "Voir Tout",
@@ -111,7 +111,10 @@
     "until": "Jusqu'au : ",
     "time": "Heure",
     "location": "Lieu",
-    "draftPreview": "Aperçu : Cet événement n'est pas encore publié. Vous le voyez car vous êtes administrateur."
+    "draftPreview": "Aperçu : Cet événement n'est pas encore publié. Vous le voyez car vous êtes administrateur.",
+    "unknownCategory": "Catégorie inconnue",
+    "event": "Événement",
+    "allEvents": "Tous les événements"
   },
   "AdminEvents": {
     "deleteConfirm": "Êtes-vous sûr de vouloir supprimer cet événement ?",
@@ -163,14 +166,38 @@
     "publishDesc": "Si coché, l'événement sera visible par tous sur le calendrier.",
     "cancel": "Annuler",
     "saveChanges": "Enregistrer",
-    "createEvent": "Créer l'événement"
+    "createEvent": "Créer l'événement",
+    "noResponses": "Aucune réponse pour le moment",
+    "totalResponses": "Total des réponses",
+    "noTextAnswers": "Aucune réponse textuelle",
+    "noHalls": "Aucun résultat",
+    "activeEvents": "Événements actifs",
+    "archived": "Archivés",
+    "markArchive": "Marquer comme terminé et archiver",
+    "manageEvent": "Gérer l'événement (Rapport et Enquête)",
+    "restoreActive": "Restaurer comme actif",
+    "archive": "Archiver",
+    "report": "Rapport",
+    "restore": "Restaurer",
+    "eventReport": "Rapport d'événement",
+    "summary": "Résumé",
+    "summaryPlaceholder": "Saisir le résumé de l'événement...",
+    "resultsOutcomes": "Résultats et Mises en œuvre",
+    "resultsPlaceholder": "Saisir les résultats de l'événement...",
+    "recommendations": "Recommandations",
+    "recommendationsPlaceholder": "Saisir les recommandations...",
+    "saved": "Enregistré",
+    "close": "Fermer",
+    "saveData": "Enregistrer les données"
   },
   "AdminSidebar": {
     "eventsManagement": "Gestion des événements",
     "reports": "Rapports",
     "userManagement": "Gestion des utilisateurs",
     "controlPanel": "Panneau de contrôle",
-    "loggedInAs": "Connecté en tant que"
+    "loggedInAs": "Connecté en tant que",
+    "categories": "Gestion des catégories",
+    "logs": "Journaux d'activité"
   },
   "AdminReports": {
     "pageTitle": "Rapports et Analyses",
@@ -207,7 +234,6 @@
     "next": "Suivant",
     "prev": "Précédent",
     "done": "Compris",
-    
     "homeNavTarget": "Navigation et Marque",
     "homeNavDesc": "Bienvenue sur le Hub des événements FEPS. Utilisez cette barre pour naviguer sur le site.",
     "homeStatsTitle": "Indicateurs en direct",
@@ -216,14 +242,12 @@
     "homeFeedContent": "Faites défiler les événements à venir les plus récents et mis en avant.",
     "homeLangTitle": "Sélecteur de langue",
     "homeLangContent": "Changez instantanément la langue de l'interface entre l'anglais, l'arabe et le français.",
-
     "eventsCalendarTitle": "Calendrier Interactif",
     "eventsCalendarContent": "Parcourez visuellement les événements de la faculté mois par mois.",
     "eventsSearchTitle": "Moteur de recherche",
     "eventsSearchContent": "Saisissez des mots-clés pour trouver rapidement des événements ou séminaires spécifiques.",
     "eventsFiltersTitle": "Filtres de Catégorie",
     "eventsFiltersContent": "Filtrez l'annuaire par types d'événements spécifiques comme les Ateliers, les Séminaires ou les événements Culturels.",
-
     "adminSidebarTitle": "Panneau de configuration",
     "adminSidebarContent": "Naviguez entre la gestion des événements, les rapports et les contrôles d'accès des utilisateurs.",
     "adminCreateTitle": "Ajouter un Nouvel Événement",
@@ -232,10 +256,186 @@
     "adminPublishContent": "Publiez instantanément un brouillon ou dépubliez un événement du calendrier public en un seul clic.",
     "adminActionsTitle": "Modifier et Supprimer",
     "adminActionsContent": "Utilisez ces outils pour modifier les détails d'un événement ou le supprimer définitivement du système.",
-
     "adminReportFiltersTitle": "Paramètres du Rapport",
     "adminReportFiltersContent": "Sélectionnez la plage de dates exacte, le type d'événement et le statut à inclure dans votre rapport officiel.",
     "adminReportGenerateTitle": "Générer un PDF Officiel",
     "adminReportGenerateContent": "Cliquez ici pour rendre et télécharger un document PDF formel et imprimable du registre des événements."
+  },
+  "AdminUsers": {
+    "systemAndPermissions": "Gestion du Système et des Permissions",
+    "fullControl": "Contrôle total sur les comptes d'utilisateurs et les permissions granulaires.",
+    "addUser": "Ajouter un utilisateur",
+    "user": "Utilisateur",
+    "permissions": "Permissions",
+    "actions": "Actions",
+    "fullAccess": "Accès Total",
+    "edit": "Modifier",
+    "delete": "Supprimer",
+    "editUser": "Modifier l'utilisateur",
+    "newUser": "Nouvel utilisateur",
+    "name": "Nom",
+    "email": "Email",
+    "password": "Mot de passe",
+    "granularPermissions": "Permissions Granulaires",
+    "allPermissionsAlert": "Cet utilisateur possède actuellement toutes les permissions.",
+    "save": "Enregistrer",
+    "cancel": "Annuler",
+    "confirmDelete": "Êtes-vous sûr de vouloir supprimer cet utilisateur ?",
+    "subtitle": "Contrôle total sur les comptes d'utilisateurs et les permissions granulaires."
+  },
+  "AdminCategories": {
+    "colorHint": "Sélectionnez la couleur de la catégorie principale. La couleur de fond transparente sera automatiquement calculée.",
+    "preview": "Aperçu",
+    "cancel": "Annuler",
+    "save": "Enregistrer"
+  },
+  "AdminLogs": {
+    "title": "Journaux d'activité du système",
+    "subtitle": "Suivi complet des actions des utilisateurs et des modifications du système.",
+    "search": "Rechercher des journaux...",
+    "allActions": "Toutes les actions",
+    "noMatch": "Aucun journal d'activité ne correspond à votre recherche.",
+    "timestamp": "Horodatage",
+    "user": "Utilisateur",
+    "action": "Action",
+    "details": "Détails"
+  },
+  "Share": {
+    "shareEvent": "Partager l'événement",
+    "shareDevice": "Partager via l'appareil",
+    "email": "E-mail",
+    "copied": "Copié !",
+    "copyLink": "Copier le lien"
+  },
+  "EventSurvey": {
+    "successTitle": "Commentaires soumis avec succès",
+    "successDesc": "Merci d'avoir participé à l'évaluation de cet événement.",
+    "feedbackTitle": "Commentaires sur l'événement",
+    "feedbackDesc": "Veuillez répondre aux questions suivantes pour nous aider à améliorer nos futurs événements.",
+    "answerPlaceholder": "Écrivez votre réponse ici...",
+    "submitFeedback": "Soumettre les commentaires"
+  },
+  "AdminEventDetail": {
+    "autoSaving": "Sauvegarde automatique...",
+    "autoSaved": "Sauvegarde automatique réussie",
+    "errorSaving": "Erreur de sauvegarde",
+    "savedSuccessfully": "Enregistré avec succès",
+    "backToEvents": "Retour aux événements",
+    "manageCustomReport": "Gérer le rapport personnalisé et l'enquête pour l'événement",
+    "saveChanges": "Enregistrer les modifications",
+    "details": "Détails",
+    "reportBuilder": "Générateur de rapports",
+    "surveyBuilder": "Générateur d'enquêtes",
+    "surveyAnalytics": "Analyse de l'enquête",
+    "historyNotes": "Historique et remarques",
+    "title": "Titre:",
+    "location": "Lieu:",
+    "dateLabel": "Date:",
+    "editDetails": "Modifier les détails",
+    "reportStructure": "Structure du rapport",
+    "addCustomFields": "Ajouter des champs personnalisés pour ce rapport d'événement",
+    "addField": "Ajouter un champ",
+    "downloadPdf": "Télécharger le PDF",
+    "hidePreview": "Masquer l'aperçu",
+    "previewReport": "Aperçu du rapport",
+    "noFieldsYet": "Aucun champ ajouté pour le moment",
+    "fieldTitle": "Titre du champ",
+    "egResults": "ex. Résultats et recommandations",
+    "content": "Contenu",
+    "writeContentHere": "Écrivez le contenu ici...",
+    "surveyQuestions": "Questions de l'enquête",
+    "designEvalForm": "Concevoir le formulaire d'évaluation pour cet événement",
+    "enableSurvey": "Activer l'enquête",
+    "textQuestion": "Question textuelle",
+    "choiceQuestion": "Question à choix",
+    "noQuestionsYet": "Aucune question ajoutée pour le moment",
+    "text": "Texte",
+    "choices": "Choix",
+    "typeQuestionHere": "Saisissez votre question ici",
+    "requiredQuestion": "Question obligatoire",
+    "addOption": "Ajouter une option",
+    "addNote": "Ajoutez une remarque pour l'équipe concernant cet événement...",
+    "add": "Ajouter",
+    "noHistory": "Aucun historique pour le moment"
+  },
+  "FAQ": {
+    "title": "Questions Fréquentes",
+    "subtitle": "Réponses aux questions les plus courantes",
+    "faqs": [
+      {
+        "q": "Qu'est-ce que le système d'événements FEPS ?",
+        "a": "C'est le système officiel de gestion et de publication des événements académiques de la Faculté d'Économie et de Sciences Politiques, Université du Caire."
+      },
+      {
+        "q": "Comment suivre les événements à venir ?",
+        "a": "Consultez la page du calendrier pour voir tous les événements publiés et naviguer entre les mois."
+      },
+      {
+        "q": "Puis-je ajouter des événements ?",
+        "a": "L'ajout d'événements est réservé aux utilisateurs autorisés (éditeur, gestionnaire ou administrateur)."
+      },
+      {
+        "q": "Comment obtenir un compte ?",
+        "a": "Les comptes sont créés par l'administrateur système. Contactez l'administration de la faculté."
+      },
+      {
+        "q": "Le système est-il multilingue ?",
+        "a": "Oui, le système prend en charge trois langues : arabe, anglais et français."
+      }
+    ]
+  },
+  "Terms": {
+    "title": "Conditions d'Utilisation",
+    "lastUpdated": "Dernière mise à jour : Janvier 2026",
+    "legal": "Légal",
+    "sections": [
+      {
+        "title": "1. Acceptation",
+        "content": "En utilisant le système d'événements FEPS, vous acceptez de respecter ces conditions."
+      },
+      {
+        "title": "2. Utilisation autorisée",
+        "content": "Ce système est destiné à la gestion et à la publication des événements académiques de la faculté. Toute utilisation non autorisée est interdite."
+      },
+      {
+        "title": "3. Comptes utilisateurs",
+        "content": "Les comptes sont créés par l'administrateur. Vous êtes responsable de la confidentialité de vos identifiants."
+      },
+      {
+        "title": "4. Contenu",
+        "content": "Tout le contenu publié est soumis à l'approbation de l'administration. La faculté se réserve le droit de modifier ou supprimer tout contenu."
+      },
+      {
+        "title": "5. Limitation de responsabilité",
+        "content": "Ce système est fourni « en l'état » sans aucune garantie. La faculté n'est pas responsable des dommages résultant de son utilisation."
+      }
+    ]
+  },
+  "Privacy": {
+    "title": "Politique de Confidentialité",
+    "lastUpdated": "Dernière mise à jour : Janvier 2026",
+    "privacy": "Confidentialité",
+    "sections": [
+      {
+        "title": "1. Collecte de données",
+        "content": "Nous collectons les données nécessaires pour fournir des services académiques via le système. Cela inclut votre nom, email et rôle."
+      },
+      {
+        "title": "2. Utilisation des données",
+        "content": "Vos données sont utilisées uniquement pour la gestion des événements et la communication officielle de la faculté."
+      },
+      {
+        "title": "3. Protection des données",
+        "content": "Nous prenons les mesures de sécurité appropriées pour protéger vos données contre tout accès ou modification non autorisés."
+      },
+      {
+        "title": "4. Partage de données",
+        "content": "Nous ne partageons vos données avec aucun tiers sauf obligation légale ou consentement explicite."
+      },
+      {
+        "title": "5. Droits de l'utilisateur",
+        "content": "Vous avez le droit de demander une copie de vos données ou leur suppression en contactant l'administrateur."
+      }
+    ]
   }
 }

@@ -4,7 +4,7 @@ import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { useTranslations } from 'next-intl'
 
-export default function AdminActions({ materialId, courseId }: { materialId: string; courseId: string }) {
+export default function AdminActions({ materialId }: { materialId: string }) {
   const router = useRouter()
   const t = useTranslations('Admin')
   const [loading, setLoading] = useState<'approve' | 'reject' | null>(null)

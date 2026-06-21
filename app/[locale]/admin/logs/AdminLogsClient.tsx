@@ -1,7 +1,8 @@
 'use client'
 
 import React, { useEffect, useState } from 'react'
-import { Activity, Clock, User, Filter, AlertCircle, Loader, Search } from 'lucide-react'
+import { useTranslations } from 'next-intl'
+import { Activity, Clock, Filter, AlertCircle, Loader, Search } from 'lucide-react'
 import { format } from 'date-fns'
 
 interface LogUser {
@@ -23,6 +24,7 @@ interface AuditLog {
 
 export default function AdminLogsClient({ locale }: { locale: string }) {
   const isAr = locale === 'ar'
+  const t = useTranslations('AdminLogs')
   const [logs, setLogs] = useState<AuditLog[]>([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
@@ -75,10 +77,10 @@ export default function AdminLogsClient({ locale }: { locale: string }) {
         <div>
           <h1 className="text-3xl font-serif text-feps-navy flex items-center gap-3">
             <Activity size={28} />
-            {isAr ? 'سجل النشاطات (Audit Logs)' : 'System Activity Logs'}
+            {t('title')}
           </h1>
           <p className="text-feps-ink-secondary mt-2 text-sm">
-            {isAr ? 'تتبع كامل لحركات المستخدمين وتعديلاتهم على النظام.' : 'Complete tracking of user actions and system modifications.'}
+            {t('subtitle')}
           </p>
         </div>
       </div>
@@ -88,7 +90,7 @@ export default function AdminLogsClient({ locale }: { locale: string }) {
           <Search size={16} className={`absolute top-3 ${isAr ? 'right-3' : 'left-3'} text-feps-ink/40`} />
           <input 
             type="text" 
-            placeholder={isAr ? 'ابحث في السجل...' : 'Search logs...'}
+            placeholder={t('search')}
             value={searchQuery}
             onChange={e => setSearchQuery(e.target.value)}
             className={`w-full border border-feps-ink/20 bg-feps-ink/5 p-2 focus:outline-none focus:border-feps-navy text-sm ${isAr ? 'pr-10' : 'pl-10'}`}
@@ -101,7 +103,7 @@ export default function AdminLogsClient({ locale }: { locale: string }) {
             onChange={e => setFilterAction(e.target.value)}
             className="border border-feps-ink/20 bg-feps-ink/5 p-2 focus:outline-none text-sm"
           >
-            <option value="ALL">{isAr ? 'جميع العمليات' : 'All Actions'}</option>
+            <option value="ALL">{t('allActions')}</option>
             {uniqueActions.map(act => <option key={act} value={act}>{act}</option>)}
           </select>
         </div>
@@ -116,17 +118,17 @@ export default function AdminLogsClient({ locale }: { locale: string }) {
       ) : filteredLogs.length === 0 ? (
         <div className="text-center py-20 text-feps-ink-secondary bg-white border border-feps-ink/10">
           <Activity size={40} className="mx-auto mb-4 opacity-20" />
-          <p>{isAr ? 'لا يوجد أي نشاط يطابق بحثك.' : 'No activity logs match your search.'}</p>
+          <p>{t('noMatch')}</p>
         </div>
       ) : (
         <div className="bg-white border border-feps-ink/20 overflow-x-auto shadow-sm">
           <table className="w-full text-left rtl:text-right text-sm">
             <thead>
               <tr className="bg-feps-ink/5 border-b border-feps-ink/20">
-                <th className="p-4 font-bold uppercase tracking-wider text-feps-ink-secondary">{isAr ? 'التاريخ والوقت' : 'Timestamp'}</th>
-                <th className="p-4 font-bold uppercase tracking-wider text-feps-ink-secondary">{isAr ? 'المستخدم' : 'User'}</th>
-                <th className="p-4 font-bold uppercase tracking-wider text-feps-ink-secondary">{isAr ? 'العملية' : 'Action'}</th>
-                <th className="p-4 font-bold uppercase tracking-wider text-feps-ink-secondary">{isAr ? 'التفاصيل' : 'Details'}</th>
+                <th className="p-4 font-bold uppercase tracking-wider text-feps-ink-secondary">{t('timestamp')}</th>
+                <th className="p-4 font-bold uppercase tracking-wider text-feps-ink-secondary">{t('user')}</th>
+                <th className="p-4 font-bold uppercase tracking-wider text-feps-ink-secondary">{t('action')}</th>
+                <th className="p-4 font-bold uppercase tracking-wider text-feps-ink-secondary">{t('details')}</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-feps-ink/10">

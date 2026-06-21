@@ -1,5 +1,28 @@
 import type { Metadata, Viewport } from 'next'
+import { Inter, Merriweather, Cairo } from 'next/font/google'
 import '../globals.css'
+
+const inter = Inter({
+  subsets: ['latin'],
+  weight: ['400', '500', '600', '700', '800'],
+  variable: '--font-inter',
+  display: 'swap',
+})
+
+const merriweather = Merriweather({
+  subsets: ['latin'],
+  weight: ['300', '400', '700', '900'],
+  style: ['normal', 'italic'],
+  variable: '--font-merriweather',
+  display: 'swap',
+})
+
+const cairo = Cairo({
+  subsets: ['arabic'],
+  weight: ['400', '500', '600', '700', '800'],
+  variable: '--font-cairo',
+  display: 'swap',
+})
 import { NextIntlClientProvider } from 'next-intl'
 import { getMessages } from 'next-intl/server'
 import Providers from '@/components/Providers'
@@ -8,12 +31,16 @@ import Footer from '@/components/Footer'
 import GuidedTour from '@/components/GuidedTour'
 
 export const metadata: Metadata = {
+  metadataBase: new URL(process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000'),
   title: 'FEPS Hub — Faculty of Economics & Political Science',
   description: 'The official academic materials platform for FEPS, Cairo University. Access lecture slides, section notes, assignments, past papers, and datasets.',
   keywords: ['FEPS', 'Cairo University', 'economics', 'political science', 'academic materials'],
   appleWebApp: {
     title: 'FEPS Events',
     statusBarStyle: 'default',
+  },
+  openGraph: {
+    images: ['/api/og'],
   },
 }
 
@@ -37,17 +64,12 @@ export default async function RootLayout({
   return (
     <html lang={locale} dir="ltr" suppressHydrationWarning>
       <head>
-        <link rel="preconnect" href="https://fonts.googleapis.com" />
-        <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
-        <link
-          href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Merriweather:ital,wght@0,300;0,400;0,700;0,900;1,400&family=Cairo:wght@400;500;600;700;800&display=swap"
-          rel="stylesheet"
-        />
+
         <link rel="icon" href="/feps-logo.png" />
         <link rel="apple-touch-icon" href="/feps-logo.png" />
         <link rel="manifest" href="/manifest.json" />
       </head>
-      <body dir={locale === 'ar' ? 'rtl' : 'ltr'}>
+      <body dir={locale === 'ar' ? 'rtl' : 'ltr'} className={`${inter.variable} ${merriweather.variable} ${cairo.variable}`}>
         <NextIntlClientProvider messages={messages} locale={locale}>
           <Providers>
             <Navbar />

@@ -3,7 +3,6 @@ export const dynamic = 'force-dynamic'
 import { prisma } from '@/lib/prisma'
 import { notFound } from 'next/navigation'
 import AdminEventDetailClient from './AdminEventDetailClient'
-import { getTranslations } from 'next-intl/server'
 
 interface PageProps {
   params: Promise<{ locale: string; id: string }>

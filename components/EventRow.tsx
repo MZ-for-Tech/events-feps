@@ -40,24 +40,24 @@ export default function EventRow({
   return (
     <Link
       href={`/${locale}/events/${id}`}
-      className="group block relative py-8 border-b border-feps-border hover:bg-feps-ink/[0.02] transition-colors"
+      className="group block relative py-6 border-b border-feps-border hover:bg-white transition-colors"
     >
-      <div className="flex flex-col sm:flex-row w-full gap-6 sm:gap-8 items-start sm:items-center">
+      <div className="flex flex-col sm:flex-row w-full gap-6 sm:gap-10 items-start sm:items-center">
         
-        {/* Stark Editorial Date */}
-        <div className="flex-shrink-0 w-24 sm:w-28 flex flex-col items-start">
-          <div className="font-mono text-xs uppercase tracking-widest text-feps-ink-secondary mb-2">
+        {/* Stark Editorial Date Box */}
+        <div className="flex-shrink-0 w-24 flex flex-col items-center justify-center p-3 border border-feps-border bg-feps-paper shadow-sm group-hover:border-feps-navy transition-colors">
+          <div className="font-mono text-[0.65rem] uppercase tracking-widest text-feps-ink-secondary mb-1 font-bold">
             {month} {year}
           </div>
-          <div className="font-serif text-5xl text-feps-ink leading-none">
+          <div className="font-serif text-4xl text-feps-navy leading-none">
             {day}
           </div>
         </div>
 
         {/* Title & Metadata */}
-        <div className={`flex-grow flex flex-col justify-center border-feps-border ${isAr ? 'sm:border-r sm:pr-8' : 'sm:border-l sm:pl-8'}`}>
-          <div className="flex flex-wrap items-center gap-3 mb-4">
-            <span className="font-mono text-[0.65rem] uppercase tracking-widest font-semibold text-feps-ink">
+        <div className="flex-grow flex flex-col justify-center">
+          <div className="flex flex-wrap items-center gap-3 mb-3">
+            <span className="font-mono text-[0.65rem] uppercase tracking-widest font-bold text-feps-navy bg-feps-gold/10 px-2 py-1 rounded-sm border border-feps-gold/30">
               {categoryLabel}
             </span>
             <div className="w-[3px] h-[3px] bg-feps-border rounded-full"></div>

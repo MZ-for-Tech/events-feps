@@ -2,7 +2,8 @@
 
 import React, { useState } from 'react'
 import { useRouter } from 'next/navigation'
-import { Plus, Edit2, Trash2, X, Check, Save, Loader } from 'lucide-react'
+import { useTranslations } from 'next-intl'
+import { Plus, Edit2, Trash2, X, Save, Loader } from 'lucide-react'
 import { EventCategoryData } from '@/components/EventCard'
 
 interface Props {
@@ -13,6 +14,7 @@ interface Props {
 export default function AdminCategoriesClient({ initialCategories, locale }: Props) {
   const router = useRouter()
   const isAr = locale === 'ar'
+  const t = useTranslations('AdminCategories')
 
   const [categories, setCategories] = useState(initialCategories)
   const [isModalOpen, setIsModalOpen] = useState(false)
@@ -256,13 +258,13 @@ export default function AdminCategoriesClient({ initialCategories, locale }: Pro
                     />
                     <div className="flex-1">
                       <p className="text-xs text-feps-ink-secondary leading-relaxed">
-                        {isAr ? 'اختر اللون الأساسي للتصنيف. سيتم حساب لون الخلفية الشفاف تلقائياً ليتناسب معه.' : 'Select the main category color. The transparent background color will be automatically calculated.'}
+                        {t('colorHint')}
                       </p>
                     </div>
                   </div>
                 </div>
                 <div className="pt-4 border-t border-feps-border">
-                  <div className="mb-2 text-xs font-bold text-feps-ink-secondary uppercase">{isAr ? 'معاينة' : 'Preview'}</div>
+                  <div className="mb-2 text-xs font-bold text-feps-ink-secondary uppercase">{t('preview')}</div>
                   <span 
                     className="px-3 py-1 font-mono text-xs font-bold uppercase tracking-widest inline-block"
                     style={{ color: form.color, backgroundColor: form.bg }}
@@ -277,7 +279,7 @@ export default function AdminCategoriesClient({ initialCategories, locale }: Pro
                   onClick={() => setIsModalOpen(false)}
                   className="px-6 py-2 border border-feps-ink/20 text-feps-ink text-sm font-bold uppercase tracking-widest hover:bg-feps-ink/5 transition-colors"
                 >
-                  {isAr ? 'إلغاء' : 'Cancel'}
+                  {t('cancel')}
                 </button>
                 <button
                   type="submit"
@@ -285,7 +287,7 @@ export default function AdminCategoriesClient({ initialCategories, locale }: Pro
                   className="flex items-center gap-2 px-6 py-2 bg-feps-ink text-feps-paper text-sm font-bold uppercase tracking-widest hover:bg-feps-navy transition-colors disabled:opacity-50"
                 >
                   {loading ? <Loader size={16} className="animate-spin" /> : <Save size={16} />}
-                  {isAr ? 'حفظ' : 'Save'}
+                  {t('save')}
                 </button>
               </div>
             </form>

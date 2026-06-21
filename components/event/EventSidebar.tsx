@@ -112,12 +112,11 @@ export default function EventSidebar({
 
       {/* Sharing / Actions Widget */}
       <div className="bg-white border-2 border-feps-navy p-4 flex flex-col gap-3">
-        <ShareButton 
+        <ShareButton
           title={title} 
           date={formattedStartDate}
           time={formattedStartTime}
           location={location}
-          isAr={isAr} 
         />
 
         {location && (

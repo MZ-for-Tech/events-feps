@@ -34,7 +34,7 @@ export default function EventAgenda({ agendaText, isAr, title }: EventAgendaProp
           text: c.text
         }
       })
-    } catch (e) {
+    } catch {
       // Fallback
     }
   }

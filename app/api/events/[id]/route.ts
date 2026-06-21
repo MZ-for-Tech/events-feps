@@ -66,7 +66,7 @@ export async function PATCH(
     const currentEvent = await prisma.event.findUnique({ where: { id } })
     
     // Clean updateData (remove undefined fields)
-    const cleanUpdateData = Object.fromEntries(Object.entries(updateData).filter(([_, v]) => v !== undefined))
+    const cleanUpdateData = Object.fromEntries(Object.entries(updateData).filter(([, v]) => v !== undefined))
 
     const updated = await prisma.event.update({
       where: { id },

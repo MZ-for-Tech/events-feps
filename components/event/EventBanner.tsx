@@ -1,4 +1,5 @@
 import React from 'react'
+import Image from 'next/image'
 
 interface EventBannerProps {
   imageUrl: string
@@ -10,10 +11,12 @@ export default function EventBanner({ imageUrl, title }: EventBannerProps) {
 
   return (
     <div className="relative w-full h-[220px] md:h-[380px] overflow-hidden border-2 border-feps-ink bg-feps-surface mt-6">
-      <img
+      <Image
         src={imageUrl}
-        className="w-full h-full object-cover"
+        className="object-cover"
         alt={title}
+        fill
+        priority
       />
     </div>
   )

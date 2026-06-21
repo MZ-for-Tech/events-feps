@@ -38,22 +38,10 @@ export default function Navbar() {
     return () => document.body.classList.remove('is-login-page')
   }, [isLoginPage])
 
-  const navLinkStyle = (path: string) => ({
-    color: isActive(path) ? 'var(--feps-gold)' : 'rgba(255,255,255,0.85)',
-    padding: '0.375rem 0.75rem',
-    borderRadius: 'var(--radius)',
-    fontWeight: 600,
-    fontSize: '0.875rem',
-    textDecoration: 'none',
-    background: isActive(path) ? 'rgba(245,168,0,0.1)' : 'transparent',
-    display: 'flex',
-    alignItems: 'center',
-    gap: '0.35rem',
-    transition: 'all 0.15s',
-  })
+
 
   return (
-    <nav className="fixed top-0 left-0 right-0 h-16 bg-feps-navy border-b border-feps-navy-dark shadow-md z-50 flex items-center" role="navigation" aria-label="Main navigation">
+    <nav className="fixed top-0 left-0 right-0 h-16 bg-feps-navy-dark border-b border-feps-navy shadow-md z-50 flex items-center" role="navigation" aria-label="Main navigation">
       <div className="container max-w-7xl mx-auto px-4 sm:px-6 flex items-center justify-between h-full relative">
         {/* Brand */}
         <Link data-tour="nav-brand" href={`/${locale}`} className="flex items-center gap-3 sm:gap-4 text-white hover:text-feps-gold transition-colors shrink-0" aria-label="FEPS Home" onClick={() => setMenuOpen(false)}>

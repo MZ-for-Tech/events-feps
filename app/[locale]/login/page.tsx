@@ -1,11 +1,7 @@
 import { getTranslations } from 'next-intl/server'
 import LoginForm from '@/components/LoginForm'
-import Link from 'next/link'
-import { ArrowLeft } from 'lucide-react'
 
-export default async function LoginPage({ params }: { params: Promise<{ locale: string }> }) {
-  const { locale } = await params
-  const t = await getTranslations('Home')
+export default async function LoginPage() {
   const tl = await getTranslations('Login')
 
   return (

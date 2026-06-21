@@ -1,22 +1,23 @@
 'use client'
 
 import React from 'react'
+import { useTranslations } from 'next-intl'
 import { PieChart, Pie, Cell, Tooltip, Legend, ResponsiveContainer } from 'recharts'
 import type { SurveyQuestion } from '@/app/[locale]/admin/events/[id]/AdminEventDetailClient'
 
 interface Props {
   responses: Array<{ id: string, answers: string | Record<string, string>, createdAt: string | Date }>
   questions: SurveyQuestion[]
-  isAr: boolean
 }
 
 const COLORS = ['#1a3a6e', '#bc9c65', '#4f46e5', '#10b981', '#f59e0b', '#ef4444', '#8b5cf6']
 
-export default function SurveyAnalytics({ responses, questions, isAr }: Props) {
+export default function SurveyAnalytics({ responses, questions }: Props) {
+  const t = useTranslations('AdminEvents')
   if (responses.length === 0) {
     return (
       <div className="text-center py-12 text-feps-ink-secondary border-2 border-dashed border-feps-ink/20">
-        {isAr ? 'لا توجد ردود بعد' : 'No responses yet'}
+        {t('noResponses')}
       </div>
     )
   }
@@ -32,7 +33,7 @@ export default function SurveyAnalytics({ responses, questions, isAr }: Props) {
     <div className="space-y-12">
       <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
         <div className="bg-feps-ink/5 p-4 border border-feps-ink/10 text-center">
-          <p className="text-xs font-bold uppercase tracking-widest text-feps-ink-secondary mb-1">{isAr ? 'إجمالي الردود' : 'Total Responses'}</p>
+          <p className="text-xs font-bold uppercase tracking-widest text-feps-ink-secondary mb-1">{t('totalResponses')}</p>
           <p className="text-3xl font-serif text-feps-navy">{responses.length}</p>
         </div>
       </div>
@@ -91,7 +92,7 @@ export default function SurveyAnalytics({ responses, questions, isAr }: Props) {
             <div key={q.id} className="border border-feps-ink/20 p-6 bg-white">
               <h3 className="font-bold text-lg mb-4">{index + 1}. {q.text}</h3>
               {textAnswers.length === 0 ? (
-                <p className="text-sm text-feps-ink-secondary italic">{isAr ? 'لا توجد إجابات نصية' : 'No text answers'}</p>
+                <p className="text-sm text-feps-ink-secondary italic">{t('noTextAnswers')}</p>
               ) : (
                 <div className="space-y-2 max-h-60 overflow-y-auto pr-4">
                   {textAnswers.map((ans, i) => (

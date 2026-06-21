@@ -3,7 +3,6 @@
 import { useState, useEffect, useCallback, useRef } from "react";
 import { ChevronLeft, ChevronRight, X, Sparkles, MapPin } from "lucide-react";
 import { useTranslations, useLocale } from "next-intl";
-import { useSession } from "next-auth/react";
 import { usePathname } from "next/navigation";
 
 interface Step {
@@ -39,12 +38,7 @@ const ADMIN_REPORTS_STEPS: Step[] = [
 ];
 
 export default function GuidedTour() {
-    const { data: session } = useSession();
-    const role = session?.user?.role;
     const pathname = usePathname();
-    const isAdmin = role === 'SUPERADMIN' || role === 'MANAGER';
-
-    
     const t = useTranslations('Tour');
     const locale = useLocale();
     const isAr = locale === 'ar';

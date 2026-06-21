@@ -22,10 +22,10 @@
   --color-feps-error:   #ef4444;
 
   /* Typography */
-  --font-serif:   'Merriweather', system-ui, serif;
-  --font-sans:    'Inter', system-ui, sans-serif;
-  --font-arabic:  'Cairo', sans-serif;
-  --font-mono:    'Inter', system-ui, sans-serif;
+  --font-serif:   var(--font-merriweather), system-ui, serif;
+  --font-sans:    var(--font-inter), system-ui, sans-serif;
+  --font-arabic:  var(--font-cairo), sans-serif;
+  --font-mono:    var(--font-inter), system-ui, sans-serif;
 }
 
 /* ─── FEPS Editorial Tokens ─────────────────────────────────── */
@@ -79,7 +79,7 @@
   }
 
   body {
-    font-family: 'Inter', system-ui, sans-serif;
+    font-family: var(--font-inter), system-ui, sans-serif;
     background: var(--feps-paper);
     color: var(--feps-ink);
     line-height: 1.6;
@@ -89,7 +89,7 @@
   }
 
   [lang="ar"], .arabic {
-    font-family: 'Cairo', sans-serif;
+    font-family: var(--font-cairo), sans-serif;
     direction: rtl;
     text-align: right;
   }
@@ -117,6 +117,12 @@
   flex: 1;
   display: flex;
   flex-direction: column;
+}
+
+.bg-grid-pattern {
+  background-size: 40px 40px;
+  background-image: linear-gradient(to right, rgba(15, 23, 42, 0.03) 1px, transparent 1px),
+                    linear-gradient(to bottom, rgba(15, 23, 42, 0.03) 1px, transparent 1px);
 }
 
 /* ─── Body styles removed ─────────────────────────────────── */

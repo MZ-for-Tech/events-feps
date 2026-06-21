@@ -120,7 +120,7 @@ export default function AdminEventsClient({ initialEvents, categories, locale, p
         {isOpen && (
           <div className="absolute z-50 w-full mt-1 bg-feps-paper border border-feps-ink/20 rounded shadow-lg max-h-60 overflow-y-auto" dir={isAr ? "rtl" : "ltr"}>
             {filteredOptions.length === 0 ? (
-              <div className={`px-3 py-2 text-sm text-feps-ink/50 ${isAr ? 'text-right' : 'text-left'}`}>No matches found / لا توجد قاعات</div>
+              <div className={`px-3 py-2 text-sm text-feps-ink/50 ${isAr ? 'text-right' : 'text-left'}`}>{t('noHalls')}</div>
             ) : (
               <div className="py-1">
                 {filteredOptions.map(opt => (
@@ -585,7 +585,7 @@ export default function AdminEventsClient({ initialEvents, categories, locale, p
             className={`flex items-center gap-2 px-6 py-3 text-xs font-bold uppercase tracking-widest border-b-2 transition-colors ${activeTab === 'active' ? 'border-feps-navy text-feps-navy bg-feps-navy/5' : 'border-transparent text-feps-ink-secondary hover:text-feps-ink'}`}
           >
             <FolderOpen size={14} />
-            {isAr ? 'الفعاليات الحالية' : 'Active Events'}
+            {t('activeEvents')}
             <span className="bg-feps-navy/10 text-feps-navy px-1.5 py-0.5 text-[10px]">
               {events.filter(e => (e.status || 'ACTIVE') === 'ACTIVE').length}
             </span>
@@ -595,7 +595,7 @@ export default function AdminEventsClient({ initialEvents, categories, locale, p
             className={`flex items-center gap-2 px-6 py-3 text-xs font-bold uppercase tracking-widest border-b-2 transition-colors ${activeTab === 'archived' ? 'border-feps-gold text-feps-ink bg-feps-gold/10' : 'border-transparent text-feps-ink-secondary hover:text-feps-ink'}`}
           >
             <Archive size={14} />
-            {isAr ? 'الأرشيف' : 'Archived'}
+            {t('archived')}
             <span className="bg-feps-gold/20 text-feps-ink px-1.5 py-0.5 text-[10px]">
               {events.filter(e => e.status === 'ARCHIVED').length}
             </span>
@@ -745,7 +745,7 @@ export default function AdminEventsClient({ initialEvents, categories, locale, p
                             <button
                               onClick={() => handleArchive(ev)}
                               className="bg-amber-50 text-amber-700 w-8 h-8 flex items-center justify-center hover:bg-amber-600 hover:text-white transition-colors"
-                              title={isAr ? 'إنهاء الفعالية وأرشفتها' : 'Mark as Completed & Archive'}
+                              title={t('markArchive')}
                             >
                               <Archive size={14} />
                             </button>
@@ -754,14 +754,14 @@ export default function AdminEventsClient({ initialEvents, categories, locale, p
                               <button
                                 onClick={() => router.push(`/${locale}/admin/events/${ev.id}`)}
                                 className="bg-feps-navy text-white w-8 h-8 flex items-center justify-center hover:bg-feps-gold hover:text-feps-navy transition-colors"
-                                title={isAr ? 'إدارة الفعالية (التقرير والاستبيان)' : 'Manage Event (Report & Survey)'}
+                                title={t('manageEvent')}
                               >
                                 <FileText size={14} />
                               </button>
                               <button
                                 onClick={() => handleRestore(ev)}
                                 className="bg-green-50 text-green-700 w-8 h-8 flex items-center justify-center hover:bg-green-600 hover:text-white transition-colors"
-                                title={isAr ? 'استعادة للنشطة' : 'Restore to Active'}
+                                title={t('restoreActive')}
                               >
                                 <ChevronRight size={14} />
                               </button>
@@ -854,7 +854,7 @@ export default function AdminEventsClient({ initialEvents, categories, locale, p
                           onClick={() => handleArchive(ev)}
                           className="bg-amber-50 text-amber-700 flex-1 py-1.5 rounded flex items-center justify-center gap-2 hover:bg-amber-600 hover:text-white transition-colors text-xs font-bold uppercase tracking-wider"
                         >
-                          <Archive size={12} /> {isAr ? 'أرشفة' : 'Archive'}
+                          <Archive size={12} /> {t('archive')}
                         </button>
                       ) : (
                         <>
@@ -862,13 +862,13 @@ export default function AdminEventsClient({ initialEvents, categories, locale, p
                             onClick={() => handleOpenReport(ev)}
                             className="bg-feps-navy text-white flex-1 py-1.5 rounded flex items-center justify-center gap-2 hover:bg-feps-gold hover:text-feps-navy transition-colors text-xs font-bold uppercase tracking-wider"
                           >
-                            <Printer size={12} /> {isAr ? 'تقرير' : 'Report'}
+                            <Printer size={12} /> {t('report')}
                           </button>
                           <button
                             onClick={() => handleRestore(ev)}
                             className="bg-green-50 text-green-700 flex-1 py-1.5 rounded flex items-center justify-center gap-2 hover:bg-green-600 hover:text-white transition-colors text-xs font-bold uppercase tracking-wider"
                           >
-                            <ChevronRight size={12} /> {isAr ? 'استعادة' : 'Restore'}
+                            <ChevronRight size={12} /> {t('restore')}
                           </button>
                         </>
                       )}
@@ -1342,7 +1342,7 @@ export default function AdminEventsClient({ initialEvents, categories, locale, p
             <div className="bg-feps-navy text-white px-6 py-5 flex items-center justify-between">
               <div>
                 <p className="font-mono text-xs uppercase tracking-widest text-white/60 mb-1">
-                  {isAr ? 'تقرير الفعالية' : 'Event Report'}
+                  {t('eventReport')}
                 </p>
                 <h3 className="m-0 font-serif font-bold text-lg leading-tight">
                   {isAr ? (reportModalEvent.titleAr || reportModalEvent.title) : reportModalEvent.title}
@@ -1371,13 +1371,13 @@ export default function AdminEventsClient({ initialEvents, categories, locale, p
               {/* Summary */}
               <div>
                 <label className="block text-start text-xs font-bold text-feps-ink mb-2 uppercase tracking-wider">
-                  {isAr ? 'الملخص' : 'Summary'}
+                  {t('summary')}
                 </label>
                 <textarea
                   rows={4}
                   value={reportForm.summary}
                   onChange={e => { setReportForm({ ...reportForm, summary: e.target.value }); setReportSaved(false) }}
-                  placeholder={isAr ? 'اكتب ملخص الفعالية...' : 'Enter event summary...'}
+                  placeholder={t('summaryPlaceholder')}
                   className="w-full px-4 py-3 border border-feps-ink/20 bg-feps-paper text-feps-ink text-sm focus:outline-none focus:border-feps-navy transition-colors resize-y font-inherit"
                 />
               </div>
@@ -1385,13 +1385,13 @@ export default function AdminEventsClient({ initialEvents, categories, locale, p
               {/* Results */}
               <div>
                 <label className="block text-start text-xs font-bold text-feps-ink mb-2 uppercase tracking-wider">
-                  {isAr ? 'النتائج والمخرجات' : 'Results & Outcomes'}
+                  {t('resultsOutcomes')}
                 </label>
                 <textarea
                   rows={4}
                   value={reportForm.results}
                   onChange={e => { setReportForm({ ...reportForm, results: e.target.value }); setReportSaved(false) }}
-                  placeholder={isAr ? 'اكتب نتائج الفعالية...' : 'Enter event results...'}
+                  placeholder={t('resultsPlaceholder')}
                   className="w-full px-4 py-3 border border-feps-ink/20 bg-feps-paper text-feps-ink text-sm focus:outline-none focus:border-feps-navy transition-colors resize-y font-inherit"
                 />
               </div>
@@ -1399,13 +1399,13 @@ export default function AdminEventsClient({ initialEvents, categories, locale, p
               {/* Recommendations */}
               <div>
                 <label className="block text-start text-xs font-bold text-feps-ink mb-2 uppercase tracking-wider">
-                  {isAr ? 'التوصيات' : 'Recommendations'}
+                  {t('recommendations')}
                 </label>
                 <textarea
                   rows={3}
                   value={reportForm.recommendations}
                   onChange={e => { setReportForm({ ...reportForm, recommendations: e.target.value }); setReportSaved(false) }}
-                  placeholder={isAr ? 'اكتب التوصيات...' : 'Enter recommendations...'}
+                  placeholder={t('recommendationsPlaceholder')}
                   className="w-full px-4 py-3 border border-feps-ink/20 bg-feps-paper text-feps-ink text-sm focus:outline-none focus:border-feps-navy transition-colors resize-y font-inherit"
                 />
               </div>
@@ -1416,7 +1416,7 @@ export default function AdminEventsClient({ initialEvents, categories, locale, p
                   {reportSaved && (
                     <span className="flex items-center gap-1.5 text-green-700 font-bold">
                       <CheckCircle size={14} />
-                      {isAr ? 'تم الحفظ' : 'Saved'}
+                      {t('saved')}
                     </span>
                   )}
                 </div>
@@ -1426,7 +1426,7 @@ export default function AdminEventsClient({ initialEvents, categories, locale, p
                     onClick={() => setReportModalEvent(null)}
                     className="bg-transparent border-2 border-feps-ink/20 text-feps-ink-secondary px-6 py-2.5 font-bold text-sm uppercase tracking-widest cursor-pointer transition-colors hover:border-feps-ink hover:text-feps-ink"
                   >
-                    {isAr ? 'إغلاق' : 'Close'}
+                    {t('close')}
                   </button>
                   <button
                     type="button"
@@ -1435,7 +1435,7 @@ export default function AdminEventsClient({ initialEvents, categories, locale, p
                     className="bg-feps-navy text-white border-2 border-feps-navy px-6 py-2.5 font-bold text-sm uppercase tracking-widest cursor-pointer flex items-center gap-2 transition-colors hover:bg-feps-gold hover:text-feps-navy hover:border-feps-gold disabled:opacity-50"
                   >
                     {reportSaving && <Loader size={14} className="animate-spin" />}
-                    {isAr ? 'حفظ البيانات' : 'Save Data'}
+                    {t('saveData')}
                   </button>
                 </div>
               </div>

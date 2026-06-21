@@ -3,10 +3,13 @@
 import { useState, useEffect } from 'react'
 import Link from 'next/link'
 import { useTranslations, useLocale } from 'next-intl'
+import { usePathname } from 'next/navigation'
 
 export default function Footer() {
   const t = useTranslations('Footer')
   const locale = useLocale()
+  const pathname = usePathname()
+  const isAdmin = pathname?.includes('/admin')
   const [developerUrl, setDeveloperUrl] = useState<string>('https://github.com/MZ-for-Tech')
 
   useEffect(() => {
@@ -27,7 +30,7 @@ export default function Footer() {
         background: 'var(--feps-navy-dark)',
         color: 'rgba(255,255,255,0.7)',
         padding: '2.5rem 0 1.5rem',
-        marginTop: '4rem',
+        marginTop: isAdmin ? '0' : '4rem',
       }}
     >
       <div className="container">
@@ -53,9 +56,9 @@ export default function Footer() {
                 { href: `/${locale}/events`, label: t('events') },
                 { href: 'http://feps.edu.eg/', label: t('officialWebsite'), external: true },
               ].map(l => (
-                <Link 
-                  key={l.href} 
-                  href={l.href} 
+                <Link
+                  key={l.href}
+                  href={l.href}
                   target={l.external ? "_blank" : undefined}
                   rel={l.external ? "noopener noreferrer" : undefined}
                   style={{ fontSize: '0.85rem', color: 'rgba(255,255,255,0.65)', textDecoration: 'none', transition: 'color 0.2s ease' }}
@@ -75,14 +78,14 @@ export default function Footer() {
             </h3>
             <nav aria-label="Social media" style={{ display: 'flex', flexDirection: 'column', gap: '0.4rem' }}>
               {[
-                { href: 'https://www.facebook.com/feps.cu.edu.eg', label: 'Facebook', external: true },
-                { href: 'https://twitter.com/FEPSCairoUni', label: 'Twitter (X)', external: true },
-                { href: 'https://www.linkedin.com/school/faculty-of-economics-and-political-science-cairo-university/', label: 'LinkedIn', external: true },
-                { href: 'https://www.youtube.com/user/FEPSCU', label: 'YouTube', external: true },
+                { href: 'https://www.facebook.com/fepsOfficial/', label: 'Facebook', external: true },
+                { href: 'https://x.com/FEPS_CU_Egypt', label: 'X', external: true },
+                { href: 'https://www.linkedin.com/school/feps-cu/', label: 'LinkedIn', external: true },
+                { href: 'https://www.youtube.com/channel/UC-AvTRKS5WARfp3NyYG6f9w', label: 'YouTube', external: true },
               ].map(l => (
-                <Link 
-                  key={l.href} 
-                  href={l.href} 
+                <Link
+                  key={l.href}
+                  href={l.href}
                   target="_blank"
                   rel="noopener noreferrer"
                   style={{ fontSize: '0.85rem', color: 'rgba(255,255,255,0.65)', textDecoration: 'none', transition: 'color 0.2s ease' }}
@@ -104,9 +107,9 @@ export default function Footer() {
               {[
                 { href: `/${locale}/faq`, label: t('faq') },
               ].map(l => (
-                <Link 
-                  key={l.href} 
-                  href={l.href} 
+                <Link
+                  key={l.href}
+                  href={l.href}
                   style={{ fontSize: '0.85rem', color: 'rgba(255,255,255,0.65)', textDecoration: 'none', transition: 'color 0.2s ease' }}
                   className="hover:text-white"
                 >
@@ -126,9 +129,9 @@ export default function Footer() {
                 { href: `/${locale}/terms`, label: t('termsOfUse') },
                 { href: `/${locale}/privacy`, label: t('privacyPolicy') },
               ].map(l => (
-                <Link 
-                  key={l.href} 
-                  href={l.href} 
+                <Link
+                  key={l.href}
+                  href={l.href}
                   style={{ fontSize: '0.85rem', color: 'rgba(255,255,255,0.65)', textDecoration: 'none', transition: 'color 0.2s ease' }}
                   className="hover:text-white"
                 >
@@ -156,9 +159,9 @@ export default function Footer() {
           <p style={{ fontSize: '0.78rem' }}>
             {t.rich('poweredBy', {
               mz: (chunks) => (
-                <a 
-                  href={developerUrl} 
-                  target="_blank" 
+                <a
+                  href={developerUrl}
+                  target="_blank"
                   rel="noopener noreferrer"
                   style={{ color: 'var(--feps-gold)', textDecoration: 'none', fontWeight: 'bold' }}
                   className="hover:text-white transition-colors"

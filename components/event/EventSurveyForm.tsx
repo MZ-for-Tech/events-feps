@@ -1,6 +1,7 @@
 'use client'
 
 import React, { useState } from 'react'
+import { useTranslations } from 'next-intl'
 import type { SurveyQuestion } from '@/app/[locale]/admin/events/[id]/AdminEventDetailClient'
 import { Send, CheckCircle, Loader } from 'lucide-react'
 
@@ -11,6 +12,7 @@ interface Props {
 }
 
 export default function EventSurveyForm({ eventId, questions, isAr }: Props) {
+  const t = useTranslations('EventSurvey')
   const [answers, setAnswers] = useState<Record<string, string>>({})
   const [submitting, setSubmitting] = useState(false)
   const [submitted, setSubmitted] = useState(false)
@@ -21,10 +23,10 @@ export default function EventSurveyForm({ eventId, questions, isAr }: Props) {
       <div className="bg-feps-navy/5 border-2 border-feps-navy p-8 text-center mt-12">
         <CheckCircle className="mx-auto text-feps-navy mb-4" size={48} />
         <h3 className="text-2xl font-serif text-feps-navy mb-2">
-          {isAr ? 'تم إرسال التقييم بنجاح' : 'Feedback submitted successfully'}
+          {t('successTitle')}
         </h3>
         <p className="text-feps-ink-secondary">
-          {isAr ? 'شكراً لمشاركتك في تقييم هذه الفعالية.' : 'Thank you for participating in evaluating this event.'}
+          {t('successDesc')}
         </p>
       </div>
     )
@@ -52,10 +54,10 @@ export default function EventSurveyForm({ eventId, questions, isAr }: Props) {
   return (
     <div className="mt-12 bg-feps-paper border-2 border-feps-navy p-6 md:p-10">
       <h3 className="text-2xl font-serif text-feps-navy mb-2 uppercase tracking-wider">
-        {isAr ? 'تقييم الفعالية' : 'Event Feedback'}
+        {t('feedbackTitle')}
       </h3>
       <p className="text-sm text-feps-ink-secondary mb-8">
-        {isAr ? 'نرجو منك الإجابة على الأسئلة التالية للمساعدة في تحسين الفعاليات القادمة.' : 'Please answer the following questions to help us improve future events.'}
+        {t('feedbackDesc')}
       </p>
 
       <form onSubmit={handleSubmit} className="space-y-8">
@@ -71,7 +73,7 @@ export default function EventSurveyForm({ eventId, questions, isAr }: Props) {
                 value={answers[q.id] || ''}
                 onChange={e => setAnswers(prev => ({ ...prev, [q.id]: e.target.value }))}
                 className="w-full border border-feps-ink/20 p-4 min-h-[100px] focus:outline-none focus:border-feps-navy bg-white"
-                placeholder={isAr ? 'اكتب إجابتك هنا...' : 'Write your answer here...'}
+                placeholder={t('answerPlaceholder')}
               />
             ) : (
               <div className="space-y-3 pl-4 rtl:pr-4 rtl:pl-0">
@@ -104,7 +106,7 @@ export default function EventSurveyForm({ eventId, questions, isAr }: Props) {
           className="w-full md:w-auto mt-8 flex items-center justify-center gap-2 bg-feps-navy hover:bg-black text-white px-8 py-4 font-bold uppercase tracking-widest transition-colors disabled:opacity-50"
         >
           {submitting ? <Loader className="animate-spin" size={20} /> : <Send size={20} className={isAr ? 'rotate-180' : ''} />}
-          {isAr ? 'إرسال التقييم' : 'Submit Feedback'}
+          {t('submitFeedback')}
         </button>
       </form>
     </div>
