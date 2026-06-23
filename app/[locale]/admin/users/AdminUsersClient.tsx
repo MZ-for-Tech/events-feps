@@ -1,9 +1,10 @@
 'use client'
 
-import React, { useState } from 'react'
+import React, { useState, useOptimistic, useTransition } from 'react'
 import { Shield, Plus, Edit2, Trash2, AlertCircle, Loader, Check } from 'lucide-react'
+import toast from 'react-hot-toast'
 import { PERMISSION_DEF } from '@/lib/permissions'
-import { useRouter } from 'next/navigation'
+
 import { useTranslations } from 'next-intl'
 import { Table, TableHeader, TableBody, TableRow, TableHead, TableCell } from '@/components/admin/AdminTable'
 import { AdminButton } from '@/components/admin/AdminButton'
@@ -27,7 +28,6 @@ interface Props {
 
 export default function AdminUsersClient({ initialUsers, locale, currentUserRole }: Props) {
   const isAr = locale === 'ar'
-  const router = useRouter()
   const t = useTranslations('AdminUsers')
   
   const [users, setUsers] = useState<User[]>(initialUsers)
@@ -42,8 +42,30 @@ export default function AdminUsersClient({ initialUsers, locale, currentUserRole
     permissions: [] as string[]
   })
   
-  const [loading, setLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
+
+  const [isPending, startTransition] = useTransition()
+
+  type OptimisticAction = 
+    | { type: 'ADD'; payload: User }
+    | { type: 'UPDATE'; payload: User }
+    | { type: 'DELETE'; id: string }
+
+  const [optimisticUsers, updateOptimisticUsers] = useOptimistic(
+    users,
+    (state, action: OptimisticAction) => {
+      switch (action.type) {
+        case 'ADD':
+          return [action.payload, ...state]
+        case 'UPDATE':
+          return state.map(u => u.id === action.payload.id ? action.payload : u)
+        case 'DELETE':
+          return state.filter(u => u.id !== action.id)
+        default:
+          return state
+      }
+    }
+  )
 
   const handleOpenCreate = () => {
     setEditingUser(null)
@@ -74,66 +96,84 @@ export default function AdminUsersClient({ initialUsers, locale, currentUserRole
     })
   }
 
-  const handleSubmit = async (e: React.FormEvent) => {
+  const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault()
-    setLoading(true)
     setError(null)
-    try {
-      const url = editingUser ? `/api/users/${editingUser.id}` : `/api/users`
-      const method = editingUser ? 'PATCH' : 'POST'
-      
-      const payload: Record<string, unknown> = { ...formData }
-      if (editingUser && !payload.password) {
-        delete payload.password // don't send empty password
-      }
-
-      const res = await fetch(url, {
-        method,
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(payload)
-      })
-
-      if (!res.ok) {
-        const txt = await res.text()
-        throw new Error(txt || 'Failed to save user')
-      }
-
-      const savedUser = await res.json()
-      // ensure permissions is parsed
-      savedUser.permissions = typeof savedUser.permissions === 'string' ? JSON.parse(savedUser.permissions) : savedUser.permissions
-      
-      if (editingUser) {
-        setUsers(users.map(u => u.id === savedUser.id ? { ...u, ...savedUser } : u))
-      } else {
-        setUsers([savedUser, ...users])
-      }
-      
-      setIsModalOpen(false)
-      router.refresh()
-    } catch (err: unknown) {
-      if (err instanceof Error) {
-        setError(err.message)
-      } else {
-        setError(String(err))
-      }
-    } finally {
-      setLoading(false)
+    
+    const optimisticUser: User = {
+      id: editingUser ? editingUser.id : `temp-${Date.now()}`,
+      name: formData.name,
+      email: formData.email,
+      role: formData.role,
+      permissions: formData.permissions,
+      createdAt: editingUser ? editingUser.createdAt : new Date().toISOString()
     }
+
+    startTransition(async () => {
+      updateOptimisticUsers({
+        type: editingUser ? 'UPDATE' : 'ADD',
+        payload: optimisticUser
+      })
+      setIsModalOpen(false)
+
+      try {
+        const url = editingUser ? `/api/users/${editingUser.id}` : `/api/users`
+        const method = editingUser ? 'PATCH' : 'POST'
+        
+        const payload: Record<string, unknown> = { ...formData }
+        if (editingUser && !payload.password) {
+          delete payload.password
+        }
+
+        const res = await fetch(url, {
+          method,
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(payload)
+        })
+
+        if (!res.ok) {
+          const txt = await res.text()
+          throw new Error(txt || 'Failed to save user')
+        }
+
+        const savedUser = await res.json()
+        savedUser.permissions = typeof savedUser.permissions === 'string' ? JSON.parse(savedUser.permissions) : savedUser.permissions
+        
+        if (editingUser) {
+          setUsers(prev => prev.map(u => u.id === savedUser.id ? { ...u, ...savedUser } : u))
+          toast.success(isAr ? 'تم تحديث المستخدم' : 'User updated')
+        } else {
+          setUsers(prev => [savedUser, ...prev])
+          toast.success(isAr ? 'تم إضافة المستخدم' : 'User added')
+        }
+      } catch (err: unknown) {
+        if (err instanceof Error) {
+          toast.error(err.message)
+        } else {
+          toast.error(String(err))
+        }
+      }
+    })
   }
 
-  const handleDelete = async (id: string) => {
+  const handleDelete = (id: string) => {
     if (!confirm(t('confirmDelete'))) return
-    try {
-      const res = await fetch(`/api/users/${id}`, { method: 'DELETE' })
-      if (!res.ok) throw new Error('Failed to delete')
-      setUsers(users.filter(u => u.id !== id))
-    } catch (err: unknown) {
-      if (err instanceof Error) {
-        alert(err.message)
-      } else {
-        alert(String(err))
+    
+    startTransition(async () => {
+      updateOptimisticUsers({ type: 'DELETE', id })
+      try {
+        const res = await fetch(`/api/users/${id}`, { method: 'DELETE' })
+        if (!res.ok) throw new Error('Failed to delete')
+        setUsers(prev => prev.filter(u => u.id !== id))
+        toast.success(isAr ? 'تم حذف المستخدم' : 'User deleted')
+      } catch (err: unknown) {
+        if (err instanceof Error) {
+          toast.error(err.message)
+        } else {
+          toast.error(String(err))
+        }
       }
-    }
+    })
   }
 
   return (
@@ -158,7 +198,7 @@ export default function AdminUsersClient({ initialUsers, locale, currentUserRole
           </TableRow>
         </TableHeader>
         <TableBody>
-          {users.map(user => (
+          {optimisticUsers.map(user => (
             <TableRow key={user.id}>
               <TableCell>
                 <div className="font-bold text-feps-ink">{user.name}</div>
@@ -303,16 +343,16 @@ export default function AdminUsersClient({ initialUsers, locale, currentUserRole
           <div className="flex gap-4 pt-6">
             <button
               type="submit"
-              disabled={loading}
+              disabled={isPending}
               className="flex-1 bg-feps-navy text-white py-3 font-bold uppercase tracking-widest hover:bg-black transition-colors disabled:opacity-50 flex items-center justify-center gap-2"
             >
-              {loading && <Loader size={16} className="animate-spin" />}
+              {isPending && <Loader size={16} className="animate-spin" />}
               {t('save')}
             </button>
             <button
               type="button"
               onClick={() => setIsModalOpen(false)}
-              disabled={loading}
+              disabled={isPending}
               className="flex-1 bg-feps-ink/10 text-feps-ink py-3 font-bold uppercase tracking-widest hover:bg-feps-ink/20 transition-colors disabled:opacity-50"
             >
               {t('cancel')}

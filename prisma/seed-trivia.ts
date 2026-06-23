@@ -18,7 +18,7 @@ async function main() {
   let count = 0
   for (const row of rows) {
     // Map Arabic correct answer letter to index
-    const correctLetter = row['الإجابة الصحيحة']?.trim()
+    const correctLetter = row['الإجابة الصحيحة']?.toString().trim()
     let correctIndex = 0
     if (correctLetter === 'أ') correctIndex = 0
     else if (correctLetter === 'ب') correctIndex = 1

@@ -1,8 +1,8 @@
 'use client'
 
-import React, { useState } from 'react'
-import { useRouter } from 'next/navigation'
+import React, { useState, useOptimistic, useTransition } from 'react'
 import { useTranslations } from 'next-intl'
+import toast from 'react-hot-toast'
 import { Plus, Edit2, Trash2, Save, Loader, Tags } from 'lucide-react'
 import { EventCategoryData } from '@/components/EventCard'
 import { Table, TableHeader, TableBody, TableRow, TableHead, TableCell } from '@/components/admin/AdminTable'
@@ -16,14 +16,35 @@ interface Props {
 }
 
 export default function AdminCategoriesClient({ initialCategories, locale }: Props) {
-  const router = useRouter()
   const isAr = locale === 'ar'
   const t = useTranslations('AdminCategories')
 
   const [categories, setCategories] = useState(initialCategories)
   const [isModalOpen, setIsModalOpen] = useState(false)
   const [editingCategory, setEditingCategory] = useState<EventCategoryData | null>(null)
-  const [loading, setLoading] = useState(false)
+
+  const [isPending, startTransition] = useTransition()
+
+  type OptimisticAction = 
+    | { type: 'ADD'; payload: EventCategoryData }
+    | { type: 'UPDATE'; payload: EventCategoryData }
+    | { type: 'DELETE'; id: string }
+
+  const [optimisticCategories, updateOptimisticCategories] = useOptimistic(
+    categories,
+    (state, action: OptimisticAction) => {
+      switch (action.type) {
+        case 'ADD':
+          return [action.payload, ...state]
+        case 'UPDATE':
+          return state.map(c => c.id === action.payload.id ? action.payload : c)
+        case 'DELETE':
+          return state.filter(c => c.id !== action.id)
+        default:
+          return state
+      }
+    }
+  )
 
   const [form, setForm] = useState({
     nameEn: '',
@@ -57,54 +78,72 @@ export default function AdminCategoriesClient({ initialCategories, locale }: Pro
     setIsModalOpen(true)
   }
 
-  async function handleDelete(id: string) {
+  function handleDelete(id: string) {
     if (!confirm(isAr ? 'هل أنت متأكد من حذف هذا التصنيف؟' : 'Are you sure you want to delete this category?')) return
 
-    try {
-      const res = await fetch(`/api/categories/${id}`, { method: 'DELETE' })
-      if (res.ok) {
-        setCategories(categories.filter(c => c.id !== id))
-        router.refresh()
-      } else {
-        const text = await res.text()
-        alert((isAr ? 'خطأ في الحذف: ' : 'Delete error: ') + text)
+    startTransition(async () => {
+      updateOptimisticCategories({ type: 'DELETE', id })
+      try {
+        const res = await fetch(`/api/categories/${id}`, { method: 'DELETE' })
+        if (res.ok) {
+          setCategories(prev => prev.filter(c => c.id !== id))
+          toast.success(isAr ? 'تم الحذف بنجاح' : 'Category deleted successfully')
+        } else {
+          toast.error(isAr ? 'خطأ في الحذف' : 'Failed to delete category')
+        }
+      } catch (err) {
+        console.error(err)
+        toast.error('Network error')
       }
-    } catch (err) {
-      console.error(err)
-    }
+    })
   }
 
-  async function handleSubmit(e: React.FormEvent) {
+  function handleSubmit(e: React.FormEvent) {
     e.preventDefault()
-    setLoading(true)
     
-    try {
-      const url = editingCategory ? `/api/categories/${editingCategory.id}` : '/api/categories'
-      const method = editingCategory ? 'PATCH' : 'POST'
-      
-      const res = await fetch(url, {
-        method,
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(form)
-      })
-
-      if (res.ok) {
-        const saved = await res.json()
-        if (editingCategory) {
-          setCategories(categories.map(c => c.id === saved.id ? saved : c))
-        } else {
-          setCategories([saved, ...categories])
-        }
-        setIsModalOpen(false)
-        router.refresh()
-      } else {
-        alert(isAr ? 'حدث خطأ أثناء الحفظ' : 'Error saving category')
-      }
-    } catch (err) {
-      console.error(err)
-    } finally {
-      setLoading(false)
+    const optimisticCategory: EventCategoryData = {
+      id: editingCategory ? editingCategory.id : `temp-${Date.now()}`,
+      nameEn: form.nameEn,
+      nameAr: form.nameAr,
+      nameFr: form.nameFr,
+      color: form.color,
+      bg: form.bg
     }
+
+    startTransition(async () => {
+      updateOptimisticCategories({
+        type: editingCategory ? 'UPDATE' : 'ADD',
+        payload: optimisticCategory
+      })
+      setIsModalOpen(false) // Close instantly
+
+      try {
+        const url = editingCategory ? `/api/categories/${editingCategory.id}` : '/api/categories'
+        const method = editingCategory ? 'PATCH' : 'POST'
+        
+        const res = await fetch(url, {
+          method,
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(form)
+        })
+
+        if (res.ok) {
+          const saved = await res.json()
+          if (editingCategory) {
+            setCategories(prev => prev.map(c => c.id === saved.id ? saved : c))
+            toast.success(isAr ? 'تم تحديث التصنيف' : 'Category updated')
+          } else {
+            setCategories(prev => [saved, ...prev])
+            toast.success(isAr ? 'تم إنشاء التصنيف' : 'Category created')
+          }
+        } else {
+          toast.error(isAr ? 'حدث خطأ أثناء الحفظ' : 'Error saving category')
+        }
+      } catch (err) {
+        console.error(err)
+        toast.error('Network error')
+      }
+    })
   }
 
   return (
@@ -131,7 +170,7 @@ export default function AdminCategoriesClient({ initialCategories, locale }: Pro
             </TableRow>
           </TableHeader>
           <TableBody>
-            {categories.map((cat) => (
+            {optimisticCategories.map((cat) => (
               <TableRow key={cat.id}>
                 <TableCell className="font-bold text-feps-ink">{cat.nameAr}</TableCell>
                 <TableCell className="text-feps-ink">{cat.nameEn}</TableCell>
@@ -164,7 +203,7 @@ export default function AdminCategoriesClient({ initialCategories, locale }: Pro
                 </TableCell>
               </TableRow>
             ))}
-            {categories.length === 0 && (
+            {optimisticCategories.length === 0 && (
               <TableRow>
                 <TableCell colSpan={5} className="px-6 py-8 text-center text-feps-ink-secondary">
                   {isAr ? 'لا يوجد تصنيفات.' : 'No categories found.'}
@@ -265,10 +304,10 @@ export default function AdminCategoriesClient({ initialCategories, locale }: Pro
             </button>
             <button
               type="submit"
-              disabled={loading}
+              disabled={isPending}
               className="flex items-center gap-2 px-6 py-2 bg-feps-ink text-feps-paper text-sm font-bold uppercase tracking-widest hover:bg-feps-navy transition-colors disabled:opacity-50"
             >
-              {loading ? <Loader size={16} className="animate-spin" /> : <Save size={16} />}
+              {isPending ? <Loader size={16} className="animate-spin" /> : <Save size={16} />}
               {t('save')}
             </button>
           </div>

@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react'
 import Link from 'next/link'
 import { useTranslations, useLocale } from 'next-intl'
 import { usePathname } from 'next/navigation'
+import { ExternalLink } from 'lucide-react'
 
 export default function Footer() {
   const t = useTranslations('Footer')
@@ -26,31 +27,35 @@ export default function Footer() {
   return (
     <footer
       role="contentinfo"
+      className="border-t-4 border-feps-gold bg-feps-navy-dark text-white relative overflow-hidden"
       style={{
-        background: 'var(--feps-navy-dark)',
-        color: 'rgba(255,255,255,0.7)',
-        padding: '2.5rem 0 1.5rem',
+        padding: '4rem 0 2rem',
         marginTop: isAdmin ? '0' : '4rem',
       }}
     >
-      <div className="container">
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(180px, 1fr))', gap: '2.5rem', marginBottom: '2rem' }}>
+      {/* Decorative Watermark for premium feel */}
+      <div className="absolute -bottom-24 -right-24 opacity-[0.03] pointer-events-none select-none">
+        <span className="font-serif text-[20rem] font-bold leading-none tracking-tighter text-white">FEPS</span>
+      </div>
+
+      <div className="container relative z-10">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-8 lg:gap-12 mb-12">
           {/* About */}
-          <div>
-            <h3 style={{ color: 'var(--feps-gold)', fontSize: '0.875rem', fontWeight: 700, marginBottom: '0.75rem', textTransform: 'uppercase', letterSpacing: '0.05em' }}>
+          <div className="lg:col-span-2 lg:pr-12 lg:border-r-2 border-white/10 rtl:lg:border-r-0 rtl:lg:border-l-2 rtl:lg:pl-12">
+            <h3 className="font-sans font-bold uppercase tracking-widest text-feps-gold text-sm mb-4 border-b-2 border-white/10 pb-2">
               {t('aboutTitle')}
             </h3>
-            <p style={{ fontSize: '0.82rem', lineHeight: 1.7 }}>
+            <p className="font-serif text-base leading-relaxed text-white/70">
               {t('aboutDesc')}
             </p>
           </div>
 
           {/* Quick links */}
           <div>
-            <h3 style={{ color: 'var(--feps-gold)', fontSize: '0.875rem', fontWeight: 700, marginBottom: '0.75rem', textTransform: 'uppercase', letterSpacing: '0.05em' }}>
+            <h3 className="font-sans font-bold uppercase tracking-widest text-feps-gold text-sm mb-4 border-b-2 border-white/10 pb-2">
               {t('quickLinks')}
             </h3>
-            <nav aria-label="Footer navigation" style={{ display: 'flex', flexDirection: 'column', gap: '0.4rem' }}>
+            <nav aria-label="Footer navigation" className="flex flex-col gap-3">
               {[
                 { href: `/${locale}`, label: t('home') },
                 { href: `/${locale}/events`, label: t('events') },
@@ -61,11 +66,10 @@ export default function Footer() {
                   href={l.href}
                   target={l.external ? "_blank" : undefined}
                   rel={l.external ? "noopener noreferrer" : undefined}
-                  style={{ fontSize: '0.85rem', color: 'rgba(255,255,255,0.65)', textDecoration: 'none', transition: 'color 0.2s ease' }}
-                  className="hover:text-white"
+                  className="group flex items-center font-sans text-sm font-medium text-white/70 hover:text-feps-gold hover:translate-x-1 rtl:hover:-translate-x-1 transition-transform"
                 >
-                  {l.label}
-                  {l.external && <span style={{ marginLeft: '4px', fontSize: '0.7rem', opacity: 0.7 }}>↗</span>}
+                  <span className="border-b border-transparent group-hover:border-feps-gold transition-colors">{l.label}</span>
+                  {l.external && <ExternalLink size={12} className="ms-1.5 opacity-50" />}
                 </Link>
               ))}
             </nav>
@@ -73,10 +77,10 @@ export default function Footer() {
 
           {/* Social Media */}
           <div>
-            <h3 style={{ color: 'var(--feps-gold)', fontSize: '0.875rem', fontWeight: 700, marginBottom: '0.75rem', textTransform: 'uppercase', letterSpacing: '0.05em' }}>
+            <h3 className="font-sans font-bold uppercase tracking-widest text-feps-gold text-sm mb-4 border-b-2 border-white/10 pb-2">
               {t('socialMedia')}
             </h3>
-            <nav aria-label="Social media" style={{ display: 'flex', flexDirection: 'column', gap: '0.4rem' }}>
+            <nav aria-label="Social media" className="flex flex-col gap-3">
               {[
                 { href: 'https://www.facebook.com/fepsOfficial/', label: 'Facebook', external: true },
                 { href: 'https://x.com/FEPS_CU_Egypt', label: 'X', external: true },
@@ -88,43 +92,21 @@ export default function Footer() {
                   href={l.href}
                   target="_blank"
                   rel="noopener noreferrer"
-                  style={{ fontSize: '0.85rem', color: 'rgba(255,255,255,0.65)', textDecoration: 'none', transition: 'color 0.2s ease' }}
-                  className="hover:text-white"
+                  className="group flex items-center font-sans text-sm font-medium text-white/70 hover:text-feps-gold hover:translate-x-1 rtl:hover:-translate-x-1 transition-transform"
                 >
-                  {l.label}
-                  <span style={{ marginLeft: '4px', fontSize: '0.7rem', opacity: 0.7 }}>↗</span>
+                  <span className="border-b border-transparent group-hover:border-feps-gold transition-colors">{l.label}</span>
+                  {l.external && <ExternalLink size={12} className="ms-1.5 opacity-50" />}
                 </Link>
               ))}
             </nav>
           </div>
 
-          {/* Help & Support */}
+          {/* Legal & Help */}
           <div>
-            <h3 style={{ color: 'var(--feps-gold)', fontSize: '0.875rem', fontWeight: 700, marginBottom: '0.75rem', textTransform: 'uppercase', letterSpacing: '0.05em' }}>
-              {t('helpSupport')}
-            </h3>
-            <nav aria-label="Help navigation" style={{ display: 'flex', flexDirection: 'column', gap: '0.4rem' }}>
-              {[
-                { href: `/${locale}/faq`, label: t('faq') },
-              ].map(l => (
-                <Link
-                  key={l.href}
-                  href={l.href}
-                  style={{ fontSize: '0.85rem', color: 'rgba(255,255,255,0.65)', textDecoration: 'none', transition: 'color 0.2s ease' }}
-                  className="hover:text-white"
-                >
-                  {l.label}
-                </Link>
-              ))}
-            </nav>
-          </div>
-
-          {/* Legal & Privacy */}
-          <div>
-            <h3 style={{ color: 'var(--feps-gold)', fontSize: '0.875rem', fontWeight: 700, marginBottom: '0.75rem', textTransform: 'uppercase', letterSpacing: '0.05em' }}>
+            <h3 className="font-sans font-bold uppercase tracking-widest text-feps-gold text-sm mb-4 border-b-2 border-white/10 pb-2">
               {t('legalPrivacy')}
             </h3>
-            <nav aria-label="Legal navigation" style={{ display: 'flex', flexDirection: 'column', gap: '0.4rem' }}>
+            <nav aria-label="Legal navigation" className="flex flex-col gap-3 mb-8">
               {[
                 { href: `/${locale}/terms`, label: t('termsOfUse') },
                 { href: `/${locale}/privacy`, label: t('privacyPolicy') },
@@ -132,39 +114,34 @@ export default function Footer() {
                 <Link
                   key={l.href}
                   href={l.href}
-                  style={{ fontSize: '0.85rem', color: 'rgba(255,255,255,0.65)', textDecoration: 'none', transition: 'color 0.2s ease' }}
-                  className="hover:text-white"
+                  className="group flex items-center font-sans text-sm font-medium text-white/70 hover:text-feps-gold hover:translate-x-1 rtl:hover:-translate-x-1 transition-transform"
                 >
-                  {l.label}
+                  <span className="border-b border-transparent group-hover:border-feps-gold transition-colors">{l.label}</span>
                 </Link>
               ))}
             </nav>
-          </div>
-
-          {/* Contact */}
-          <div>
-            <h3 style={{ color: 'var(--feps-gold)', fontSize: '0.875rem', fontWeight: 700, marginBottom: '0.75rem', textTransform: 'uppercase', letterSpacing: '0.05em' }}>
+            
+            <h3 className="font-sans font-bold uppercase tracking-widest text-feps-gold text-sm mb-4 border-b-2 border-white/10 pb-2">
               {t('contact')}
             </h3>
-            <p style={{ fontSize: '0.82rem', lineHeight: 1.7 }}>
+            <p className="font-sans text-sm leading-relaxed text-white/70">
               {t('address')}
             </p>
           </div>
         </div>
 
-        <div style={{ borderTop: '1px solid rgba(255,255,255,0.1)', paddingTop: '1rem', display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '0.5rem' }}>
-          <p style={{ fontSize: '0.78rem' }}>
+        <div className="mt-16 pt-6 border-t-2 border-white/10 flex justify-between items-center flex-wrap gap-4 font-sans text-xs font-bold tracking-widest uppercase text-white/50">
+          <p>
             {t('copyright', { year: new Date().getFullYear() })}
           </p>
-          <p style={{ fontSize: '0.78rem' }}>
+          <p>
             {t.rich('poweredBy', {
               mz: (chunks) => (
                 <a
                   href={developerUrl}
                   target="_blank"
                   rel="noopener noreferrer"
-                  style={{ color: 'var(--feps-gold)', textDecoration: 'none', fontWeight: 'bold' }}
-                  className="hover:text-white transition-colors"
+                  className="text-white hover:text-feps-gold border-b border-transparent hover:border-feps-gold transition-colors ms-1"
                 >
                   {chunks}
                 </a>

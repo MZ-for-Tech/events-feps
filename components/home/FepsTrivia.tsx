@@ -307,12 +307,11 @@ export default function FepsTrivia() {
     return (
       <button 
         onClick={() => setIsOpen(true)}
-        className="fixed bottom-6 right-6 lg:bottom-10 lg:right-10 z-50 flex items-center justify-center w-16 h-16 bg-gradient-to-br from-feps-navy to-slate-900 text-white rounded-full shadow-[0_10px_30px_-10px_rgba(20,30,60,0.8)] hover:shadow-[0_20px_40px_-15px_rgba(20,30,60,0.9)] hover:-translate-y-2 transition-all duration-300 border border-white/10 group"
+        className="fixed bottom-6 right-6 lg:bottom-10 lg:right-10 z-50 flex items-center justify-center w-14 h-14 bg-feps-paper border-2 border-feps-navy text-feps-navy shadow-lg hover:bg-feps-navy hover:text-white hover:-translate-y-1 transition-all duration-200 group"
         aria-label={t('trigger')}
       >
-        <div className="absolute inset-0 rounded-full bg-feps-gold/20 animate-ping opacity-20" />
-        <Brain size={28} className="group-hover:scale-110 transition-transform duration-300" />
-        <span className={`absolute ${isAr ? 'left-full ml-4' : 'right-full mr-4'} top-1/2 -translate-y-1/2 bg-white text-slate-800 font-bold px-4 py-2 text-sm shadow-xl rounded-xl whitespace-nowrap opacity-0 group-hover:opacity-100 transition-all duration-300 ${isAr ? '-translate-x-4 group-hover:translate-x-0' : 'translate-x-4 group-hover:translate-x-0'} pointer-events-none border border-slate-100`}>
+        <Brain size={26} className="group-hover:scale-110 transition-transform duration-200" />
+        <span className={`absolute ${isAr ? 'left-full ml-4' : 'right-full mr-4'} top-1/2 -translate-y-1/2 bg-feps-navy text-white font-serif px-4 py-2 text-sm shadow-md whitespace-nowrap opacity-0 group-hover:opacity-100 transition-all duration-200 ${isAr ? '-translate-x-4 group-hover:translate-x-0' : 'translate-x-4 group-hover:translate-x-0'} pointer-events-none`}>
           {t('trigger')}
         </span>
       </button>

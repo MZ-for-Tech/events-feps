@@ -89,8 +89,7 @@ export default function CalendarGrid({
                             style={{
                               background: meta.bg,
                               color: 'var(--feps-ink)',
-                              borderLeft: isAr ? 'none' : `3px solid ${meta.color}`,
-                              borderRight: isAr ? `3px solid ${meta.color}` : 'none',
+                              border: `1px solid ${meta.color}40`, /* 40 is hex for 25% opacity */
                             }}
                             title={isAr && ev.titleAr ? ev.titleAr : ev.title}
                           >

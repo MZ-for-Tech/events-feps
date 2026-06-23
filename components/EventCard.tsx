@@ -38,14 +38,14 @@ export default function EventCard({
   const isAr = locale === 'ar'
   const categoryLabel = locale === 'ar' ? category.nameAr : locale === 'fr' ? category.nameFr : category.nameEn
 
-  const formattedDate = start.toLocaleDateString(isAr ? 'ar-EG' : 'en-US', {
+  const formattedDate = start.toLocaleDateString(isAr ? 'ar-EG-u-nu-latn' : 'en-US', {
     weekday: 'long',
     day: 'numeric',
     month: 'short',
     year: 'numeric',
   })
 
-  const formattedTime = start.toLocaleTimeString(isAr ? 'ar-EG' : 'en-US', {
+  const formattedTime = start.toLocaleTimeString(isAr ? 'ar-EG-u-nu-latn' : 'en-US', {
     hour: '2-digit',
     minute: '2-digit',
   })

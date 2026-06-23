@@ -12,7 +12,7 @@ export async function GET(request: Request) {
     const hasTitle = searchParams.has('title')
     const title = hasTitle
       ? searchParams.get('title')?.slice(0, 100)
-      : 'FEPS Hub — Faculty of Economics & Political Science'
+      : 'FEPS Events — Faculty of Economics & Political Science'
       
     const category = searchParams.get('category') || 'Academic Materials'
     

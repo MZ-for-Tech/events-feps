@@ -3,7 +3,7 @@
 import React, { useState, useEffect } from 'react'
 import dynamic from 'next/dynamic'
 import { CalendarEvent } from '../calendar/types'
-import { Download, Eye, FileSpreadsheet } from 'lucide-react'
+import { Download, Eye, FileSpreadsheet, Settings2 } from 'lucide-react'
 import { EventCategoryData } from '../EventCard'
 
 // Dynamically import react-pdf components to avoid SSR issues
@@ -57,6 +57,22 @@ export default function ReportGenerator({ events, categories }: Props) {
   
   const [showPreview, setShowPreview] = useState(false)
   const [isClient, setIsClient] = useState(false)
+  
+  const [showTextConfig, setShowTextConfig] = useState(false)
+  
+  const [customReportTitle, setCustomReportTitle] = useState(t('reportTitle'))
+  const [customUniversity, setCustomUniversity] = useState(t('university'))
+  const [customFaculty, setCustomFaculty] = useState(t('faculty'))
+  const [customDepartment, setCustomDepartment] = useState(t('department'))
+  const [customDescription, setCustomDescription] = useState(t('description'))
+  const [customSummaryPrefix, setCustomSummaryPrefix] = useState(t('summaryPrefix'))
+  const [customDetailedPrefix, setCustomDetailedPrefix] = useState(tAdmin('detailedAgendaPrefix') || 'Event Agenda & Details:')
+  const [customDatePrefix, setCustomDatePrefix] = useState(t('datePrefix'))
+  const [customColDateTime, setCustomColDateTime] = useState(t('colDateTime'))
+  const [customColEventLocation, setCustomColEventLocation] = useState(t('colEventLocation'))
+  const [customColCategory, setCustomColCategory] = useState(t('colCategory'))
+  const [customLocPrefix, setCustomLocPrefix] = useState(t('locPrefix'))
+  const [customFooter, setCustomFooter] = useState(t('footer'))
 
   useEffect(() => {
     // eslint-disable-next-line react-hooks/set-state-in-effect
@@ -96,25 +112,25 @@ export default function ReportGenerator({ events, categories }: Props) {
     periodDisplay = tAdmin('statusAll')
   }
 
-  const reportTitle = t('reportTitle')
+  const reportTitle = customReportTitle
   const filename = `FEPS_Report_${new Date().toISOString().split('T')[0]}.pdf`
 
   const translations: ReportTranslations = {
-    university: t('university'),
-    faculty: t('faculty'),
-    department: t('department'),
-    datePrefix: t('datePrefix'),
-    summaryPrefix: t('summaryPrefix'),
-    description: t('description'),
-    colDateTime: t('colDateTime'),
-    colEventLocation: t('colEventLocation'),
-    colCategory: t('colCategory'),
+    university: customUniversity,
+    faculty: customFaculty,
+    department: customDepartment,
+    datePrefix: customDatePrefix,
+    summaryPrefix: customSummaryPrefix,
+    description: customDescription,
+    colDateTime: customColDateTime,
+    colEventLocation: customColEventLocation,
+    colCategory: customColCategory,
     noEvents: t('noEvents'),
-    locPrefix: t('locPrefix'),
-    footer: t('footer'),
+    locPrefix: customLocPrefix,
+    footer: customFooter,
     pagePrefix: t('pagePrefix'),
     pageOf: t('pageOf'),
-    detailedAgendaPrefix: tAdmin('detailedAgendaPrefix') || 'Event Agenda & Details:'
+    detailedAgendaPrefix: customDetailedPrefix
   }
 
   const downloadCSV = () => {
@@ -133,7 +149,7 @@ export default function ReportGenerator({ events, categories }: Props) {
       const typeMeta = ev.category
       const typeStr = `"${isAr ? typeMeta?.nameAr : typeMeta?.nameEn}"`
       const titleStr = `"${(ev.titleAr || ev.title).replace(/"/g, '""')}"`
-      const dateStr = `"${new Date(ev.startDate).toLocaleString(isAr ? 'ar-EG' : 'en-US')}"`
+      const dateStr = `"${new Date(ev.startDate).toLocaleString(isAr ? 'ar-EG-u-nu-latn' : 'en-US')}"`
       const locStr = `"${(ev.location || '').replace(/"/g, '""')}"`
       const pubStr = ev.published ? tAdmin('statusPublished') : tAdmin('statusDraft')
       
@@ -243,6 +259,82 @@ export default function ReportGenerator({ events, categories }: Props) {
         </div>
 
       </div>
+
+      {/* Text Configuration Toggle */}
+      <div className="mb-4">
+        <button 
+          onClick={() => setShowTextConfig(!showTextConfig)}
+          className={`flex items-center gap-2 px-6 py-3 font-bold text-sm transition-colors border ${
+            showTextConfig 
+              ? 'bg-feps-ink text-feps-paper border-feps-ink hover:bg-black' 
+              : 'bg-transparent text-feps-ink border-feps-ink/20 hover:bg-feps-ink/5'
+          } cursor-pointer w-full md:w-auto justify-center`}
+        >
+          <Settings2 size={16} />
+          {showTextConfig ? (isAr ? 'إخفاء إعدادات النصوص' : 'Hide Text Configuration') : (isAr ? 'تخصيص نصوص التقرير' : 'Customize Report Text')}
+        </button>
+      </div>
+
+      {showTextConfig && (
+        <div className="mb-8 p-6 bg-feps-ink/5 border border-feps-ink/10">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div className="flex flex-col gap-2">
+              <label className="text-xs font-bold text-feps-ink uppercase tracking-wider">{isAr ? 'عنوان التقرير' : 'Report Title'}</label>
+              <input type="text" value={customReportTitle} onChange={e => setCustomReportTitle(e.target.value)} className="w-full p-2 border border-feps-ink/20 bg-feps-paper text-sm text-feps-ink focus:outline-none focus:border-feps-ink" />
+            </div>
+            <div className="flex flex-col gap-2">
+              <label className="text-xs font-bold text-feps-ink uppercase tracking-wider">{isAr ? 'الجامعة' : 'University'}</label>
+              <input type="text" value={customUniversity} onChange={e => setCustomUniversity(e.target.value)} className="w-full p-2 border border-feps-ink/20 bg-feps-paper text-sm text-feps-ink focus:outline-none focus:border-feps-ink" />
+            </div>
+            <div className="flex flex-col gap-2">
+              <label className="text-xs font-bold text-feps-ink uppercase tracking-wider">{isAr ? 'الكلية' : 'Faculty'}</label>
+              <input type="text" value={customFaculty} onChange={e => setCustomFaculty(e.target.value)} className="w-full p-2 border border-feps-ink/20 bg-feps-paper text-sm text-feps-ink focus:outline-none focus:border-feps-ink" />
+            </div>
+            <div className="flex flex-col gap-2">
+              <label className="text-xs font-bold text-feps-ink uppercase tracking-wider">{isAr ? 'القسم / الجهة' : 'Department'}</label>
+              <input type="text" value={customDepartment} onChange={e => setCustomDepartment(e.target.value)} className="w-full p-2 border border-feps-ink/20 bg-feps-paper text-sm text-feps-ink focus:outline-none focus:border-feps-ink" />
+            </div>
+            <div className="flex flex-col gap-2 md:col-span-2">
+              <label className="text-xs font-bold text-feps-ink uppercase tracking-wider">{isAr ? 'وصف التقرير' : 'Description'}</label>
+              <textarea rows={3} value={customDescription} onChange={e => setCustomDescription(e.target.value)} className="w-full p-2 border border-feps-ink/20 bg-feps-paper text-sm text-feps-ink focus:outline-none focus:border-feps-ink resize-none" />
+            </div>
+            <div className="flex flex-col gap-2">
+              <label className="text-xs font-bold text-feps-ink uppercase tracking-wider">{isAr ? 'عنوان الملخص' : 'Summary Subtitle'}</label>
+              <input type="text" value={customSummaryPrefix} onChange={e => setCustomSummaryPrefix(e.target.value)} className="w-full p-2 border border-feps-ink/20 bg-feps-paper text-sm text-feps-ink focus:outline-none focus:border-feps-ink" />
+            </div>
+            <div className="flex flex-col gap-2">
+              <label className="text-xs font-bold text-feps-ink uppercase tracking-wider">{isAr ? 'عنوان التفاصيل' : 'Detailed Subtitle'}</label>
+              <input type="text" value={customDetailedPrefix} onChange={e => setCustomDetailedPrefix(e.target.value)} className="w-full p-2 border border-feps-ink/20 bg-feps-paper text-sm text-feps-ink focus:outline-none focus:border-feps-ink" />
+            </div>
+
+            {/* Additional fields */}
+            <div className="flex flex-col gap-2">
+              <label className="text-xs font-bold text-feps-ink uppercase tracking-wider">{isAr ? 'بادئة التاريخ' : 'Date Prefix'}</label>
+              <input type="text" value={customDatePrefix} onChange={e => setCustomDatePrefix(e.target.value)} className="w-full p-2 border border-feps-ink/20 bg-feps-paper text-sm text-feps-ink focus:outline-none focus:border-feps-ink" />
+            </div>
+            <div className="flex flex-col gap-2">
+              <label className="text-xs font-bold text-feps-ink uppercase tracking-wider">{isAr ? 'بادئة المكان' : 'Location Prefix'}</label>
+              <input type="text" value={customLocPrefix} onChange={e => setCustomLocPrefix(e.target.value)} className="w-full p-2 border border-feps-ink/20 bg-feps-paper text-sm text-feps-ink focus:outline-none focus:border-feps-ink" />
+            </div>
+            <div className="flex flex-col gap-2">
+              <label className="text-xs font-bold text-feps-ink uppercase tracking-wider">{isAr ? 'عمود الوقت/التاريخ' : 'Time/Date Column'}</label>
+              <input type="text" value={customColDateTime} onChange={e => setCustomColDateTime(e.target.value)} className="w-full p-2 border border-feps-ink/20 bg-feps-paper text-sm text-feps-ink focus:outline-none focus:border-feps-ink" />
+            </div>
+            <div className="flex flex-col gap-2">
+              <label className="text-xs font-bold text-feps-ink uppercase tracking-wider">{isAr ? 'عمود المكان' : 'Location Column'}</label>
+              <input type="text" value={customColEventLocation} onChange={e => setCustomColEventLocation(e.target.value)} className="w-full p-2 border border-feps-ink/20 bg-feps-paper text-sm text-feps-ink focus:outline-none focus:border-feps-ink" />
+            </div>
+            <div className="flex flex-col gap-2">
+              <label className="text-xs font-bold text-feps-ink uppercase tracking-wider">{isAr ? 'عمود الفئة' : 'Category Column'}</label>
+              <input type="text" value={customColCategory} onChange={e => setCustomColCategory(e.target.value)} className="w-full p-2 border border-feps-ink/20 bg-feps-paper text-sm text-feps-ink focus:outline-none focus:border-feps-ink" />
+            </div>
+            <div className="flex flex-col gap-2">
+              <label className="text-xs font-bold text-feps-ink uppercase tracking-wider">{isAr ? 'تذييل الصفحة' : 'Footer Text'}</label>
+              <input type="text" value={customFooter} onChange={e => setCustomFooter(e.target.value)} className="w-full p-2 border border-feps-ink/20 bg-feps-paper text-sm text-feps-ink focus:outline-none focus:border-feps-ink" />
+            </div>
+          </div>
+        </div>
+      )}
 
       <div className="bg-feps-ink/5 p-4 mb-8 border border-feps-ink/10 border-l-4 border-l-feps-ink">
         <div className="font-bold text-sm text-feps-ink mb-2">{tAdmin('reportSummary')}</div>

@@ -108,12 +108,12 @@ export function AdminEventsTable({
               {filteredEvents.map(ev => {
                 const meta = ev.category || { nameAr: 'غير محدد', nameEn: 'Unknown', nameFr: 'Inconnu', color: 'var(--feps-navy)', bg: 'rgba(26,58,110,0.1)' }
                 const date = new Date(ev.startDate)
-                const formattedDate = date.toLocaleDateString(isAr ? 'ar-EG' : 'en-US', {
+                const formattedDate = date.toLocaleDateString(isAr ? 'ar-EG-u-nu-latn' : 'en-US', {
                   month: 'short',
                   day: 'numeric',
                   year: 'numeric',
                 })
-                const formattedTime = date.toLocaleTimeString(isAr ? 'ar-EG' : 'en-US', {
+                const formattedTime = date.toLocaleTimeString(isAr ? 'ar-EG-u-nu-latn' : 'en-US', {
                   hour: '2-digit',
                   minute: '2-digit',
                 })
@@ -251,12 +251,12 @@ export function AdminEventsTable({
             {filteredEvents.map(ev => {
               const meta = ev.category || { nameAr: 'غير محدد', nameEn: 'Unknown', nameFr: 'Inconnu', color: 'var(--feps-navy)', bg: 'rgba(26,58,110,0.1)' }
               const date = new Date(ev.startDate)
-              const formattedDate = date.toLocaleDateString(isAr ? 'ar-EG' : 'en-US', {
+              const formattedDate = date.toLocaleDateString(isAr ? 'ar-EG-u-nu-latn' : 'en-US', {
                 month: 'short',
                 day: 'numeric',
                 year: 'numeric',
               })
-              const formattedTime = date.toLocaleTimeString(isAr ? 'ar-EG' : 'en-US', {
+              const formattedTime = date.toLocaleTimeString(isAr ? 'ar-EG-u-nu-latn' : 'en-US', {
                 hour: '2-digit',
                 minute: '2-digit',
               })

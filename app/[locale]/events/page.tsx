@@ -1,8 +1,5 @@
 import { prisma } from '@/lib/prisma'
 import EventCalendar from '@/components/EventCalendar'
-import { ShieldAlert } from 'lucide-react'
-import { auth } from '@/lib/auth'
-import Link from 'next/link'
 import { getTranslations } from 'next-intl/server'
 
 interface PageProps {
@@ -13,9 +10,6 @@ export default async function EventsPage({ params }: PageProps) {
   const { locale } = await params
 
   const t = await getTranslations({ locale, namespace: 'EventsPage' })
-  const session = await auth()
-  const isAdmin = !!session?.user
-
   // Fetch initial events for current month
   const today = new Date()
   const currentYear = today.getFullYear()
@@ -56,36 +50,29 @@ export default async function EventsPage({ params }: PageProps) {
   return (
     <div className="min-h-screen bg-feps-paper pb-24">
       {/* Editorial Header */}
-      <div className="border-b border-feps-border pt-8 pb-6">
-        <div className="container max-w-5xl">
-          <div className="flex items-center gap-4 mb-4">
-            <div className="h-[40px] w-[3px] bg-feps-ink"></div>
-            <span className="font-sans text-xs uppercase tracking-widest font-semibold text-feps-ink-secondary">
+      <div className="border-b border-feps-border pt-8 pb-16 bg-grid-pattern relative overflow-hidden">
+        {/* Subtle light bloom for depth */}
+        <div className="absolute top-0 left-1/2 -translate-x-1/2 w-3/4 h-[500px] bg-feps-navy/5 rounded-full blur-[120px] pointer-events-none" />
+        
+        <div className="container max-w-7xl relative z-10">
+          <div className="flex items-center gap-4 mb-6">
+            <div className="h-[40px] w-[3px] bg-feps-gold"></div>
+            <span className="font-sans text-xs uppercase tracking-[0.2em] font-bold text-feps-navy">
               {t('pageLabel')}
             </span>
           </div>
-          <h1 className="font-serif text-5xl md:text-6xl font-normal tracking-tight text-feps-ink leading-[1.1] mb-4">
+          <h1 className="font-serif text-5xl md:text-6xl lg:text-7xl font-normal tracking-tight text-feps-navy leading-tight mb-6">
             {t('pageTitle')}
           </h1>
-          <p className="text-lg text-feps-ink-secondary max-w-2xl leading-relaxed mb-4">
+          <p className="text-lg md:text-xl text-feps-ink-secondary max-w-3xl leading-relaxed font-sans">
             {t('pageDescription')}
           </p>
-          
-          {isAdmin && (
-            <Link
-              href={`/admin/events`}
-              className="inline-flex items-center gap-2 px-6 py-3 bg-feps-ink text-feps-paper font-sans text-xs uppercase tracking-widest font-semibold hover:bg-feps-navy transition-colors"
-            >
-              <ShieldAlert size={16} />
-              {t('manageEvents')}
-            </Link>
-          )}
         </div>
       </div>
 
       {/* Main Content (Calendar Wrapper) */}
-      <div className="container max-w-5xl py-6">
-        <div className="bg-feps-surface border border-feps-border p-8">
+      <div className="container max-w-7xl py-12">
+        <div className="bg-feps-paper">
           <EventCalendar initialEvents={initialEvents} categories={categories} />
         </div>
       </div>

@@ -2,13 +2,13 @@
 
 @theme {
   /* Paper & Ink palette — must be literal values in Tailwind v4 @theme */
-  --color-feps-paper: #faf9f6;
+  --color-feps-paper: #f8f9fa;
   --color-feps-ink: #0b1930;
   --color-feps-ink-secondary: rgba(11, 25, 48, 0.65);
   --color-feps-ink-tertiary: rgba(11, 25, 48, 0.45);
   --color-feps-border: rgba(11, 25, 48, 0.1);
   --color-feps-surface: #ffffff;
-  --color-feps-surface-alt: #f4f1e8;
+  --color-feps-surface-alt: #f1f5f9;
 
   /* Accents */
   --color-feps-navy: #1a3a6e;
@@ -23,21 +23,21 @@
 
   /* Typography */
   --font-serif: var(--font-amiri), system-ui, serif;
-  --font-sans: var(--font-amiri), system-ui, serif;
-  --font-arabic: var(--font-amiri), serif;
-  --font-mono: var(--font-amiri), system-ui, serif;
+  --font-sans: var(--font-cairo), system-ui, sans-serif;
+  --font-arabic: var(--font-cairo), sans-serif;
+  --font-mono: var(--font-cairo), system-ui, monospace;
 }
 
 /* ─── FEPS Editorial Tokens ─────────────────────────────────── */
 :root {
   /* Paper & Ink Palette */
-  --feps-paper: #faf9f6;
+  --feps-paper: #f8f9fa;
   --feps-ink: #0b1930;
   --feps-ink-secondary: rgba(11, 25, 48, 0.65);
   --feps-ink-tertiary: rgba(11, 25, 48, 0.45);
   --feps-border: rgba(11, 25, 48, 0.1);
   --feps-surface: #ffffff;
-  --feps-surface-alt: #f4f1e8;
+  --feps-surface-alt: #f1f5f9;
 
   /* Accents (Used Sparingly) */
   --feps-navy: #1a3a6e;
@@ -75,12 +75,11 @@
 @layer base {
   html {
     font-size: 16px;
-    scroll-behavior: smooth;
     -webkit-font-smoothing: antialiased;
   }
 
   body {
-    font-family: var(--font-amiri), system-ui, serif;
+    font-family: var(--font-cairo), system-ui, sans-serif;
     background: var(--feps-paper);
     color: var(--feps-ink);
     line-height: 1.6;
@@ -91,7 +90,7 @@
 
   [lang="ar"],
   .arabic {
-    font-family: var(--font-amiri), serif;
+    font-family: var(--font-cairo), sans-serif;
     direction: rtl;
     text-align: right;
   }
@@ -130,9 +129,27 @@
 }
 
 .bg-grid-pattern {
-  background-size: 40px 40px;
-  background-image: linear-gradient(to right, rgba(15, 23, 42, 0.03) 1px, transparent 1px),
-    linear-gradient(to bottom, rgba(15, 23, 42, 0.03) 1px, transparent 1px);
+  background-size: 60px 60px;
+  background-image: 
+    linear-gradient(to right, rgba(26, 58, 110, 0.04) 1px, transparent 1px),
+    linear-gradient(to bottom, rgba(26, 58, 110, 0.04) 1px, transparent 1px);
+  position: relative;
+}
+
+.bg-grid-pattern::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(circle at center, transparent 0%, var(--feps-paper) 80%);
+  pointer-events: none;
+}
+
+.bg-feps-gradient {
+  background: linear-gradient(180deg, var(--feps-paper) 0%, #F4F6F8 100%);
+}
+
+.shadow-academic {
+  box-shadow: 0 10px 40px -10px rgba(26, 58, 110, 0.08);
 }
 
 /* ─── Body styles removed ─────────────────────────────────── */
@@ -356,7 +373,7 @@
 @keyframes fadeInUp {
   from {
     opacity: 0;
-    transform: translateY(18px);
+    transform: translateY(24px);
   }
 
   to {
@@ -366,8 +383,14 @@
 }
 
 .fade-in-up {
-  animation: fadeInUp 0.45s ease both;
+  animation: fadeInUp 0.6s cubic-bezier(0.2, 0.8, 0.2, 1) both;
 }
+
+.delay-100 { animation-delay: 100ms; }
+.delay-200 { animation-delay: 200ms; }
+.delay-300 { animation-delay: 300ms; }
+.delay-400 { animation-delay: 400ms; }
+.delay-500 { animation-delay: 500ms; }
 
 @keyframes shimmer {
   0% {

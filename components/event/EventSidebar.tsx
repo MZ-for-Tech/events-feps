@@ -1,6 +1,7 @@
 import React from 'react'
-import { Calendar, Clock, MapPin, FileText, Download, Map } from 'lucide-react'
+import { Calendar, Clock, MapPin, Download, Map } from 'lucide-react'
 import ShareButton from '@/components/ShareButton'
+import InlineEdit from '../admin/InlineEdit'
 
 interface EventSidebarProps {
   isAr: boolean
@@ -20,6 +21,10 @@ interface EventSidebarProps {
     officialAgenda: string
     downloadFile: string
   }
+  isAdmin?: boolean
+  eventId?: string
+  rawStartDate?: string | null
+  rawEndDate?: string | null
 }
 
 export default function EventSidebar({
@@ -31,56 +36,79 @@ export default function EventSidebar({
   formattedEndTime,
   location,
   agendaFile,
-  labels
+  labels,
+  isAdmin,
+  eventId,
+  rawStartDate,
+  rawEndDate
 }: EventSidebarProps) {
   return (
-    <div className="sticky top-24 flex flex-col gap-6">
+    <div className="sticky top-24 flex flex-col bg-feps-surface-alt border-t-4 border-feps-ink">
       {/* Quick Ledger Info Box */}
-      <div className="bg-white border-2 border-feps-navy p-6 flex flex-col">
-        <h3 className={`text-xl font-sans uppercase tracking-wider font-bold text-feps-navy mb-6 pb-4 border-b-2 border-feps-navy ${isAr ? 'font-arabic' : ''}`}>
+      <div className="p-6 md:p-8 flex flex-col">
+        <h3 className={`text-sm md:text-base font-sans uppercase tracking-widest font-bold text-feps-ink mb-6 pb-4 border-b-2 border-feps-ink ${isAr ? 'font-arabic' : ''}`}>
           {labels.quickFacts}
         </h3>
 
-        <div className="flex flex-col gap-5">
+        <div className="flex flex-col gap-6">
           {/* Date Ledger */}
-          <div className="flex flex-col gap-1 border-b-2 border-feps-navy/20 pb-4">
-            <div className="flex items-center gap-2 text-xs font-sans text-feps-navy font-bold uppercase tracking-wider">
-              <Calendar size={14} className="text-feps-gold" /> {labels.date}
+          <div className="flex flex-col gap-2 border-b border-feps-ink/20 pb-4">
+            <div className="flex items-center gap-2 text-xs font-sans text-feps-ink-secondary font-bold uppercase tracking-widest">
+              <Calendar size={14} className="text-feps-ink" /> {labels.date}
             </div>
-            <div className={`text-sm font-semibold text-feps-navy ${isAr ? 'font-arabic' : ''}`}>
-              {formattedStartDate}
-              {formattedEndDate && formattedEndDate !== formattedStartDate && (
-                <div className="text-xs mt-1 text-feps-navy/80">
-                  {labels.until} {formattedEndDate}
+            <div className={`text-base font-serif font-bold text-feps-ink ${isAr ? 'font-arabic' : ''}`}>
+              <div className="inline-block">
+                <InlineEdit field="startDate" value={rawStartDate || ''} eventId={eventId!} isAdmin={!!isAdmin} type="datetime-local">
+                  {formattedStartDate}
+                </InlineEdit>
+              </div>
+              {(formattedEndDate || isAdmin) && formattedEndDate !== formattedStartDate && (
+                <div className="text-sm mt-1 text-feps-ink-secondary font-sans font-normal flex items-center gap-1">
+                  <span>{labels.until}</span>
+                  <div className="inline-block">
+                    <InlineEdit field="endDate" value={rawEndDate || ''} eventId={eventId!} isAdmin={!!isAdmin} type="datetime-local">
+                      {formattedEndDate || (isAr ? 'إضافة تاريخ الانتهاء' : 'Add end date')}
+                    </InlineEdit>
+                  </div>
                 </div>
               )}
             </div>
           </div>
 
           {/* Time Ledger */}
-          <div className="flex flex-col gap-1 border-b-2 border-feps-navy/20 pb-4">
-            <div className="flex items-center gap-2 text-xs font-sans text-feps-navy font-bold uppercase tracking-wider">
-              <Clock size={14} className="text-feps-gold" /> {labels.time}
+          <div className="flex flex-col gap-2 border-b border-feps-ink/20 pb-4">
+            <div className="flex items-center gap-2 text-xs font-sans text-feps-ink-secondary font-bold uppercase tracking-widest">
+              <Clock size={14} className="text-feps-ink" /> {labels.time}
             </div>
-            <div className={`text-sm font-semibold text-feps-navy ${isAr ? 'font-arabic' : ''}`}>
-              {formattedStartTime}
-              {formattedEndTime && (
-                <span className="text-feps-navy/80">
-                  {' '}
-                  - {formattedEndTime}
+            <div className={`text-base font-serif font-bold text-feps-ink ${isAr ? 'font-arabic' : ''}`}>
+              <div className="inline-block">
+                <InlineEdit field="startDate" value={rawStartDate || ''} eventId={eventId!} isAdmin={!!isAdmin} type="datetime-local">
+                  {formattedStartTime}
+                </InlineEdit>
+              </div>
+              {(formattedEndTime || isAdmin) && (
+                <span className="text-feps-ink-secondary flex items-center gap-1 inline-flex mt-1">
+                  <span>-</span>
+                  <div className="inline-block">
+                    <InlineEdit field="endDate" value={rawEndDate || ''} eventId={eventId!} isAdmin={!!isAdmin} type="datetime-local">
+                      {formattedEndTime || (isAr ? 'إضافة وقت الانتهاء' : 'Add end time')}
+                    </InlineEdit>
+                  </div>
                 </span>
               )}
             </div>
           </div>
 
           {/* Location Ledger */}
-          {location && (
-            <div className="flex flex-col gap-1">
-              <div className="flex items-center gap-2 text-xs font-sans text-feps-navy font-bold uppercase tracking-wider">
-                <MapPin size={14} className="text-feps-gold" /> {labels.location}
+          {(location || isAdmin) && (
+            <div className="flex flex-col gap-2">
+              <div className="flex items-center gap-2 text-xs font-sans text-feps-ink-secondary font-bold uppercase tracking-widest">
+                <MapPin size={14} className="text-feps-ink" /> {labels.location}
               </div>
-              <div className={`text-sm font-semibold text-feps-navy ${isAr ? 'font-arabic' : ''}`}>
-                {location}
+              <div className={`text-base font-serif font-bold text-feps-ink ${isAr ? 'font-arabic' : ''}`}>
+                <InlineEdit field="location" value={location || ''} eventId={eventId!} isAdmin={!!isAdmin} type="text">
+                  {location || (isAr ? 'إضافة مكان' : 'Add Location')}
+                </InlineEdit>
               </div>
             </div>
           )}
@@ -89,12 +117,9 @@ export default function EventSidebar({
 
       {/* Agenda File Download Card */}
       {agendaFile && (
-        <div className="bg-feps-surface border-2 border-feps-navy p-6 flex flex-col gap-4">
-          <div className="flex items-center gap-3">
-            <div className="w-10 h-10 bg-feps-navy flex items-center justify-center shrink-0">
-              <FileText size={20} className="text-white" />
-            </div>
-            <div className={`text-sm font-bold text-feps-navy ${isAr ? 'font-arabic' : ''}`}>
+        <div className="px-6 md:px-8 pb-6 md:pb-8 border-t border-feps-ink/20 pt-6 flex flex-col gap-4">
+          <div className="flex items-center gap-3 mb-2">
+            <div className={`text-xs font-sans font-bold uppercase tracking-widest text-feps-ink ${isAr ? 'font-arabic' : ''}`}>
               {labels.officialAgenda}
             </div>
           </div>
@@ -102,16 +127,16 @@ export default function EventSidebar({
           <a
             href={agendaFile}
             download
-            className="flex items-center justify-center gap-2 w-full py-3 bg-white border-2 border-feps-navy hover:bg-feps-navy hover:text-white text-feps-navy font-bold transition-colors"
+            className="flex items-center justify-center gap-2 w-full py-4 bg-feps-ink text-white font-sans text-xs uppercase tracking-widest font-bold hover:bg-feps-gold hover:text-feps-navy-dark transition-colors"
           >
-            <Download size={18} />
+            <Download size={16} />
             <span>{labels.downloadFile}</span>
           </a>
         </div>
       )}
 
       {/* Sharing / Actions Widget */}
-      <div className="bg-white border-2 border-feps-navy p-4 flex flex-col gap-3">
+      <div className="px-6 md:px-8 pb-6 md:pb-8 border-t border-feps-ink/20 pt-6 flex flex-col gap-3">
         <ShareButton
           title={title} 
           date={formattedStartDate}
@@ -121,12 +146,12 @@ export default function EventSidebar({
 
         {location && (
           <a
-            href={`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(location)}`}
+            href="https://maps.app.goo.gl/xTZ6WMdJuuzjPfqP7"
             target="_blank"
             rel="noopener noreferrer"
-            className="flex items-center justify-center gap-2 w-full py-3 border-2 border-feps-navy/20 text-feps-navy font-bold hover:bg-feps-navy/5 transition-colors"
+            className="flex items-center justify-center gap-2 w-full py-3 border-2 border-feps-ink text-feps-ink font-sans text-xs uppercase tracking-widest font-bold hover:bg-feps-ink hover:text-white transition-colors mt-2"
           >
-            <Map size={18} />
+            <Map size={16} />
             <span>{labels.location}</span>
           </a>
         )}

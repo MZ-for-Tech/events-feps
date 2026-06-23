@@ -1,7 +1,8 @@
 'use client'
 
-import React, { useState, useEffect } from 'react'
+import React, { useState, useEffect, useOptimistic, useTransition } from 'react'
 import { Brain, Plus, Loader, AlertCircle, Edit, Trash2 } from 'lucide-react'
+import toast from 'react-hot-toast'
 import { AdminPageHeader } from '@/components/admin/AdminPageHeader'
 import { Table, TableHeader, TableBody, TableRow, TableHead, TableCell } from '@/components/admin/AdminTable'
 import { AdminModal } from '@/components/admin/AdminModal'
@@ -35,7 +36,29 @@ export default function AdminTriviaClient({ locale }: { locale: string }) {
   
   const [isModalOpen, setIsModalOpen] = useState(false)
   const [editingId, setEditingId] = useState<string | null>(null)
-  const [isSaving, setIsSaving] = useState(false)
+
+  const [isPending, startTransition] = useTransition()
+
+  type OptimisticAction = 
+    | { type: 'ADD'; payload: TriviaQuestion }
+    | { type: 'UPDATE'; payload: TriviaQuestion }
+    | { type: 'DELETE'; id: string }
+
+  const [optimisticQuestions, updateOptimisticQuestions] = useOptimistic(
+    questions,
+    (state, action: OptimisticAction) => {
+      switch (action.type) {
+        case 'ADD':
+          return [action.payload, ...state]
+        case 'UPDATE':
+          return state.map(q => q.id === action.payload.id ? action.payload : q)
+        case 'DELETE':
+          return state.filter(q => q.id !== action.id)
+        default:
+          return state
+      }
+    }
+  )
 
   // Form State
   const [textEn, setTextEn] = useState('')
@@ -107,51 +130,72 @@ export default function AdminTriviaClient({ locale }: { locale: string }) {
     setOptions(newOptions)
   }
 
-  const handleSave = async () => {
+  const handleSave = () => {
     if (!textEn || !textAr) {
-      alert('Please fill at least EN and AR question text')
+      toast.error('Please fill at least EN and AR question text')
       return
     }
 
-    setIsSaving(true)
-    try {
-      const payload = {
-        textEn, textAr, textFr,
-        explanation: explanationEn,
-        explanationAr,
-        explanationFr,
-        options: JSON.stringify(options)
-      }
-
-      const url = editingId ? `/api/admin/trivia/${editingId}` : '/api/admin/trivia'
-      const method = editingId ? 'PATCH' : 'POST'
-
-      const res = await fetch(url, {
-        method,
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(payload)
-      })
-
-      if (!res.ok) throw new Error('Failed to save')
-      
-      await fetchQuestions()
-      setIsModalOpen(false)
-    } catch (err: unknown) {
-      alert(err instanceof Error ? err.message : String(err))
-    } finally {
-      setIsSaving(false)
+    const payload = {
+      textEn, textAr, textFr,
+      explanation: explanationEn,
+      explanationAr,
+      explanationFr,
+      options: JSON.stringify(options)
     }
+
+    const optimisticQuestion: TriviaQuestion = {
+      id: editingId || `temp-${Date.now()}`,
+      ...payload,
+    }
+
+    startTransition(async () => {
+      updateOptimisticQuestions({
+        type: editingId ? 'UPDATE' : 'ADD',
+        payload: optimisticQuestion
+      })
+      setIsModalOpen(false)
+
+      try {
+        const url = editingId ? `/api/admin/trivia/${editingId}` : '/api/admin/trivia'
+        const method = editingId ? 'PATCH' : 'POST'
+
+        const res = await fetch(url, {
+          method,
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(payload)
+        })
+
+        if (!res.ok) throw new Error('Failed to save')
+        
+        const saved = await res.json()
+        if (editingId) {
+          setQuestions(prev => prev.map(q => q.id === saved.id ? saved : q))
+          toast.success(isAr ? 'تم تعديل السؤال' : 'Question updated')
+        } else {
+          setQuestions(prev => [saved, ...prev])
+          toast.success(isAr ? 'تمت إضافة السؤال' : 'Question added')
+        }
+      } catch (err: unknown) {
+        toast.error(err instanceof Error ? err.message : String(err))
+      }
+    })
   }
 
-  const handleDelete = async (id: string) => {
-    if (!confirm('Are you sure you want to delete this question?')) return
-    try {
-      const res = await fetch(`/api/admin/trivia/${id}`, { method: 'DELETE' })
-      if (!res.ok) throw new Error('Failed to delete')
-      await fetchQuestions()
-    } catch (err: unknown) {
-      alert(err instanceof Error ? err.message : String(err))
-    }
+  const handleDelete = (id: string) => {
+    if (!confirm(isAr ? 'هل أنت متأكد من حذف هذا السؤال؟' : 'Are you sure you want to delete this question?')) return
+    
+    startTransition(async () => {
+      updateOptimisticQuestions({ type: 'DELETE', id })
+      try {
+        const res = await fetch(`/api/admin/trivia/${id}`, { method: 'DELETE' })
+        if (!res.ok) throw new Error('Failed to delete')
+        setQuestions(prev => prev.filter(q => q.id !== id))
+        toast.success(isAr ? 'تم حذف السؤال' : 'Question deleted')
+      } catch (err: unknown) {
+        toast.error(err instanceof Error ? err.message : String(err))
+      }
+    })
   }
 
   return (
@@ -174,7 +218,7 @@ export default function AdminTriviaClient({ locale }: { locale: string }) {
         <div className="bg-red-50 text-red-600 p-6 flex items-center gap-3 border border-red-200">
           <AlertCircle size={24} /> {error}
         </div>
-      ) : questions.length === 0 ? (
+      ) : optimisticQuestions.length === 0 ? (
         <div className="text-center py-20 text-feps-ink-secondary bg-white border border-feps-ink/10">
           <Brain size={40} className="mx-auto mb-4 opacity-20" />
           <p>{isAr ? "لا توجد أسئلة مسجلة" : "No questions found"}</p>
@@ -189,7 +233,7 @@ export default function AdminTriviaClient({ locale }: { locale: string }) {
             </TableRow>
           </TableHeader>
           <TableBody>
-            {questions.map(q => {
+            {optimisticQuestions.map(q => {
               const opts = JSON.parse(q.options)
               return (
                 <TableRow key={q.id}>
@@ -283,10 +327,10 @@ export default function AdminTriviaClient({ locale }: { locale: string }) {
             </button>
             <button
               onClick={handleSave}
-              disabled={isSaving}
+              disabled={isPending}
               className="bg-feps-navy text-white border-2 border-feps-navy px-6 py-2.5 font-bold text-sm uppercase tracking-widest cursor-pointer flex items-center gap-2 transition-colors hover:bg-feps-gold hover:text-feps-navy hover:border-feps-gold disabled:opacity-50"
             >
-              {isSaving && <Loader size={16} className="animate-spin" />}
+              {isPending && <Loader size={16} className="animate-spin" />}
               {t('save')}
             </button>
           </div>

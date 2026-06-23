@@ -47,7 +47,7 @@
     "tour": "Tour"
   },
   "Footer": {
-    "aboutTitle": "FEPS Hub",
+    "aboutTitle": "FEPS Events",
     "aboutDesc": "The official events information system of the Faculty of Economics and Political Science, Cairo University.",
     "aboutDescAr": "كلية الاقتصاد والعلوم السياسية — جامعة القاهرة",
     "quickLinks": "Quick Links",
@@ -122,8 +122,7 @@
     "pageLabel": "Academic Calendar",
     "facultyName": "Faculty of Economics & Political Science",
     "pageTitle": "Faculty Events Calendar",
-    "pageDescription": "Keep track of all conferences, seminars, workshops, and student activities organized by the faculty.",
-    "manageEvents": "Manage Events"
+    "pageDescription": "Keep track of all conferences, seminars, workshops, and student activities organized by the faculty."
   },
   "EventDetail": {
     "backToEvents": "Back to Events",

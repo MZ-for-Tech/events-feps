@@ -53,13 +53,18 @@ const styles = StyleSheet.create({
     height: 60,
     objectFit: 'contain'
   },
+  documentTitleWrapper: {
+    alignSelf: 'center',
+    borderBottomWidth: 1,
+    borderBottomColor: '#000000',
+    paddingBottom: 4,
+    marginBottom: 30,
+  },
   documentTitle: {
     fontSize: 18,
     textAlign: 'center',
-    marginBottom: 30,
     fontFamily: 'Times-Bold',
     textTransform: 'uppercase',
-    textDecoration: 'underline'
   },
   sectionTitle: {
     fontSize: 14,
@@ -219,23 +224,27 @@ interface AcademicReportDocumentProps {
 }
 
 export default function AcademicReportDocument({ events, reportTitle, monthYear, translations, locale, format = 'SUMMARY' }: AcademicReportDocumentProps) {
-  const currentDate = new Date().toLocaleDateString('en-US', {
-    year: 'numeric',
-    month: 'long',
-    day: 'numeric'
-  })
-
   const isAr = locale === 'ar'
   const baseFont = isAr ? 'Amiri' : 'Times-Roman'
   const boldFont = isAr ? 'Amiri' : 'Times-Bold'
 
   // Helper: reshape Arabic text for PDF rendering (letters won't connect without this)
   const ar = (str: string) => isAr ? reshapeArabic(str) : str
+  const ltr = (str: string) => `\u202A${str}\u202C`
+  const rtl = (str: string) => `\u200F${str}\u200F`
+  const fixArabicPeriod = (str: string) => str.replace(/\.$/, '.\u200F')
+  const hasArabic = (str: string) => /[\u0600-\u06FF]/.test(str)
+
+  // React-PDF native bidi handles trailing punctuation, so we just use ar()
+
+  const currentDateObj = new Date()
+  const currentMonthNameAr = currentDateObj.toLocaleDateString('ar-EG-u-nu-latn', { month: 'long' })
+  const currentDateEn = currentDateObj.toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' })
 
   return (
     <Document>
       <Page size="A4" style={{ ...styles.page, fontFamily: baseFont, direction: isAr ? 'rtl' : 'ltr' }}>
-        
+
         {/* Header matching CU/FEPS official documents */}
         <View style={styles.header}>
           {isAr ? (
@@ -257,34 +266,31 @@ export default function AcademicReportDocument({ events, reportTitle, monthYear,
           <Text style={styles.facultyText}>{ar(translations.department)}</Text>
         </View>
 
-        {/* Date line — compose as single string so bidi doesn't scramble it */}
-        <Text style={{ fontSize: 11, marginBottom: 20, textAlign: 'right' }}>
+        {/* Date line — single string to avoid row-reverse child-ordering issues */}
+        <Text style={{ fontSize: 11, marginBottom: 20, textAlign: isAr ? 'right' : 'left' }}>
           {isAr
-            ? ar(translations.datePrefix) + currentDate
-            : translations.datePrefix + currentDate
-          }
+            ? ar(translations.datePrefix) + rtl(`${currentDateObj.getDate()} ${ar(currentMonthNameAr)} ${currentDateObj.getFullYear()}`)
+            : translations.datePrefix + currentDateEn}
         </Text>
 
-        <Text style={{ ...styles.documentTitle, fontFamily: boldFont }}>{ar(reportTitle)}</Text>
+        <View style={styles.documentTitleWrapper}>
+          <Text style={{ ...styles.documentTitle, fontFamily: boldFont }}>{ar(reportTitle)}</Text>
+        </View>
 
         {monthYear && (
-          // Compose full sentence before reshaping so word joins work across boundary
           <Text style={{ fontSize: 12, marginBottom: 15, textAlign: isAr ? 'right' : 'left' }}>
-            {isAr
-              ? ar(translations.summaryPrefix + monthYear)
-              : translations.summaryPrefix + monthYear + '.'
-            }
+            {isAr ? ar(translations.summaryPrefix + monthYear) : translations.summaryPrefix + monthYear + '.'}
           </Text>
         )}
 
         <Text style={{ fontSize: 11, marginBottom: 10, lineHeight: 1.5, textAlign: isAr ? 'right' : 'justify' }}>
-          {ar(translations.description)}
+          {isAr ? fixArabicPeriod(ar(translations.description)) : translations.description}
         </Text>
 
         {/* Event Ledger */}
         {format === 'SUMMARY' ? (
           <View style={styles.table}>
-            <View style={styles.tableRow}>
+            <View style={{ ...styles.tableRow, flexDirection: isAr ? 'row-reverse' : 'row' }}>
               {isAr ? (
                 <>
                   <View style={styles.tableColHeader}><Text style={{ ...styles.tableCellHeader, fontFamily: boldFont, textAlign: 'right' }}>{ar(translations.colCategory)}</Text></View>
@@ -301,7 +307,7 @@ export default function AcademicReportDocument({ events, reportTitle, monthYear,
             </View>
 
             {events.length === 0 ? (
-              <View style={styles.tableRow}>
+              <View style={{ ...styles.tableRow, flexDirection: isAr ? 'row-reverse' : 'row' }}>
                 <View style={{ width: '100%', borderStyle: 'solid', borderWidth: 1, borderLeftWidth: 0, borderTopWidth: 0, padding: 10 }}>
                   <Text style={{ fontSize: 10, textAlign: 'center', color: '#666', fontFamily: baseFont }}>{translations.noEvents}</Text>
                 </View>
@@ -309,25 +315,17 @@ export default function AcademicReportDocument({ events, reportTitle, monthYear,
             ) : (
               events.map((ev, i) => {
                 const meta = ev.category || { nameAr: 'غير محدد', nameEn: 'Unknown', nameFr: 'Inconnu' }
-                
-                let dateStr: string
-                let timeStr: string
-                
-                if (isAr) {
-                  const d = new Date(ev.startDate)
-                  const monthNameAr = d.toLocaleDateString('ar-EG-u-nu-latn', { month: 'long' })
-                  dateStr = `${d.getFullYear()} ${ar(monthNameAr)} ${d.getDate()}`
-                  
-                  const h = d.getHours()
-                  const mm = d.getMinutes().toString().padStart(2, '0')
-                  timeStr = `${h % 12 || 12}:${mm} ${ar(h >= 12 ? 'م' : 'ص')}`
-                } else {
-                  dateStr = new Date(ev.startDate).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })
-                  timeStr = new Date(ev.startDate).toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' })
-                }
-                
+
+                const d = new Date(ev.startDate)
+                const dateStrEn = d.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })
+                const timeStrEn = d.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' })
+                const monthNameAr = d.toLocaleDateString('ar-EG-u-nu-latn', { month: 'long' })
+                const h = d.getHours()
+                const mm = d.getMinutes().toString().padStart(2, '0')
+                const ampm = h >= 12 ? 'م' : 'ص'
+
                 return (
-                  <View style={styles.tableRow} key={ev.id || i}>
+                  <View style={{ ...styles.tableRow, flexDirection: isAr ? 'row-reverse' : 'row' }} key={ev.id || i}>
                     {isAr ? (
                       <>
                         <View style={styles.tableCol}>
@@ -335,18 +333,28 @@ export default function AcademicReportDocument({ events, reportTitle, monthYear,
                         </View>
                         <View style={styles.tableColLarge}>
                           <Text style={{ ...styles.tableCell, fontFamily: boldFont, textAlign: 'right' }}>{ar(ev.title)}</Text>
-                          {ev.location && <Text style={{ ...styles.tableCell, color: '#444', marginTop: 0, textAlign: 'right' }}>{ar(translations.locPrefix + ev.location)}</Text>}
+                          {ev.location && (
+                            <Text style={{ fontSize: 10, color: '#444', margin: 5, marginTop: 0, textAlign: 'right' }}>
+                              {hasArabic(ev.location)
+                                ? ar(translations.locPrefix) + ' ' + ar(ev.location)
+                                : ltr(ev.location) + '\u00A0' + rtl(ar(translations.locPrefix))}
+                            </Text>
+                          )}
                         </View>
-                        <View style={{ ...styles.tableCol, borderRightWidth: 0 }}>
-                          <Text style={{ ...styles.tableCell, textAlign: 'right' }}>{dateStr}</Text>
-                          <Text style={{ ...styles.tableCell, color: '#666', marginTop: 0, textAlign: 'right' }}>{timeStr}</Text>
+                        <View style={{ ...styles.tableCol, borderRightWidth: 0, padding: 5 }}>
+                          <Text style={{ fontSize: 10, textAlign: 'right' }}>
+                            {rtl(`${d.getDate()} ${ar(monthNameAr)} ${d.getFullYear()}`)}
+                          </Text>
+                          <Text style={{ fontSize: 10, color: '#666', textAlign: 'right', marginTop: 2 }}>
+                            {ar(ampm) + ' ' + ltr(`${h % 12 || 12}:${mm}`)}
+                          </Text>
                         </View>
                       </>
                     ) : (
                       <>
                         <View style={styles.tableCol}>
-                          <Text style={{ ...styles.tableCell, textAlign: 'left' }}>{dateStr}</Text>
-                          <Text style={{ ...styles.tableCell, color: '#666', marginTop: 0, textAlign: 'left' }}>{timeStr}</Text>
+                          <Text style={{ ...styles.tableCell, textAlign: 'left' }}>{dateStrEn}</Text>
+                          <Text style={{ ...styles.tableCell, color: '#666', marginTop: 0, textAlign: 'left' }}>{timeStrEn}</Text>
                         </View>
                         <View style={styles.tableColLarge}>
                           <Text style={{ ...styles.tableCell, fontFamily: boldFont, textAlign: 'left' }}>{ev.title}</Text>
@@ -369,20 +377,13 @@ export default function AcademicReportDocument({ events, reportTitle, monthYear,
             ) : (
               events.map((ev, i) => {
                 const meta = ev.category || { nameAr: 'غير محدد', nameEn: 'Unknown', nameFr: 'Inconnu', color: '#1A3A6E', bg: 'rgba(26,58,110,0.1)' }
-                let dateStr: string
-                let timeStr: string
-                
-                if (isAr) {
-                  const d = new Date(ev.startDate)
-                  const monthNameAr = d.toLocaleDateString('ar-EG-u-nu-latn', { month: 'long' })
-                  dateStr = `${d.getFullYear()} ${ar(monthNameAr)} ${d.getDate()}`
-                  const h = d.getHours()
-                  const mm = d.getMinutes().toString().padStart(2, '0')
-                  timeStr = `${h % 12 || 12}:${mm} ${ar(h >= 12 ? 'م' : 'ص')}`
-                } else {
-                  dateStr = new Date(ev.startDate).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })
-                  timeStr = new Date(ev.startDate).toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' })
-                }
+                const d = new Date(ev.startDate)
+                const dateStrEn = d.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })
+                const timeStrEn = d.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' })
+                const monthNameAr = d.toLocaleDateString('ar-EG-u-nu-latn', { month: 'long' })
+                const h = d.getHours()
+                const mm = d.getMinutes().toString().padStart(2, '0')
+                const ampm = h >= 12 ? 'م' : 'ص'
 
                 let agendaCells: Array<{ day?: string; startTime?: string; endTime?: string; text?: string }> = []
                 if (ev.agendaText) {
@@ -397,11 +398,26 @@ export default function AcademicReportDocument({ events, reportTitle, monthYear,
                 return (
                   <View style={styles.eventSection} key={ev.id || i} wrap={false}>
                     <Text style={{ ...styles.eventTitle, fontFamily: boldFont, textAlign: isAr ? 'right' : 'left' }}>{ar(isAr ? (ev.titleAr || ev.title) : ev.title)}</Text>
-                    
-                    <Text style={{ ...styles.eventMeta, textAlign: isAr ? 'right' : 'left' }}>
-                      {ar(isAr ? meta.nameAr : meta.nameEn)} | {dateStr} - {timeStr}
-                      {ev.location ? ` | ${ar(translations.locPrefix + ev.location)}` : ''}
-                    </Text>
+
+                    {isAr ? (
+                      <Text style={{ fontSize: 11, color: '#666', marginBottom: 15, textAlign: 'right' }}>
+                        {ar(meta.nameAr)}
+                        {' | '}
+                        {rtl(`${d.getDate()} ${ar(monthNameAr)} ${d.getFullYear()}`)}
+                        {' - '}
+                        {ar(ampm) + ' ' + ltr(`${h % 12 || 12}:${mm}`)}
+                        {ev.location && (
+                          hasArabic(ev.location)
+                            ? ` | ${ar(translations.locPrefix)} ${ar(ev.location)}`
+                            : ` | ${ltr(ev.location)}\u00A0${rtl(ar(translations.locPrefix))}`
+                        )}
+                      </Text>
+                    ) : (
+                      <Text style={{ ...styles.eventMeta, textAlign: 'left' }}>
+                        {meta.nameEn} | {dateStrEn} - {timeStrEn}
+                        {ev.location ? ` | ${translations.locPrefix + ev.location}` : ''}
+                      </Text>
+                    )}
 
                     {ev.description && (
                       <Text style={{ ...styles.eventDesc, textAlign: isAr ? 'right' : 'justify' }}>
@@ -414,13 +430,13 @@ export default function AcademicReportDocument({ events, reportTitle, monthYear,
                         <Text style={{ ...styles.agendaHeader, fontFamily: boldFont, textAlign: isAr ? 'right' : 'left' }}>
                           {ar(translations.detailedAgendaPrefix)}
                         </Text>
-                        
+
                         {agendaCells.map((cell, idx) => {
                           const timeRange = `${cell.startTime || ''} ${cell.endTime ? '- ' + cell.endTime : ''}`
                           return (
                             <View style={{ ...styles.agendaRow, flexDirection: isAr ? 'row-reverse' : 'row' }} key={idx}>
-                              <Text style={{ ...styles.agendaTime, textAlign: isAr ? 'right' : 'left' }}>
-                                {cell.day ? `${ar(cell.day)}: ` : ''} {timeRange}
+                              <Text style={{ ...styles.agendaTime, width: '30%', textAlign: isAr ? 'right' : 'left' }}>
+                                {cell.day ? ar(cell.day + ': ') + ltr(timeRange) : ltr(timeRange)}
                               </Text>
                               <Text style={{ ...styles.agendaText, textAlign: isAr ? 'right' : 'left' }}>
                                 {ar(cell.text || '')}
@@ -442,7 +458,7 @@ export default function AcademicReportDocument({ events, reportTitle, monthYear,
           {ar(translations.footer)}
         </Text>
         <Text style={styles.pageNumber} render={({ pageNumber, totalPages }) => (
-          `${translations.pagePrefix}${pageNumber}${translations.pageOf}${totalPages}`
+          ar(`${translations.pagePrefix}${pageNumber}${translations.pageOf}${totalPages}`)
         )} fixed />
       </Page>
     </Document>

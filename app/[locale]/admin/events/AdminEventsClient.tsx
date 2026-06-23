@@ -1,9 +1,9 @@
 'use client'
 
-import React, { useState, useEffect } from 'react'
+import React, { useState, useEffect, useOptimistic, useTransition } from 'react'
 import { Plus, Calendar } from 'lucide-react'
-import { useRouter } from 'next/navigation'
 import { useTranslations } from 'next-intl'
+import toast from 'react-hot-toast'
 import { EventCategoryData } from '@/components/EventCard'
 import { AdminEvent, EventPayload } from '@/components/admin/events/types'
 import { AdminEventsTable } from '@/components/admin/events/AdminEventsTable'
@@ -21,12 +21,34 @@ interface Props {
 }
 
 export default function AdminEventsClient({ initialEvents, categories, locale, permissions, role }: Props) {
-  const router = useRouter()
   const isAr = locale === 'ar'
   const t = useTranslations('AdminEvents')
 
   const [events, setEvents] = useState<AdminEvent[]>(initialEvents)
   const [activeTab, setActiveTab] = useState<'active' | 'archived'>('active')
+
+  const [, startTransition] = useTransition()
+  
+  type OptimisticAction = 
+    | { type: 'UPDATE'; payload: Partial<AdminEvent> & { id: string } }
+    | { type: 'DELETE'; id: string }
+    | { type: 'ADD'; payload: AdminEvent }
+
+  const [optimisticEvents, updateOptimisticEvents] = useOptimistic(
+    events,
+    (state, action: OptimisticAction) => {
+      switch (action.type) {
+        case 'UPDATE':
+          return state.map(e => e.id === action.payload.id ? { ...e, ...action.payload } as AdminEvent : e)
+        case 'DELETE':
+          return state.filter(e => e.id !== action.id)
+        case 'ADD':
+          return [action.payload, ...state]
+        default:
+          return state
+      }
+    }
+  )
 
   // Form Modal state
   const [isModalOpen, setIsModalOpen] = useState(false)
@@ -163,88 +185,95 @@ export default function AdminEventsClient({ initialEvents, categories, locale, p
   }
 
   // Handle Publish/Unpublish Quick Toggle
-  async function handleTogglePublish(ev: AdminEvent) {
-    try {
-      const res = await fetch(`/api/events/${ev.id}`, {
-        method: 'PATCH',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ published: !ev.published }),
-      })
-      if (res.ok) {
-        const updated = await res.json()
-        setEvents(events.map(item => item.id === ev.id ? { ...item, published: updated.published } : item))
-        router.refresh()
-      } else {
-        const text = await res.text()
-        alert('Error toggling publish: ' + text)
+  function handleTogglePublish(ev: AdminEvent) {
+    startTransition(async () => {
+      updateOptimisticEvents({ type: 'UPDATE', payload: { id: ev.id, published: !ev.published } })
+      try {
+        const res = await fetch(`/api/events/${ev.id}`, {
+          method: 'PATCH',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ published: !ev.published }),
+        })
+        if (res.ok) {
+          const updated = await res.json()
+          setEvents(prev => prev.map(item => item.id === ev.id ? { ...item, published: updated.published } : item))
+        } else {
+          toast.error('Error toggling publish')
+        }
+      } catch (err) {
+        console.error(err)
+        toast.error('Network error')
       }
-    } catch (err) {
-      console.error(err)
-      alert('Network error')
-    }
+    })
   }
 
   // Handle Delete
-  async function handleDelete(id: string) {
+  function handleDelete(id: string) {
     if (!confirm(t('deleteConfirm'))) return
 
-    try {
-      const res = await fetch(`/api/events/${id}`, {
-        method: 'DELETE',
-      })
-      if (res.ok) {
-        setEvents(events.filter(item => item.id !== id))
-        router.refresh()
-      } else {
-        alert('Failed to delete event')
+    startTransition(async () => {
+      updateOptimisticEvents({ type: 'DELETE', id })
+      try {
+        const res = await fetch(`/api/events/${id}`, {
+          method: 'DELETE',
+        })
+        if (res.ok) {
+          setEvents(prev => prev.filter(item => item.id !== id))
+          toast.success('Event deleted')
+        } else {
+          toast.error('Failed to delete event')
+        }
+      } catch (err) {
+        console.error(err)
+        toast.error('Network error')
       }
-    } catch (err) {
-      console.error(err)
-    }
+    })
   }
 
   // Mark event as Archived (completed)
-  async function handleArchive(ev: AdminEvent) {
-    try {
-      const res = await fetch(`/api/events/${ev.id}`, {
-        method: 'PATCH',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ status: 'ARCHIVED' }),
-      })
-      if (res.ok) {
-        setEvents(events.map(item => item.id === ev.id ? { ...item, status: 'ARCHIVED' } : item))
-        router.refresh()
-      } else {
-        const text = await res.text()
-        alert('Error: ' + text)
-        console.error('Archive failed', res.status, text)
+  function handleArchive(ev: AdminEvent) {
+    startTransition(async () => {
+      updateOptimisticEvents({ type: 'UPDATE', payload: { id: ev.id, status: 'ARCHIVED' } })
+      try {
+        const res = await fetch(`/api/events/${ev.id}`, {
+          method: 'PATCH',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ status: 'ARCHIVED' }),
+        })
+        if (res.ok) {
+          setEvents(prev => prev.map(item => item.id === ev.id ? { ...item, status: 'ARCHIVED' } : item))
+          toast.success('Event archived')
+        } else {
+          toast.error('Archive failed')
+        }
+      } catch (err) {
+        console.error(err)
+        toast.error('Network error')
       }
-    } catch (err) {
-      console.error(err)
-      alert('Network error')
-    }
+    })
   }
 
   // Restore event from Archive to Active
-  async function handleRestore(ev: AdminEvent) {
-    try {
-      const res = await fetch(`/api/events/${ev.id}`, {
-        method: 'PATCH',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ status: 'ACTIVE' }),
-      })
-      if (res.ok) {
-        setEvents(events.map(item => item.id === ev.id ? { ...item, status: 'ACTIVE' } : item))
-        router.refresh()
-      } else {
-        const text = await res.text()
-        alert('Error restoring: ' + text)
-        console.error('Restore failed', res.status, text)
+  function handleRestore(ev: AdminEvent) {
+    startTransition(async () => {
+      updateOptimisticEvents({ type: 'UPDATE', payload: { id: ev.id, status: 'ACTIVE' } })
+      try {
+        const res = await fetch(`/api/events/${ev.id}`, {
+          method: 'PATCH',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ status: 'ACTIVE' }),
+        })
+        if (res.ok) {
+          setEvents(prev => prev.map(item => item.id === ev.id ? { ...item, status: 'ACTIVE' } : item))
+          toast.success('Event restored')
+        } else {
+          toast.error('Restore failed')
+        }
+      } catch (err) {
+        console.error(err)
+        toast.error('Network error')
       }
-    } catch (err) {
-      console.error(err)
-      alert('Network error')
-    }
+    })
   }
 
   return (
@@ -261,7 +290,7 @@ export default function AdminEventsClient({ initialEvents, categories, locale, p
       />
 
       <AdminEventsTable
-        events={events}
+        events={optimisticEvents}
         activeTab={activeTab}
         setActiveTab={setActiveTab}
         locale={locale}

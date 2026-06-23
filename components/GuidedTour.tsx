@@ -58,16 +58,8 @@ export default function GuidedTour() {
     }, []);
 
     useEffect(() => {
-        if (isActive) {
-            document.body.style.overflow = 'hidden';
-            document.body.style.touchAction = 'none';
-        } else {
-            document.body.style.overflow = '';
-            document.body.style.touchAction = '';
-        }
         return () => {
-            document.body.style.overflow = '';
-            document.body.style.touchAction = '';
+            // cleanup if needed
         };
     }, [isActive]);
 
@@ -101,21 +93,18 @@ export default function GuidedTour() {
 
         if (element) {
             const rect = element.getBoundingClientRect();
-            const newTop = rect.top + window.scrollY;
-            const newLeft = rect.left + window.scrollX;
-
             setCoords(prev => {
-                const hasChanged = prev.top !== newTop || prev.left !== newLeft || prev.width !== rect.width || prev.height !== rect.height;
+                const hasChanged = prev.top !== rect.top || prev.left !== rect.left || prev.width !== rect.width || prev.height !== rect.height;
                 if (!hasChanged) return prev;
-                return { top: newTop, left: newLeft, width: rect.width, height: rect.height };
+                return { top: rect.top, left: rect.left, width: rect.width, height: rect.height };
             });
 
             if (mobile) {
                 setPlacement("mobile");
                 const viewHeight = window.innerHeight;
                 const offset = viewHeight * 0.2;
-                window.scrollTo({
-                    top: newTop - offset,
+                window.scrollBy({
+                    top: rect.top - offset,
                     behavior: 'smooth'
                 });
             } else {
@@ -208,17 +197,17 @@ export default function GuidedTour() {
         let left = 0;
         let transform = '';
 
-        const vCenter = coords.top - window.scrollY + (coords.height / 2);
+        const vCenter = coords.top + (coords.height / 2);
         const hCenter = coords.left + (coords.width / 2);
 
         switch (placement) {
             case "top":
-                top = coords.top - window.scrollY - 20;
+                top = coords.top - 20;
                 left = hCenter - (bW / 2);
                 transform = 'translateY(-100%)';
                 break;
             case "bottom":
-                top = coords.top - window.scrollY + coords.height + 20;
+                top = coords.top + coords.height + 20;
                 left = hCenter - (bW / 2);
                 break;
             case "left":
@@ -251,7 +240,7 @@ export default function GuidedTour() {
         const pTop = typeof pStyle.top === 'number' ? pStyle.top : 0;
 
         const hCenter = coords.left + (coords.width / 2);
-        const vCenter = coords.top - window.scrollY + (coords.height / 2);
+        const vCenter = coords.top + (coords.height / 2);
 
         let arrowTop: string | number = '50%';
         let arrowLeft: string | number = '50%';
@@ -277,7 +266,7 @@ export default function GuidedTour() {
     return (
         <div className={`fixed inset-0 z-[100] pointer-events-none overflow-hidden h-[100dvh] ${isAr ? 'rtl' : 'ltr'}`}>
             <svg
-                className="absolute inset-0 w-full h-full pointer-events-auto cursor-pointer"
+                className="absolute inset-0 w-full h-full pointer-events-auto cursor-pointer z-[101]"
                 onClick={() => setIsActive(false)}
             >
                 <defs>
@@ -285,10 +274,10 @@ export default function GuidedTour() {
                         <rect x="0" y="0" width="100%" height="100%" fill="white" />
                         <rect
                             x={coords.left - 8}
-                            y={coords.top - 8 - window.scrollY}
+                            y={coords.top - 8}
                             width={coords.width + 16}
                             height={coords.height + 16}
-                            rx="12"
+                            rx="4"
                             fill="black"
                             className={`transition-all duration-500 ease-out ${isMobile ? 'animate-pulse' : ''}`}
                         />
@@ -299,9 +288,8 @@ export default function GuidedTour() {
                     y="0"
                     width="100%"
                     height="100%"
-                    fill="rgba(0, 0, 0, 0.7)"
+                    fill="rgba(0, 0, 0, 0.8)"
                     mask="url(#tour-spotlight-mask)"
-                    style={{ backdropFilter: 'blur(8px)', WebkitBackdropFilter: 'blur(8px)' }}
                 />
             </svg>
 
@@ -312,10 +300,10 @@ export default function GuidedTour() {
                 style={getPopupStyle()}
             >
                 <div className={`
-                    bg-feps-paper p-6 border border-feps-ink/20 relative overflow-hidden group shadow-2xl
-                    ${isMobile ? 'pb-10' : ''}
+                    bg-feps-paper p-6 border border-feps-border relative overflow-hidden group shadow-[0_8px_32px_rgba(26,58,110,0.12)]
+                    ${isMobile ? 'pb-10' : 'rounded-[2px]'}
                 `}>
-                    <div className="absolute top-0 right-0 left-0 h-0.5 bg-feps-gold/20">
+                    <div className="absolute top-0 right-0 left-0 h-1 bg-feps-border">
                         <div
                             className={`h-full bg-feps-gold transition-all duration-700 ${isAr ? 'float-right' : 'float-left'}`}
                             style={{ width: `${((currentStep + 1) / steps.length) * 100}%` }}
@@ -326,16 +314,16 @@ export default function GuidedTour() {
                         <div className="flex items-center justify-between">
                             <button
                                 onClick={() => setIsActive(false)}
-                                className="w-8 h-8 flex items-center justify-center hover:bg-black/5 rounded-lg transition-colors"
+                                className="w-8 h-8 flex items-center justify-center hover:bg-feps-navy/5 rounded-[2px] transition-colors"
                             >
                                 <X className="w-4 h-4 text-feps-ink-secondary" />
                             </button>
                             <div className="flex items-center gap-3">
                                 <div className={isAr ? 'text-left' : 'text-right'}>
-                                    <p className="text-[8px] font-black text-feps-ink-secondary uppercase tracking-widest leading-none mb-0.5">{t('step')}</p>
-                                    <p className="text-[11px] font-black text-feps-ink leading-none">{currentStep + 1} {t('of')} {steps.length}</p>
+                                    <p className="text-[9px] font-sans font-bold text-feps-ink-secondary uppercase tracking-widest leading-none mb-1">{t('step')}</p>
+                                    <p className="text-[12px] font-sans font-bold text-feps-ink leading-none">{currentStep + 1} {t('of')} {steps.length}</p>
                                 </div>
-                                <div className="w-9 h-9 rounded-xl bg-feps-navy flex items-center justify-center text-white shadow-lg rotate-2">
+                                <div className="w-10 h-10 rounded-[2px] bg-feps-navy border border-feps-gold/30 flex items-center justify-center text-feps-gold shadow-sm">
                                     <Sparkles className="w-4 h-4" />
                                 </div>
                             </div>
@@ -343,36 +331,36 @@ export default function GuidedTour() {
 
                         <div className={`space-y-2.5 max-h-[25vh] overflow-y-auto custom-scrollbar ${isAr ? 'ps-1' : 'pe-1'}`}>
                             <div className={`flex items-center gap-1.5 text-feps-ink-secondary ${isAr ? 'justify-start' : 'justify-end'}`}>
-                                <MapPin className="w-2.5 h-2.5" />
-                                <span className="text-[8px] font-black uppercase tracking-widest opacity-50">
+                                <MapPin className="w-3 h-3" />
+                                <span className="text-[9px] font-sans font-bold uppercase tracking-widest opacity-60">
                                     {steps[currentStep].target.replace('-', ' ')}
                                 </span>
                             </div>
-                            <h4 className="text-lg font-black text-feps-ink tracking-tight leading-tight">
+                            <h4 className="text-xl font-amiri font-bold text-feps-ink tracking-tight leading-tight">
                                 {/* Using t() but we cast as any since the keys are dynamic from object */}
                                 {t(steps[currentStep].titleKey as Parameters<typeof t>[0])}
                             </h4>
-                            <p className="text-feps-ink-secondary text-[13px] leading-relaxed font-bold">
+                            <p className="text-feps-ink-secondary text-[14px] leading-relaxed font-sans">
                                 {t(steps[currentStep].contentKey as Parameters<typeof t>[0])}
                             </p>
                         </div>
 
-                        <div className="flex items-center justify-between pt-4 border-t border-black/10">
+                        <div className="flex items-center justify-between pt-5 border-t border-feps-border">
                             <div className={`flex gap-3 w-full ${isAr ? 'flex-row-reverse' : 'flex-row'} justify-end`}>
                                 <button
                                     onClick={prevStep}
                                     disabled={currentStep === 0}
-                                    className={`rounded-xl border border-black/10 flex items-center justify-center text-feps-ink hover:bg-black/5 disabled:opacity-30 transition-all
+                                    className={`rounded-[2px] border border-feps-border flex items-center justify-center text-feps-ink hover:bg-feps-navy/5 disabled:opacity-30 transition-all
                                         ${isMobile ? 'w-12 h-12' : 'w-9 h-9'}`}
                                 >
-                                    {isAr ? <ChevronRight className={isMobile ? "w-6 h-6" : "w-5 h-5"} /> : <ChevronLeft className={isMobile ? "w-6 h-6" : "w-5 h-5"} />}
+                                    {isAr ? <ChevronRight className={isMobile ? "w-6 h-6" : "w-4 h-4"} /> : <ChevronLeft className={isMobile ? "w-6 h-6" : "w-4 h-4"} />}
                                 </button>
                                 <button
                                     onClick={nextStep}
-                                    className={`rounded-xl bg-feps-navy flex items-center justify-center text-white shadow-md hover:translate-y-[-1px] active:scale-95 transition-all flex items-center gap-2
+                                    className={`rounded-[2px] bg-feps-navy border border-transparent hover:border-feps-gold/50 flex items-center justify-center text-white shadow-sm hover:translate-y-[-1px] active:scale-95 transition-all flex items-center gap-2
                                         ${isMobile ? 'px-8 h-12' : 'px-5 h-9'} ${isAr ? 'flex-row-reverse' : ''}`}
                                 >
-                                    <span className={`font-black ${isMobile ? 'text-[14px]' : 'text-[12px]'}`}>
+                                    <span className={`font-sans font-bold ${isMobile ? 'text-[14px]' : 'text-[13px]'}`}>
                                         {currentStep === steps.length - 1 ? t('done') : t('next')}
                                     </span>
                                     {isAr ? <ChevronLeft className={isMobile ? "w-5 h-5" : "w-4 h-4"} /> : <ChevronRight className={isMobile ? "w-5 h-5" : "w-4 h-4"} />}
@@ -385,7 +373,7 @@ export default function GuidedTour() {
                 {!isMobile && (
                     <div
                         style={getArrowStyle()}
-                        className={`w-4 h-4 border-feps-ink/20 bg-feps-paper transition-all duration-500
+                        className={`w-4 h-4 border-feps-border bg-feps-paper transition-all duration-500
                             ${placement === "top" ? 'border-r border-b' : ''}
                             ${placement === "bottom" ? 'border-l border-t' : ''}
                             ${placement === "left" ? 'border-t border-r' : ''}

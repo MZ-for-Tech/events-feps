@@ -1,7 +1,7 @@
 'use client'
 
 import React, { useState, useMemo, useRef } from 'react'
-import { ChevronLeft, ChevronRight, Filter, Grid, List as ListIcon } from 'lucide-react'
+import { ChevronLeft, ChevronRight, Filter, Grid, List as ListIcon, Search } from 'lucide-react'
 import { useParams } from 'next/navigation'
 import './EventCalendar.css'
 
@@ -46,6 +46,7 @@ export default function EventCalendar({ initialEvents, categories }: Props) {
   const [events, setEvents] = useState<CalendarEvent[]>(initialEvents)
   const [loading, setLoading] = useState(false)
   const [selectedType, setSelectedType] = useState<string>('ALL')
+  const [searchQuery, setSearchQuery] = useState('')
   const [viewMode, setViewMode] = useState<'GRID' | 'LIST'>('GRID')
 
   const sidebarRef = useRef<HTMLDivElement>(null)
@@ -54,11 +55,22 @@ export default function EventCalendar({ initialEvents, categories }: Props) {
   const firstDay = new Date(currentYear, currentMonth, 1).getDay()
   const daysInMonth = new Date(currentYear, currentMonth + 1, 0).getDate()
 
+  // Search filter helper
+  const matchesSearch = (ev: CalendarEvent, query: string) => {
+    if (!query) return true
+    const q = query.toLowerCase()
+    return (
+      (ev.title && ev.title.toLowerCase().includes(q)) ||
+      (ev.titleAr && ev.titleAr.toLowerCase().includes(q))
+    )
+  }
+
   // Map events to days, applying category filter
   const eventsByDay = useMemo(() => {
     const map = new Map<number, CalendarEvent[]>()
     events.forEach(ev => {
       if (selectedType !== 'ALL' && ev.category.id !== selectedType) return
+      if (!matchesSearch(ev, searchQuery)) return
 
       const d = new Date(ev.startDate)
       if (d.getFullYear() === currentYear && d.getMonth() === currentMonth) {
@@ -68,18 +80,19 @@ export default function EventCalendar({ initialEvents, categories }: Props) {
       }
     })
     return map
-  }, [events, currentYear, currentMonth, selectedType])
+  }, [events, currentYear, currentMonth, selectedType, searchQuery])
 
   // Get chronological filtered events list for Agenda (LIST) view
   const agendaEvents = useMemo(() => {
     return events
       .filter(ev => {
         if (selectedType !== 'ALL' && ev.category.id !== selectedType) return false
+        if (!matchesSearch(ev, searchQuery)) return false
         const d = new Date(ev.startDate)
         return d.getFullYear() === currentYear && d.getMonth() === currentMonth
       })
       .sort((a, b) => new Date(a.startDate).getTime() - new Date(b.startDate).getTime())
-  }, [events, currentYear, currentMonth, selectedType])
+  }, [events, currentYear, currentMonth, selectedType, searchQuery])
 
   const selectedEvents = selectedDay ? (eventsByDay.get(selectedDay) ?? []) : []
 
@@ -118,11 +131,12 @@ export default function EventCalendar({ initialEvents, categories }: Props) {
 
   return (
     <div>
-      {/* Category Filter Bar */}
-      <div data-tour="events-filters" className="filter-header-row" style={{ display: 'flex', alignItems: 'center', gap: '0.4rem', marginBottom: '0.6rem', color: 'var(--feps-ink-secondary)', fontSize: '0.75rem', fontWeight: 600, fontFamily: 'var(--font-sans, sans-serif)', textTransform: 'uppercase', letterSpacing: '0.05em', direction: isAr ? 'rtl' : 'ltr' }}>
-        <Filter size={12} style={{ color: 'var(--feps-ink-tertiary)' }} />
-        <span>{isAr ? 'تصفية حسب التصنيف' : isFr ? 'Filtrer par catégorie' : 'Filter by Category'}</span>
-      </div>
+      {/* Category Filters Container */}
+      <div data-tour="events-filters" style={{ marginBottom: '2rem' }}>
+        <div className="filter-header-row" style={{ display: 'flex', alignItems: 'center', gap: '0.4rem', marginBottom: '0.6rem', color: 'var(--feps-ink-secondary)', fontSize: '0.75rem', fontWeight: 600, fontFamily: 'var(--font-sans, sans-serif)', textTransform: 'uppercase', letterSpacing: '0.05em', direction: isAr ? 'rtl' : 'ltr' }}>
+          <Filter size={12} />
+          <span>{isAr ? 'تصفية حسب التصنيف' : isFr ? 'Filtrer par catégorie' : 'Filter by Category'}</span>
+        </div>
       
       <div className="calendar-filters-scroll" style={{ direction: isAr ? 'rtl' : 'ltr' }}>
         <button
@@ -163,10 +177,39 @@ export default function EventCalendar({ initialEvents, categories }: Props) {
             </button>
           )
         })}
+        </div>
       </div>
 
       {/* Calendar Toolbar */}
       <div data-tour="events-search" className="calendar-toolbar" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.5rem', flexWrap: 'wrap', gap: '1rem', direction: isAr ? 'rtl' : 'ltr' }}>
+        
+        {/* Search Bar */}
+        <div style={{ flex: '1 1 250px', maxWidth: '400px', position: 'relative' }}>
+          <div style={{ position: 'absolute', top: '50%', transform: 'translateY(-50%)', [isAr ? 'right' : 'left']: '1rem', color: 'var(--feps-ink-secondary)', display: 'flex', alignItems: 'center' }}>
+            <Search size={16} />
+          </div>
+          <input
+            type="text"
+            placeholder={isAr ? 'ابحث عن الفعاليات...' : isFr ? 'Rechercher des événements...' : 'Search events...'}
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+            style={{
+              width: '100%',
+              padding: `0.5rem ${isAr ? '2.5rem' : '1rem'} 0.5rem ${isAr ? '1rem' : '2.5rem'}`,
+              border: '1px solid var(--feps-border)',
+              borderRadius: 'var(--radius-feps, 2px)',
+              background: 'transparent',
+              fontFamily: 'var(--font-sans, sans-serif)',
+              fontSize: '0.875rem',
+              color: 'var(--feps-ink)',
+              outline: 'none',
+              transition: 'border-color 0.2s ease'
+            }}
+            onFocus={(e) => e.target.style.borderColor = 'var(--feps-gold)'}
+            onBlur={(e) => e.target.style.borderColor = 'var(--feps-border)'}
+          />
+        </div>
+
         {/* Month Navigation */}
         <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
           <button className="nav-chevron-btn" onClick={() => navigate(isAr ? 1 : -1)} aria-label="Previous Month">

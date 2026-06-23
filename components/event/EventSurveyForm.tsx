@@ -1,7 +1,8 @@
 'use client'
 
-import React, { useState } from 'react'
+import React, { useState, useOptimistic, useTransition } from 'react'
 import { useTranslations } from 'next-intl'
+import toast from 'react-hot-toast'
 import type { SurveyQuestion } from '@/app/[locale]/admin/events/[id]/AdminEventDetailClient'
 import { Send, CheckCircle, Loader } from 'lucide-react'
 
@@ -14,11 +15,16 @@ interface Props {
 export default function EventSurveyForm({ eventId, questions, isAr }: Props) {
   const t = useTranslations('EventSurvey')
   const [answers, setAnswers] = useState<Record<string, string>>({})
-  const [submitting, setSubmitting] = useState(false)
   const [submitted, setSubmitted] = useState(false)
+  const [isPending, startTransition] = useTransition()
+
+  const [optimisticSubmitted, addOptimisticSubmit] = useOptimistic(
+    submitted,
+    (state, newState: boolean) => newState
+  )
 
   if (questions.length === 0) return null
-  if (submitted) {
+  if (optimisticSubmitted) {
     return (
       <div className="bg-feps-navy/5 border-2 border-feps-navy p-8 text-center mt-12">
         <CheckCircle className="mx-auto text-feps-navy mb-4" size={48} />
@@ -32,23 +38,28 @@ export default function EventSurveyForm({ eventId, questions, isAr }: Props) {
     )
   }
 
-  const handleSubmit = async (e: React.FormEvent) => {
+  const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault()
-    setSubmitting(true)
-    try {
-      const res = await fetch(`/api/events/${eventId}/survey`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ answers })
-      })
-      if (res.ok) {
-        setSubmitted(true)
+    
+    startTransition(async () => {
+      addOptimisticSubmit(true)
+      try {
+        const res = await fetch(`/api/events/${eventId}/survey`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ answers })
+        })
+        if (res.ok) {
+          setSubmitted(true)
+          toast.success(isAr ? 'تم إرسال التقييم بنجاح' : 'Feedback submitted successfully')
+        } else {
+          toast.error(isAr ? 'حدث خطأ' : 'Error submitting feedback')
+        }
+      } catch (err) {
+        console.error(err)
+        toast.error('Network error')
       }
-    } catch (err) {
-      console.error(err)
-    } finally {
-      setSubmitting(false)
-    }
+    })
   }
 
   return (
@@ -102,10 +113,10 @@ export default function EventSurveyForm({ eventId, questions, isAr }: Props) {
 
         <button
           type="submit"
-          disabled={submitting}
+          disabled={isPending}
           className="w-full md:w-auto mt-8 flex items-center justify-center gap-2 bg-feps-navy hover:bg-black text-white px-8 py-4 font-bold uppercase tracking-widest transition-colors disabled:opacity-50"
         >
-          {submitting ? <Loader className="animate-spin" size={20} /> : <Send size={20} className={isAr ? 'rotate-180' : ''} />}
+          {isPending ? <Loader className="animate-spin" size={20} /> : <Send size={20} className={isAr ? 'rotate-180' : ''} />}
           {t('submitFeedback')}
         </button>
       </form>

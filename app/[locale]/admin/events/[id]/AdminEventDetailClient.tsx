@@ -310,7 +310,7 @@ export default function AdminEventDetailClient({ event, locale, surveyResponses 
                 <div className="space-y-4">
                   <p><strong>{t('title')}</strong> {event.title}</p>
                   <p><strong>{t('location')}</strong> {event.location}</p>
-                  <p><strong>{t('dateLabel')}</strong> {new Date(event.startDate).toLocaleString(isAr ? 'ar-EG' : 'en-US')}</p>
+                  <p><strong>{t('dateLabel')}</strong> {new Date(event.startDate).toLocaleString(isAr ? 'ar-EG-u-nu-latn' : 'en-US')}</p>
                 </div>
                 <button
                   onClick={() => router.push(`/${isAr ? 'ar' : 'en'}/admin/events?edit=${event.id}`)}
@@ -527,7 +527,7 @@ export default function AdminEventDetailClient({ event, locale, surveyResponses 
                         <div className={`w-[calc(100%-4rem)] md:w-[calc(50%-2.5rem)] p-4 rounded border shadow-sm ${isNote ? 'bg-blue-50 border-blue-100' : 'bg-white border-feps-ink/10'}`}>
                           <div className="flex items-center justify-between mb-1">
                             <div className="font-bold text-sm text-feps-navy">{(log.user as { name?: string })?.name || 'System'}</div>
-                            <time className="text-xs text-feps-ink-secondary font-sans">{new Date(log.timestamp as string).toLocaleString(isAr ? 'ar-EG' : 'en-US')}</time>
+                            <time className="text-xs text-feps-ink-secondary font-sans">{new Date(log.timestamp as string).toLocaleString(isAr ? 'ar-EG-u-nu-latn' : 'en-US')}</time>
                           </div>
                           <div className="text-sm">
                             <span className="font-bold text-xs uppercase tracking-widest bg-black/5 px-1 py-0.5 rounded mr-2 rtl:mr-0 rtl:ml-2">{log.action as string}</span>
