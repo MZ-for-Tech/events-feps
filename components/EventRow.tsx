@@ -46,7 +46,7 @@ export default function EventRow({
         
         {/* Stark Editorial Date Box */}
         <div className="flex-shrink-0 w-24 flex flex-col items-center justify-center p-3 border border-feps-border bg-feps-paper shadow-sm group-hover:border-feps-navy transition-colors">
-          <div className="font-mono text-[0.65rem] uppercase tracking-widest text-feps-ink-secondary mb-1 font-bold">
+          <div className="font-sans text-[0.65rem] uppercase tracking-widest text-feps-ink-secondary mb-1 font-bold">
             {month} {year}
           </div>
           <div className="font-serif text-4xl text-feps-navy leading-none">
@@ -57,18 +57,18 @@ export default function EventRow({
         {/* Title & Metadata */}
         <div className="flex-grow flex flex-col justify-center">
           <div className="flex flex-wrap items-center gap-3 mb-3">
-            <span className="font-mono text-[0.65rem] uppercase tracking-widest font-bold text-feps-navy bg-feps-gold/10 px-2 py-1 rounded-sm border border-feps-gold/30">
+            <span className="font-sans text-[0.65rem] uppercase tracking-widest font-bold text-feps-navy bg-feps-gold/10 px-2 py-1 rounded-sm border border-feps-gold/30">
               {categoryLabel}
             </span>
             <div className="w-[3px] h-[3px] bg-feps-border rounded-full"></div>
-            <div className="font-mono text-[0.65rem] uppercase tracking-widest text-feps-ink-secondary flex items-center gap-1.5">
+            <div className="font-sans text-[0.65rem] uppercase tracking-widest text-feps-ink-secondary flex items-center gap-1.5">
               <Clock size={12} />
               {formattedTime}
             </div>
             {location && (
               <>
                 <div className="w-[3px] h-[3px] bg-feps-border rounded-full"></div>
-                <div className="font-mono text-[0.65rem] uppercase tracking-widest text-feps-ink-secondary flex items-center gap-1.5">
+                <div className="font-sans text-[0.65rem] uppercase tracking-widest text-feps-ink-secondary flex items-center gap-1.5">
                   <MapPin size={12} />
                   <span className="line-clamp-1">{location}</span>
                 </div>

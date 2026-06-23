@@ -26,7 +26,7 @@ export default function EventHeader({
     <div className={`mt-8 mb-8 ${isAr ? 'text-right' : 'text-left'}`}>
       {/* Event Type Badge */}
       <div className="mb-4">
-        <span className="inline-flex items-center gap-2 border-2 border-feps-navy bg-white text-feps-navy px-4 py-1.5 font-mono text-xs font-bold uppercase tracking-wider">
+        <span className="inline-flex items-center gap-2 border-2 border-feps-navy bg-white text-feps-navy px-4 py-1.5 font-sans text-xs font-bold uppercase tracking-wider">
           <span className="w-2 h-2 bg-feps-navy" />
           {categoryLabel}
         </span>
@@ -46,12 +46,12 @@ export default function EventHeader({
 
       {/* Quick Info Pills */}
       <div className="flex flex-wrap items-center mt-6 border-y-2 border-feps-navy divide-x-2 divide-feps-navy rtl:divide-x-reverse">
-        <div className="flex items-center gap-2 font-mono text-sm text-feps-navy font-bold uppercase px-4 py-3">
+        <div className="flex items-center gap-2 font-sans text-sm text-feps-navy font-bold uppercase px-4 py-3">
           <Calendar size={18} />
           <span>{formattedStartDate}</span>
         </div>
         
-        <div className="flex items-center gap-2 font-mono text-sm text-feps-navy font-bold uppercase px-4 py-3">
+        <div className="flex items-center gap-2 font-sans text-sm text-feps-navy font-bold uppercase px-4 py-3">
           <Clock size={18} />
           <span>
             {formattedStartTime} {formattedEndTime && `- ${formattedEndTime}`}
@@ -59,7 +59,7 @@ export default function EventHeader({
         </div>
 
         {location && (
-          <div className="flex items-center gap-2 font-mono text-sm text-feps-navy font-bold uppercase px-4 py-3">
+          <div className="flex items-center gap-2 font-sans text-sm text-feps-navy font-bold uppercase px-4 py-3">
             <MapPin size={18} />
             <span>{location}</span>
           </div>

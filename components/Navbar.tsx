@@ -48,7 +48,7 @@ export default function Navbar() {
           <Image src="/feps-logo.png" alt="FEPS Logo" width={32} height={32} priority className="object-contain brightness-0 invert w-7 h-7 sm:w-8 sm:h-8" />
           <div className="flex flex-col">
             <span className="font-serif font-semibold text-base sm:text-lg leading-tight tracking-tight">FEPS</span>
-            <span className="font-mono text-[0.5rem] sm:text-[0.6rem] text-white/60 leading-tight tracking-widest uppercase hidden sm:block">Events System</span>
+            <span className="font-sans text-[0.5rem] sm:text-[0.6rem] text-white/60 leading-tight tracking-widest uppercase hidden sm:block">Events System</span>
           </div>
         </Link>
 
@@ -58,7 +58,7 @@ export default function Navbar() {
             <>
               <Link 
                 href={`/${locale}`} 
-                className={`flex items-center gap-2 font-mono text-xs uppercase tracking-widest font-semibold transition-colors ${isActive('/') ? 'text-feps-gold' : 'text-white/70 hover:text-white'}`}
+                className={`flex items-center gap-2 font-sans text-xs uppercase tracking-widest font-semibold transition-colors ${isActive('/') ? 'text-feps-gold' : 'text-white/70 hover:text-white'}`}
               >
                 <Home size={14} />
                 {t('home')}
@@ -66,7 +66,7 @@ export default function Navbar() {
               <Link 
                 href={`/${locale}/events`} 
                 data-tour="nav-events"
-                className={`flex items-center gap-2 font-mono text-xs uppercase tracking-widest font-semibold transition-colors ${isActive('/events') ? 'text-feps-gold' : 'text-white/70 hover:text-white'}`}
+                className={`flex items-center gap-2 font-sans text-xs uppercase tracking-widest font-semibold transition-colors ${isActive('/events') ? 'text-feps-gold' : 'text-white/70 hover:text-white'}`}
               >
                 <CalendarDays size={14} />
                 {f('events')}
@@ -75,7 +75,7 @@ export default function Navbar() {
               {isEditor && (
                 <Link 
                   href={`/${locale}/admin/events`} 
-                  className={`flex items-center gap-2 font-mono text-xs uppercase tracking-widest font-semibold transition-colors ${isActive('/admin') ? 'text-feps-gold' : 'text-white/70 hover:text-white'}`}
+                  className={`flex items-center gap-2 font-sans text-xs uppercase tracking-widest font-semibold transition-colors ${isActive('/admin') ? 'text-feps-gold' : 'text-white/70 hover:text-white'}`}
                 >
                   <Settings size={14} />
                   {t('admin')}
@@ -91,7 +91,7 @@ export default function Navbar() {
           {!isLoginPage && (
             <button
               onClick={() => window.dispatchEvent(new Event('start-tour'))}
-              className="hidden sm:flex bg-feps-gold text-feps-navy px-3 py-1 font-mono text-xs font-bold hover:bg-white hover:text-feps-navy transition-colors items-center justify-center uppercase"
+              className="hidden sm:flex bg-feps-gold text-feps-navy px-3 py-1 font-sans text-xs font-bold hover:bg-white hover:text-feps-navy transition-colors items-center justify-center uppercase"
             >
               {t('tour')}
             </button>
@@ -105,7 +105,7 @@ export default function Navbar() {
                 window.location.href = `/${next}${currentPathWithoutLocale}`
               }}
               aria-label="Select language"
-              className="appearance-none bg-transparent border border-white/20 text-white font-mono text-xs px-2 sm:px-3 py-1.5 pr-6 sm:pr-8 rounded-sm cursor-pointer outline-none hover:border-feps-gold focus:border-feps-gold transition-colors"
+              className="appearance-none bg-transparent border border-white/20 text-white font-sans text-xs px-2 sm:px-3 py-1.5 pr-6 sm:pr-8 rounded-sm cursor-pointer outline-none hover:border-feps-gold focus:border-feps-gold transition-colors"
             >
               <option value="en" className="text-feps-ink">EN</option>
               <option value="ar" className="text-feps-ink">عربي</option>
@@ -118,12 +118,12 @@ export default function Navbar() {
           <div className="hidden lg:flex items-center gap-4">
             {session ? (
               <>
-                <span className="font-mono text-xs text-white/70 truncate max-w-[150px]">
+                <span className="font-sans text-xs text-white/70 truncate max-w-[150px]">
                   {session.user?.name}
                 </span>
                 <button 
                   onClick={() => signOut()} 
-                  className="flex items-center gap-2 font-mono text-xs uppercase tracking-widest font-semibold text-white hover:text-feps-gold transition-colors"
+                  className="flex items-center gap-2 font-sans text-xs uppercase tracking-widest font-semibold text-white hover:text-feps-gold transition-colors"
                 >
                   <LogOut size={14} />
                   {t('signOut')}
@@ -133,7 +133,7 @@ export default function Navbar() {
               !isLoginPage && (
                 <Link 
                   href={`/${locale}/login`} 
-                  className="flex items-center gap-2 font-mono text-xs uppercase tracking-widest font-semibold text-white hover:text-feps-gold transition-colors"
+                  className="flex items-center gap-2 font-sans text-xs uppercase tracking-widest font-semibold text-white hover:text-feps-gold transition-colors"
                 >
                   <LogIn size={14} />
                   {t('signIn')}
@@ -175,16 +175,16 @@ export default function Navbar() {
           <div className="mt-auto flex flex-col gap-4 pt-8">
             {session ? (
               <>
-                <span className="font-mono text-xs text-white/70">
+                <span className="font-sans text-xs text-white/70">
                   {session.user?.name}
                 </span>
-                <button onClick={() => signOut()} className="w-full py-3 flex items-center justify-center gap-2 bg-feps-gold text-feps-navy font-mono text-xs uppercase tracking-widest font-bold">
+                <button onClick={() => signOut()} className="w-full py-3 flex items-center justify-center gap-2 bg-feps-gold text-feps-navy font-sans text-xs uppercase tracking-widest font-bold">
                   <LogOut size={16} />
                   {t('signOut')}
                 </button>
               </>
             ) : (
-              <Link href={`/${locale}/login`} className="w-full py-3 flex items-center justify-center gap-2 border border-feps-gold text-feps-gold text-center font-mono text-xs uppercase tracking-widest font-semibold hover:bg-feps-gold hover:text-feps-navy transition-colors" onClick={toggleMenu}>
+              <Link href={`/${locale}/login`} className="w-full py-3 flex items-center justify-center gap-2 border border-feps-gold text-feps-gold text-center font-sans text-xs uppercase tracking-widest font-semibold hover:bg-feps-gold hover:text-feps-navy transition-colors" onClick={toggleMenu}>
                 <LogIn size={16} />
                 {t('signIn')}
               </Link>

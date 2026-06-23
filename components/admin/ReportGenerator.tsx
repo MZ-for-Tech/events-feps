@@ -158,7 +158,7 @@ export default function ReportGenerator({ events, categories }: Props) {
         <h2 className="text-xl font-serif text-feps-ink mb-2">
           {tAdmin('generateReport')}
         </h2>
-        <p className="font-mono text-sm text-feps-ink-secondary">
+        <p className="font-sans text-sm text-feps-ink-secondary">
           {tAdmin('generateDesc')}
         </p>
       </div>
@@ -246,7 +246,7 @@ export default function ReportGenerator({ events, categories }: Props) {
 
       <div className="bg-feps-ink/5 p-4 mb-8 border border-feps-ink/10 border-l-4 border-l-feps-ink">
         <div className="font-bold text-sm text-feps-ink mb-2">{tAdmin('reportSummary')}</div>
-        <div className="font-mono text-xs text-feps-ink-secondary space-y-1">
+        <div className="font-sans text-xs text-feps-ink-secondary space-y-1">
           <div>{tAdmin('selectedPeriod')}: <strong className="text-feps-ink">{periodDisplay}</strong></div>
           <div>{tAdmin('totalEvents')}: <strong className="text-feps-ink">{filteredEvents.length}</strong></div>
         </div>

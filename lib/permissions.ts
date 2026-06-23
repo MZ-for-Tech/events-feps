@@ -8,6 +8,7 @@ export const PERMISSIONS = {
   USERS_MANAGE: 'users:manage',
   CATEGORIES_MANAGE: 'categories:manage',
   LOGS_VIEW: 'logs:view',
+  TRIVIA_MANAGE: 'trivia:manage',
 } as const
 
 export type Permission = typeof PERMISSIONS[keyof typeof PERMISSIONS]
@@ -30,5 +31,6 @@ export const PERMISSION_DEF = [
   { id: PERMISSIONS.EVENTS_REPORTS, labelAr: 'إدارة التقارير والاستبيانات', labelEn: 'Manage Reports & Surveys' },
   { id: PERMISSIONS.USERS_MANAGE, labelAr: 'إدارة المستخدمين', labelEn: 'Manage Users' },
   { id: PERMISSIONS.CATEGORIES_MANAGE, labelAr: 'إدارة التصنيفات', labelEn: 'Manage Categories' },
-  { id: PERMISSIONS.LOGS_VIEW, labelAr: 'الاطلاع على سجل النشاطات', labelEn: 'View Activity Logs' },
+  { id: PERMISSIONS.LOGS_VIEW, labelAr: 'الاطلاع على سجل النشاطات', labelEn: 'View Audit Logs' },
+  { id: PERMISSIONS.TRIVIA_MANAGE, labelAr: 'إدارة مسابقة المعلومات', labelEn: 'Manage Trivia' },
 ]

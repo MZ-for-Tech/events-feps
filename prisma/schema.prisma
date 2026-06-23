@@ -84,3 +84,16 @@ model SurveyResponse {
 
   event     Event    @relation(fields: [eventId], references: [id], onDelete: Cascade)
 }
+
+model TriviaQuestion {
+  id          String   @id @default(cuid())
+  textEn      String
+  textAr      String
+  textFr      String
+  options     String   // JSON: [{textEn, textAr, textFr, isCorrect}]
+  explanation String?  // Optional fun fact shown after answering
+  explanationAr String?
+  explanationFr String?
+  createdAt   DateTime @default(now())
+}
+

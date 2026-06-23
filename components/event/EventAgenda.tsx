@@ -71,7 +71,7 @@ export default function EventAgenda({ agendaText, isAr, title }: EventAgendaProp
   return (
     <div className="bg-feps-surface border-2 border-feps-navy p-8 mb-8">
       <div className="flex items-center gap-4 mb-8 border-b-2 border-feps-navy pb-4">
-        <h2 className={`text-2xl font-mono uppercase tracking-wider font-bold text-feps-navy ${isAr ? 'font-arabic' : ''}`}>
+        <h2 className={`text-2xl font-sans uppercase tracking-wider font-bold text-feps-navy ${isAr ? 'font-arabic' : ''}`}>
           {title}
         </h2>
       </div>
@@ -85,12 +85,12 @@ export default function EventAgenda({ agendaText, isAr, title }: EventAgendaProp
               
               <div className="flex flex-col md:flex-row md:items-start md:justify-between gap-2 mb-2">
                 {item.time && (
-                  <span className="font-mono text-feps-navy font-bold text-sm md:text-base tracking-wider bg-feps-navy/5 border border-feps-navy/20 px-3 py-1 w-fit">
+                  <span className="font-sans text-feps-navy font-bold text-sm md:text-base tracking-wider bg-feps-navy/5 border border-feps-navy/20 px-3 py-1 w-fit">
                     {item.time}
                   </span>
                 )}
                 {item.day && (
-                  <span className="text-xs font-mono font-bold bg-feps-navy text-feps-surface px-3 py-1 uppercase tracking-wider w-fit">
+                  <span className="text-xs font-sans font-bold bg-feps-navy text-feps-surface px-3 py-1 uppercase tracking-wider w-fit">
                     {item.day}
                   </span>
                 )}

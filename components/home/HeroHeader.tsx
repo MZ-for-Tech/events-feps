@@ -24,7 +24,7 @@ export default function HeroHeader({ locale, stats }: HeroHeaderProps) {
           <div className="lg:col-span-8">
             <div className="flex items-center gap-4 mb-8">
               <div className="h-[40px] w-[4px] bg-feps-navy"></div>
-              <span className="font-mono text-xs uppercase tracking-widest font-bold text-feps-ink">
+              <span className="font-sans text-xs uppercase tracking-widest font-bold text-feps-ink">
                 {t('directoryOverview')}
               </span>
             </div>
@@ -48,7 +48,7 @@ export default function HeroHeader({ locale, stats }: HeroHeaderProps) {
             >
               <div className="flex items-center gap-4 relative z-10">
                 <Calendar size={24} className="text-feps-gold" />
-                <span className="font-mono text-sm uppercase tracking-widest font-bold">
+                <span className="font-sans text-sm uppercase tracking-widest font-bold">
                   {t('viewCalendar')}
                 </span>
               </div>
@@ -62,11 +62,11 @@ export default function HeroHeader({ locale, stats }: HeroHeaderProps) {
             <div data-tour="hero-stats" className="grid grid-cols-2 gap-4">
               <div className="p-6 border border-feps-border bg-white shadow-sm">
                 <div className="text-4xl font-serif text-feps-navy leading-none mb-3">{stats.upcoming}</div>
-                <div className="font-mono text-[0.65rem] uppercase tracking-widest text-feps-ink-secondary font-bold">{t('upcomingSeminars')}</div>
+                <div className="font-sans text-[0.65rem] uppercase tracking-widest text-feps-ink-secondary font-bold">{t('upcomingSeminars')}</div>
               </div>
               <div className="p-6 border border-feps-border bg-white shadow-sm">
                 <div className="text-4xl font-serif text-feps-navy leading-none mb-3">{stats.total}</div>
-                <div className="font-mono text-[0.65rem] uppercase tracking-widest text-feps-ink-secondary font-bold">{t('activeRecords')}</div>
+                <div className="font-sans text-[0.65rem] uppercase tracking-widest text-feps-ink-secondary font-bold">{t('activeRecords')}</div>
               </div>
             </div>
 

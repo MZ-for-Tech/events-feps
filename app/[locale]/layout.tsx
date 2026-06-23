@@ -1,26 +1,12 @@
 import type { Metadata, Viewport } from 'next'
-import { Inter, Merriweather, Cairo } from 'next/font/google'
+import { Amiri } from 'next/font/google'
 import '../globals.css'
 
-const inter = Inter({
-  subsets: ['latin'],
-  weight: ['400', '500', '600', '700', '800'],
-  variable: '--font-inter',
-  display: 'swap',
-})
-
-const merriweather = Merriweather({
-  subsets: ['latin'],
-  weight: ['300', '400', '700', '900'],
+const amiri = Amiri({
+  subsets: ['latin', 'arabic'],
+  weight: ['400', '700'],
   style: ['normal', 'italic'],
-  variable: '--font-merriweather',
-  display: 'swap',
-})
-
-const cairo = Cairo({
-  subsets: ['arabic'],
-  weight: ['400', '500', '600', '700', '800'],
-  variable: '--font-cairo',
+  variable: '--font-amiri',
   display: 'swap',
 })
 import { NextIntlClientProvider } from 'next-intl'
@@ -69,7 +55,7 @@ export default async function RootLayout({
         <link rel="apple-touch-icon" href="/feps-logo.png" />
         <link rel="manifest" href="/manifest.json" />
       </head>
-      <body dir={locale === 'ar' ? 'rtl' : 'ltr'} className={`${inter.variable} ${merriweather.variable} ${cairo.variable}`}>
+      <body dir={locale === 'ar' ? 'rtl' : 'ltr'} className={`${amiri.variable}`}>
         <NextIntlClientProvider messages={messages} locale={locale}>
           <Providers>
             <Navbar />

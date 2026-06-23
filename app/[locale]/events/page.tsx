@@ -60,7 +60,7 @@ export default async function EventsPage({ params }: PageProps) {
         <div className="container max-w-5xl">
           <div className="flex items-center gap-4 mb-4">
             <div className="h-[40px] w-[3px] bg-feps-ink"></div>
-            <span className="font-mono text-xs uppercase tracking-widest font-semibold text-feps-ink-secondary">
+            <span className="font-sans text-xs uppercase tracking-widest font-semibold text-feps-ink-secondary">
               {t('pageLabel')}
             </span>
           </div>
@@ -74,7 +74,7 @@ export default async function EventsPage({ params }: PageProps) {
           {isAdmin && (
             <Link
               href={`/admin/events`}
-              className="inline-flex items-center gap-2 px-6 py-3 bg-feps-ink text-feps-paper font-mono text-xs uppercase tracking-widest font-semibold hover:bg-feps-navy transition-colors"
+              className="inline-flex items-center gap-2 px-6 py-3 bg-feps-ink text-feps-paper font-sans text-xs uppercase tracking-widest font-semibold hover:bg-feps-navy transition-colors"
             >
               <ShieldAlert size={16} />
               {t('manageEvents')}

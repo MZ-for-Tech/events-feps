@@ -11,14 +11,14 @@ export default async function LoginPage() {
           <div className="mb-8">
             <div className="flex items-center gap-4 mb-4">
               <div className="h-[40px] w-[3px] bg-feps-ink"></div>
-              <span className="font-mono text-xs uppercase tracking-widest font-semibold text-feps-ink-secondary">
+              <span className="font-sans text-xs uppercase tracking-widest font-semibold text-feps-ink-secondary">
                 {tl('pageLabel')}
               </span>
             </div>
             <h1 className="font-serif text-3xl font-normal text-feps-ink leading-tight mb-2">
               {tl('signIn')}
             </h1>
-            <p className="font-mono text-xs uppercase tracking-widest text-feps-ink-secondary">
+            <p className="font-sans text-xs uppercase tracking-widest text-feps-ink-secondary">
               {tl('subtitle')}
             </p>
           </div>
@@ -26,7 +26,7 @@ export default async function LoginPage() {
           <LoginForm />
         </div>
         
-        <p className="mt-8 text-center font-mono text-[0.65rem] uppercase tracking-widest text-feps-ink-tertiary">
+        <p className="mt-8 text-center font-sans text-[0.65rem] uppercase tracking-widest text-feps-ink-tertiary">
           &copy; {new Date().getFullYear()} Faculty of Economics and Political Science
         </p>
       </div>

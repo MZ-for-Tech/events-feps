@@ -32,7 +32,7 @@
   flex-shrink: 0;
   display: inline-flex;
   align-items: center;
-  font-family: var(--font-mono, monospace);
+  font-family: var(--font-sans, sans-serif);
   font-size: 0.75rem;
   font-weight: 600;
   padding: 0.4rem 1rem;
@@ -86,7 +86,7 @@
   border: 1px solid var(--feps-border);
   color: var(--feps-ink);
   padding: 0.45rem 1.15rem;
-  font-family: var(--font-mono, monospace);
+  font-family: var(--font-sans, sans-serif);
   font-size: 0.75rem;
   font-weight: 600;
   text-transform: uppercase;
@@ -116,7 +116,7 @@
   display: flex;
   align-items: center;
   gap: 0.4rem;
-  font-family: var(--font-mono, monospace);
+  font-family: var(--font-sans, sans-serif);
   font-size: 0.75rem;
   font-weight: 600;
   text-transform: uppercase;
@@ -152,7 +152,7 @@
 
 .day-header-cell {
   text-align: center;
-  font-family: var(--font-mono, monospace);
+  font-family: var(--font-sans, sans-serif);
   font-size: 0.75rem;
   font-weight: 600;
   color: var(--feps-ink);
@@ -273,7 +273,7 @@
 
 /* More count indicator */
 .cell-events-more {
-  font-family: var(--font-mono, monospace);
+  font-family: var(--font-sans, sans-serif);
   font-size: 0.65rem;
   font-weight: 600;
   color: var(--feps-ink-secondary);
@@ -285,7 +285,7 @@
 .cell-mobile-count {
   background: var(--feps-ink);
   color: var(--feps-paper);
-  font-family: var(--font-mono, monospace);
+  font-family: var(--font-sans, sans-serif);
   font-size: 0.65rem;
   font-weight: 600;
   width: 18px;
@@ -360,7 +360,7 @@
 }
 
 .agenda-month-name {
-  font-family: var(--font-mono, monospace);
+  font-family: var(--font-sans, sans-serif);
   font-size: 0.65rem;
   font-weight: 600;
   text-transform: uppercase;
@@ -369,7 +369,7 @@
 }
 
 .agenda-day-name {
-  font-family: var(--font-mono, monospace);
+  font-family: var(--font-sans, sans-serif);
   font-size: 0.65rem;
   color: var(--feps-ink-tertiary);
   margin-top: 0.15rem;
@@ -383,7 +383,7 @@
 .category-indicator-tag {
   display: inline-flex;
   align-items: center;
-  font-family: var(--font-mono, monospace);
+  font-family: var(--font-sans, sans-serif);
   font-size: 0.65rem;
   font-weight: 600;
   padding: 0.2rem 0.5rem;
@@ -430,7 +430,7 @@
   display: inline-flex;
   align-items: center;
   gap: 0.3rem;
-  font-family: var(--font-mono, monospace);
+  font-family: var(--font-sans, sans-serif);
   font-size: 0.7rem;
   color: var(--feps-ink-tertiary);
 }
@@ -486,7 +486,7 @@
 }
 
 .sidebar-title-month {
-  font-family: var(--font-mono, monospace);
+  font-family: var(--font-sans, sans-serif);
   font-size: 0.75rem;
   color: var(--feps-ink-secondary);
   font-weight: 600;

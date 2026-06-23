@@ -1,4 +1,29 @@
 {
+  "FepsTrivia": {
+    "trigger": "Test Your Knowledge",
+    "welcomeTitle": "Faculty Knowledge Challenge",
+    "welcomeDesc": "Test your knowledge about the Faculty of Economics and Political Science. Discover historical facts, academic achievements, and institutional milestones.",
+    "loadingTrivia": "Loading Trivia...",
+    "startBtn": "Start Quiz",
+    "question": "Question",
+    "of": "of",
+    "correct": "Correct!",
+    "wrong": "Incorrect",
+    "correctAnswer": "Correct answer:",
+    "next": "Next",
+    "finish": "See Results",
+    "score": "Your Score",
+    "shareScore": "Share My Score",
+    "downloadImage": "Download Score Card",
+    "playAgain": "Play Again",
+    "close": "Close",
+    "scoreBands": {
+      "perfect": "Perfect Score! You truly belong here.",
+      "good": "Impressive! A true FEPS scholar.",
+      "average": "Not bad — keep exploring.",
+      "poor": "FEPS has a lot to teach you!"
+    }
+  },
   "Home": {
     "systemName": "FEPS Events Hub",
     "directoryOverview": "Live & Upcoming",
@@ -57,7 +82,10 @@
     "approve": "Approve",
     "approving": "...",
     "reject": "Reject",
-    "rejecting": "..."
+    "rejecting": "...",
+    "close": "Close",
+    "cancel": "Cancel",
+    "save": "Save"
   },
   "Report": {
     "university": "Cairo University",
@@ -197,7 +225,8 @@
     "controlPanel": "Control Panel",
     "loggedInAs": "Logged in as",
     "categories": "Categories Management",
-    "logs": "Activity Logs"
+    "logs": "Audit Logs",
+    "trivia": "Trivia"
   },
   "AdminReports": {
     "pageTitle": "Reports & Analytics",
@@ -262,6 +291,11 @@
     "adminReportGenerateContent": "Click here to render and download a formal, printable PDF document of the events ledger."
   },
   "AdminUsers": {
+    "roles": {
+      "SUPERADMIN": "Super Admin",
+      "MANAGER": "Manager",
+      "EDITOR": "Editor"
+    },
     "systemAndPermissions": "System & Permissions Management",
     "fullControl": "Full control over user accounts and granular permissions.",
     "addUser": "Add User",
@@ -290,15 +324,26 @@
     "save": "Save"
   },
   "AdminLogs": {
-    "title": "System Activity Logs",
+    "title": "System Audit Logs",
     "subtitle": "Complete tracking of user actions and system modifications.",
     "search": "Search logs...",
     "allActions": "All Actions",
-    "noMatch": "No activity logs match your search.",
+    "noMatch": "No audit logs match your search.",
     "timestamp": "Timestamp",
     "user": "User",
     "action": "Action",
-    "details": "Details"
+    "details": "Details",
+    "systemUser": "System / Deleted User",
+    "actions": {
+      "PAGE_VIEW": "Page View",
+      "LOGIN": "Login",
+      "LOGOUT": "Logout",
+      "CREATE": "Create",
+      "UPDATE": "Update",
+      "DELETE": "Delete",
+      "PUBLISH": "Publish",
+      "UNPUBLISH": "Unpublish"
+    }
   },
   "Share": {
     "shareEvent": "Share Event",

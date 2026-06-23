@@ -1,6 +1,8 @@
 import { getTranslations } from 'next-intl/server'
 import { prisma } from '@/lib/prisma'
 import ReportGenerator from '@/components/admin/ReportGenerator'
+import { AdminPageHeader } from '@/components/admin/AdminPageHeader'
+import { FileText } from 'lucide-react'
 
 export const dynamic = 'force-dynamic'
 
@@ -35,14 +37,11 @@ export default async function AdminReportsPage() {
 
   return (
     <div>
-      <div className="mb-8 border-b border-feps-ink/20 pb-4">
-        <h1 className="text-3xl font-serif text-feps-ink mb-2">
-          {t('pageTitle')}
-        </h1>
-        <p className="font-mono text-sm text-feps-ink-secondary">
-          {t('pageDesc')}
-        </p>
-      </div>
+      <AdminPageHeader 
+        title={t('pageTitle')}
+        description={t('pageDesc')}
+        icon={FileText}
+      />
 
       <ReportGenerator events={events} categories={categories} />
     </div>

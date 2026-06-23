@@ -12,7 +12,7 @@ export default function EventAbout({ description, isAr, title }: EventAboutProps
   return (
     <div className="bg-feps-surface border-2 border-feps-navy p-8 mb-8">
       <div className="flex items-center gap-4 mb-6 border-b-2 border-feps-navy pb-4">
-        <h2 className={`text-2xl font-mono uppercase tracking-wider font-bold text-feps-navy ${isAr ? 'font-arabic' : ''}`}>
+        <h2 className={`text-2xl font-sans uppercase tracking-wider font-bold text-feps-navy ${isAr ? 'font-arabic' : ''}`}>
           {title}
         </h2>
       </div>

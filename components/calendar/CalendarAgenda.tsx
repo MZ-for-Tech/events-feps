@@ -2,8 +2,9 @@
 
 import React from 'react'
 import Link from 'next/link'
-import { MapPin, Clock, ExternalLink } from 'lucide-react'
+import { MapPin, Clock, ExternalLink, CalendarPlus } from 'lucide-react'
 import { CalendarEvent } from './types'
+import { generateGoogleCalendarUrl } from '@/lib/calendar'
 
 interface Props {
   events: CalendarEvent[]
@@ -90,8 +91,46 @@ export default function CalendarAgenda({ events, locale, isAr, isFr }: Props) {
                   </div>
                 </div>
                 
-                <div className="agenda-action" style={{ transform: isAr ? 'rotate(180deg)' : 'none' }}>
-                  <ExternalLink size={16} />
+                <div className="agenda-action" style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end', gap: '0.75rem' }}>
+                  <div style={{ transform: isAr ? 'rotate(180deg)' : 'none' }}>
+                    <ExternalLink size={16} />
+                  </div>
+                  <button
+                    onClick={(e) => {
+                      e.preventDefault()
+                      e.stopPropagation()
+                      window.open(generateGoogleCalendarUrl(ev), '_blank', 'noopener,noreferrer')
+                    }}
+                    style={{
+                      display: 'inline-flex',
+                      alignItems: 'center',
+                      gap: '0.35rem',
+                      fontSize: '0.7rem',
+                      fontFamily: 'var(--font-sans, sans-serif)',
+                      fontWeight: 600,
+                      color: 'var(--feps-navy)',
+                      background: 'rgba(26,58,110,0.05)',
+                      padding: '0.35rem 0.6rem',
+                      borderRadius: 'var(--radius-feps, 2px)',
+                      border: '1px solid rgba(26,58,110,0.1)',
+                      cursor: 'pointer',
+                      transition: 'all 0.2s ease',
+                      textTransform: 'uppercase',
+                      letterSpacing: '0.02em',
+                      whiteSpace: 'nowrap'
+                    }}
+                    onMouseOver={(e) => {
+                      e.currentTarget.style.background = 'rgba(26,58,110,0.1)'
+                      e.currentTarget.style.borderColor = 'rgba(26,58,110,0.2)'
+                    }}
+                    onMouseOut={(e) => {
+                      e.currentTarget.style.background = 'rgba(26,58,110,0.05)'
+                      e.currentTarget.style.borderColor = 'rgba(26,58,110,0.1)'
+                    }}
+                  >
+                    <CalendarPlus size={12} />
+                    {isAr ? 'إضافة للتقويم' : isFr ? 'Ajouter' : 'Add to Calendar'}
+                  </button>
                 </div>
               </Link>
             )

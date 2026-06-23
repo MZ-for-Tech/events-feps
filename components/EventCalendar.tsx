@@ -119,7 +119,7 @@ export default function EventCalendar({ initialEvents, categories }: Props) {
   return (
     <div>
       {/* Category Filter Bar */}
-      <div data-tour="events-filters" className="filter-header-row" style={{ display: 'flex', alignItems: 'center', gap: '0.4rem', marginBottom: '0.6rem', color: 'var(--feps-ink-secondary)', fontSize: '0.75rem', fontWeight: 600, fontFamily: 'var(--font-mono, monospace)', textTransform: 'uppercase', letterSpacing: '0.05em', direction: isAr ? 'rtl' : 'ltr' }}>
+      <div data-tour="events-filters" className="filter-header-row" style={{ display: 'flex', alignItems: 'center', gap: '0.4rem', marginBottom: '0.6rem', color: 'var(--feps-ink-secondary)', fontSize: '0.75rem', fontWeight: 600, fontFamily: 'var(--font-sans, sans-serif)', textTransform: 'uppercase', letterSpacing: '0.05em', direction: isAr ? 'rtl' : 'ltr' }}>
         <Filter size={12} style={{ color: 'var(--feps-ink-tertiary)' }} />
         <span>{isAr ? 'تصفية حسب التصنيف' : isFr ? 'Filtrer par catégorie' : 'Filter by Category'}</span>
       </div>

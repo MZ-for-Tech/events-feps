@@ -37,14 +37,14 @@ export default function EventSidebar({
     <div className="sticky top-24 flex flex-col gap-6">
       {/* Quick Ledger Info Box */}
       <div className="bg-white border-2 border-feps-navy p-6 flex flex-col">
-        <h3 className={`text-xl font-mono uppercase tracking-wider font-bold text-feps-navy mb-6 pb-4 border-b-2 border-feps-navy ${isAr ? 'font-arabic' : ''}`}>
+        <h3 className={`text-xl font-sans uppercase tracking-wider font-bold text-feps-navy mb-6 pb-4 border-b-2 border-feps-navy ${isAr ? 'font-arabic' : ''}`}>
           {labels.quickFacts}
         </h3>
 
         <div className="flex flex-col gap-5">
           {/* Date Ledger */}
           <div className="flex flex-col gap-1 border-b-2 border-feps-navy/20 pb-4">
-            <div className="flex items-center gap-2 text-xs font-mono text-feps-navy font-bold uppercase tracking-wider">
+            <div className="flex items-center gap-2 text-xs font-sans text-feps-navy font-bold uppercase tracking-wider">
               <Calendar size={14} className="text-feps-gold" /> {labels.date}
             </div>
             <div className={`text-sm font-semibold text-feps-navy ${isAr ? 'font-arabic' : ''}`}>
@@ -59,7 +59,7 @@ export default function EventSidebar({
 
           {/* Time Ledger */}
           <div className="flex flex-col gap-1 border-b-2 border-feps-navy/20 pb-4">
-            <div className="flex items-center gap-2 text-xs font-mono text-feps-navy font-bold uppercase tracking-wider">
+            <div className="flex items-center gap-2 text-xs font-sans text-feps-navy font-bold uppercase tracking-wider">
               <Clock size={14} className="text-feps-gold" /> {labels.time}
             </div>
             <div className={`text-sm font-semibold text-feps-navy ${isAr ? 'font-arabic' : ''}`}>
@@ -76,7 +76,7 @@ export default function EventSidebar({
           {/* Location Ledger */}
           {location && (
             <div className="flex flex-col gap-1">
-              <div className="flex items-center gap-2 text-xs font-mono text-feps-navy font-bold uppercase tracking-wider">
+              <div className="flex items-center gap-2 text-xs font-sans text-feps-navy font-bold uppercase tracking-wider">
                 <MapPin size={14} className="text-feps-gold" /> {labels.location}
               </div>
               <div className={`text-sm font-semibold text-feps-navy ${isAr ? 'font-arabic' : ''}`}>

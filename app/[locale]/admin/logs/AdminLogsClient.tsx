@@ -4,6 +4,8 @@ import React, { useEffect, useState } from 'react'
 import { useTranslations } from 'next-intl'
 import { Activity, Clock, Filter, AlertCircle, Loader, Search } from 'lucide-react'
 import { format } from 'date-fns'
+import { Table, TableHeader, TableBody, TableRow, TableHead, TableCell } from '@/components/admin/AdminTable'
+import { AdminPageHeader } from '@/components/admin/AdminPageHeader'
 
 interface LogUser {
   name: string
@@ -25,6 +27,7 @@ interface AuditLog {
 export default function AdminLogsClient({ locale }: { locale: string }) {
   const isAr = locale === 'ar'
   const t = useTranslations('AdminLogs')
+  const tAdminUsers = useTranslations('AdminUsers')
   const [logs, setLogs] = useState<AuditLog[]>([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
@@ -72,18 +75,12 @@ export default function AdminLogsClient({ locale }: { locale: string }) {
   }
 
   return (
-    <div className="p-6 md:p-10 max-w-7xl mx-auto" dir={isAr ? 'rtl' : 'ltr'}>
-      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-8">
-        <div>
-          <h1 className="text-3xl font-serif text-feps-navy flex items-center gap-3">
-            <Activity size={28} />
-            {t('title')}
-          </h1>
-          <p className="text-feps-ink-secondary mt-2 text-sm">
-            {t('subtitle')}
-          </p>
-        </div>
-      </div>
+    <div dir={isAr ? 'rtl' : 'ltr'}>
+      <AdminPageHeader
+        title={t('title')}
+        description={t('subtitle')}
+        icon={Activity}
+      />
 
       <div className="bg-white border border-feps-ink/20 shadow-sm p-4 mb-6 flex flex-col md:flex-row gap-4">
         <div className="flex-1 relative">
@@ -104,7 +101,7 @@ export default function AdminLogsClient({ locale }: { locale: string }) {
             className="border border-feps-ink/20 bg-feps-ink/5 p-2 focus:outline-none text-sm"
           >
             <option value="ALL">{t('allActions')}</option>
-            {uniqueActions.map(act => <option key={act} value={act}>{act}</option>)}
+            {uniqueActions.map(act => <option key={act} value={act}>{t.has(`actions.${act}`) ? t(`actions.${act}` as Parameters<typeof t>[0]) : act}</option>)}
           </select>
         </div>
       </div>
@@ -121,47 +118,47 @@ export default function AdminLogsClient({ locale }: { locale: string }) {
           <p>{t('noMatch')}</p>
         </div>
       ) : (
-        <div className="bg-white border border-feps-ink/20 overflow-x-auto shadow-sm">
-          <table className="w-full text-left rtl:text-right text-sm">
-            <thead>
-              <tr className="bg-feps-ink/5 border-b border-feps-ink/20">
-                <th className="p-4 font-bold uppercase tracking-wider text-feps-ink-secondary">{t('timestamp')}</th>
-                <th className="p-4 font-bold uppercase tracking-wider text-feps-ink-secondary">{t('user')}</th>
-                <th className="p-4 font-bold uppercase tracking-wider text-feps-ink-secondary">{t('action')}</th>
-                <th className="p-4 font-bold uppercase tracking-wider text-feps-ink-secondary">{t('details')}</th>
-              </tr>
-            </thead>
-            <tbody className="divide-y divide-feps-ink/10">
-              {filteredLogs.map(log => (
-                <tr key={log.id} className="hover:bg-feps-ink/5 transition-colors">
-                  <td className="p-4 whitespace-nowrap text-feps-ink-secondary flex items-center gap-2">
-                    <Clock size={14} />
-                    {format(new Date(log.timestamp), 'yyyy-MM-dd HH:mm:ss')}
-                  </td>
-                  <td className="p-4">
-                    {log.user ? (
-                      <div>
-                        <div className="font-bold text-feps-navy">{log.user.name}</div>
-                        <div className="text-xs text-feps-ink-secondary">{log.user.role}</div>
+        <Table>
+          <TableHeader>
+            <TableRow>
+              <TableHead>{t('timestamp')}</TableHead>
+              <TableHead>{t('user')}</TableHead>
+              <TableHead>{t('action')}</TableHead>
+              <TableHead>{t('details')}</TableHead>
+            </TableRow>
+          </TableHeader>
+          <TableBody>
+            {filteredLogs.map(log => (
+              <TableRow key={log.id}>
+                <TableCell className="whitespace-nowrap text-feps-ink-secondary flex items-center gap-2">
+                  <Clock size={14} />
+                  {format(new Date(log.timestamp), 'yyyy-MM-dd HH:mm:ss')}
+                </TableCell>
+                <TableCell>
+                  {log.user ? (
+                    <div>
+                      <div className="font-bold text-feps-navy">{log.user.name}</div>
+                      <div className="text-xs text-feps-ink-secondary">
+                        {tAdminUsers.has(`roles.${log.user.role}`) ? tAdminUsers(`roles.${log.user.role}` as Parameters<typeof tAdminUsers>[0]) : log.user.role}
                       </div>
-                    ) : (
-                      <span className="text-feps-ink-secondary italic">System / Deleted User</span>
-                    )}
-                  </td>
-                  <td className="p-4">
-                    <span className={`px-2 py-1 text-xs font-bold border rounded-sm ${getActionColor(log.action)}`}>
-                      {log.action}
-                    </span>
-                  </td>
-                  <td className="p-4 text-feps-ink-secondary max-w-md truncate" title={formatDetails(log.details)}>
-                    {log.entityType && <span className="font-bold text-feps-ink mr-2">[{log.entityType}]</span>}
-                    {formatDetails(log.details)}
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
+                    </div>
+                  ) : (
+                    <span className="text-feps-ink-secondary italic">{t('systemUser')}</span>
+                  )}
+                </TableCell>
+                <TableCell>
+                  <span className={`px-2 py-1 text-xs font-bold border rounded-sm ${getActionColor(log.action)}`}>
+                    {t.has(`actions.${log.action}`) ? t(`actions.${log.action}` as Parameters<typeof t>[0]) : log.action}
+                  </span>
+                </TableCell>
+                <TableCell className="text-feps-ink-secondary max-w-md truncate" title={formatDetails(log.details)}>
+                  {log.entityType && <span className="font-bold text-feps-ink mr-2">[{log.entityType === 'SYSTEM' ? (isAr ? 'النظام' : 'System') : log.entityType}]</span>}
+                  {formatDetails(log.details)}
+                </TableCell>
+              </TableRow>
+            ))}
+          </TableBody>
+        </Table>
       )}
     </div>
   )

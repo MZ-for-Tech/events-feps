@@ -1,4 +1,29 @@
 {
+  "FepsTrivia": {
+    "trigger": "Testez Vos Connaissances",
+    "welcomeTitle": "Défi de Connaissances",
+    "welcomeDesc": "Testez vos connaissances sur la Faculté d'Économie et de Sciences Politiques. Découvrez des faits historiques et des jalons institutionnels.",
+    "loadingTrivia": "Chargement du quiz...",
+    "startBtn": "Démarrer le Quiz",
+    "question": "Question",
+    "of": "sur",
+    "correct": "Correct!",
+    "wrong": "Incorrect",
+    "correctAnswer": "Bonne réponse:",
+    "next": "Suivant",
+    "finish": "Voir les Résultats",
+    "score": "Votre Score",
+    "shareScore": "Partager Mon Score",
+    "downloadImage": "Télécharger l'Image",
+    "playAgain": "Rejouer",
+    "close": "Fermer",
+    "scoreBands": {
+      "perfect": "Score Parfait! Vous êtes à votre place ici.",
+      "good": "Impressionnant! Un vrai chercheur FEPS.",
+      "average": "Pas mal — continuez à explorer.",
+      "poor": "FEPS a beaucoup à vous apprendre!"
+    }
+  },
   "Home": {
     "systemName": "Hub Événementiel FEPS",
     "directoryOverview": "En Direct & À Venir",
@@ -57,7 +82,10 @@
     "approve": "Approuver",
     "approving": "...",
     "reject": "Rejeter",
-    "rejecting": "..."
+    "rejecting": "...",
+    "close": "Fermer",
+    "cancel": "Annuler",
+    "save": "Enregistrer"
   },
   "Report": {
     "university": "Université du Caire",
@@ -197,7 +225,8 @@
     "controlPanel": "Panneau de contrôle",
     "loggedInAs": "Connecté en tant que",
     "categories": "Gestion des catégories",
-    "logs": "Journaux d'activité"
+    "logs": "Journaux d'activité",
+    "trivia": "Quiz"
   },
   "AdminReports": {
     "pageTitle": "Rapports et Analyses",

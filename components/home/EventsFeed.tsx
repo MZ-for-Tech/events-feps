@@ -23,10 +23,10 @@ export default function EventsFeed({ locale, upcomingEvents }: EventsFeedProps) 
           </div>
           <div>
             <h2 className="font-serif text-3xl md:text-4xl font-normal text-feps-navy mb-2">{t('upcomingEntries')}</h2>
-            <p className="font-mono text-xs uppercase tracking-widest text-feps-ink-secondary font-bold">{t('latestActivities')}</p>
+            <p className="font-sans text-xs uppercase tracking-widest text-feps-ink-secondary font-bold">{t('latestActivities')}</p>
           </div>
         </div>
-        <Link href={`/${locale}/events`} className="group hidden sm:flex items-center gap-3 font-mono text-xs uppercase tracking-widest font-bold text-feps-navy hover:text-feps-gold transition-colors pb-2">
+        <Link href={`/${locale}/events`} className="group hidden sm:flex items-center gap-3 font-sans text-xs uppercase tracking-widest font-bold text-feps-navy hover:text-feps-gold transition-colors pb-2">
           {t('seeAll')} <ArrowRight size={16} className="group-hover:translate-x-1 transition-transform" />
         </Link>
       </div>
@@ -52,11 +52,11 @@ export default function EventsFeed({ locale, upcomingEvents }: EventsFeedProps) 
         <div className="text-center py-20 bg-feps-paper border border-feps-border">
           <Calendar className="mx-auto text-feps-border mb-4" size={48} />
           <h3 className="text-xl font-serif text-feps-ink mb-2">{t('noEvents')}</h3>
-          <p className="font-mono text-xs uppercase tracking-widest text-feps-ink-secondary">{t('noEventsHint')}</p>
+          <p className="font-sans text-xs uppercase tracking-widest text-feps-ink-secondary">{t('noEventsHint')}</p>
         </div>
       )}
       
-      <Link href={`/${locale}/events`} className="group sm:hidden mt-8 flex justify-center items-center gap-2 font-mono text-xs uppercase tracking-widest font-bold text-feps-navy hover:text-feps-gold border border-feps-border py-4 transition-colors w-full">
+      <Link href={`/${locale}/events`} className="group sm:hidden mt-8 flex justify-center items-center gap-2 font-sans text-xs uppercase tracking-widest font-bold text-feps-navy hover:text-feps-gold border border-feps-border py-4 transition-colors w-full">
         {t('seeAll')} <ArrowRight size={16} className="group-hover:translate-x-1 transition-transform" />
       </Link>
     </div>

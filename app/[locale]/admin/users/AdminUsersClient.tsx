@@ -5,6 +5,10 @@ import { Shield, Plus, Edit2, Trash2, AlertCircle, Loader, Check } from 'lucide-
 import { PERMISSION_DEF } from '@/lib/permissions'
 import { useRouter } from 'next/navigation'
 import { useTranslations } from 'next-intl'
+import { Table, TableHeader, TableBody, TableRow, TableHead, TableCell } from '@/components/admin/AdminTable'
+import { AdminButton } from '@/components/admin/AdminButton'
+import { AdminPageHeader } from '@/components/admin/AdminPageHeader'
+import { AdminModal } from '@/components/admin/AdminModal'
 
 interface User {
   id: string
@@ -133,200 +137,189 @@ export default function AdminUsersClient({ initialUsers, locale, currentUserRole
   }
 
   return (
-    <div className="p-6 md:p-10 max-w-7xl mx-auto" dir={isAr ? 'rtl' : 'ltr'}>
-      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-8">
-        <div>
-          <h1 className="text-3xl font-serif text-feps-navy flex items-center gap-3">
-            <Shield size={28} />
-            {t('systemAndPermissions')}
-          </h1>
-          <p className="text-feps-ink-secondary mt-2 text-sm">
-            {t('subtitle')}
-          </p>
-        </div>
-        <button
-          onClick={handleOpenCreate}
-          className="bg-feps-navy text-white px-6 py-3 font-bold uppercase tracking-widest text-sm flex items-center gap-2 hover:bg-black transition-colors"
-        >
-          <Plus size={18} />
-          {t('addUser')}
-        </button>
-      </div>
+    <div dir={isAr ? 'rtl' : 'ltr'}>
+      <AdminPageHeader
+        title={t('systemAndPermissions')}
+        description={t('subtitle')}
+        icon={Shield}
+        action={
+          <AdminButton onClick={handleOpenCreate} icon={Plus}>
+            {t('addUser')}
+          </AdminButton>
+        }
+      />
 
-      <div className="bg-white border border-feps-ink/20 overflow-x-auto shadow-sm">
-        <table className="w-full text-left rtl:text-right">
-          <thead>
-            <tr className="bg-feps-ink/5 border-b border-feps-ink/20">
-              <th className="p-4 font-bold text-xs uppercase tracking-widest text-feps-ink-secondary">{t('user')}</th>
-              <th className="p-4 font-bold text-xs uppercase tracking-widest text-feps-ink-secondary">{t('permissions')}</th>
-              <th className="p-4 font-bold text-xs uppercase tracking-widest text-feps-ink-secondary text-center">{t('actions')}</th>
-            </tr>
-          </thead>
-          <tbody className="divide-y divide-feps-ink/10">
-            {users.map(user => (
-              <tr key={user.id} className="hover:bg-feps-ink/5 transition-colors">
-                <td className="p-4">
-                  <div className="font-bold text-feps-ink">{user.name}</div>
-                  <div className="text-xs text-feps-ink-secondary mt-1">{user.email}</div>
-                  {user.role === 'SUPERADMIN' && (
-                    <span className="inline-block mt-2 bg-amber-100 text-amber-800 text-[10px] font-bold px-2 py-0.5 rounded-full uppercase tracking-wider">
-                      SUPERADMIN
+      <Table>
+        <TableHeader>
+          <TableRow>
+            <TableHead>{t('user')}</TableHead>
+            <TableHead>{t('permissions')}</TableHead>
+            <TableHead className="text-center">{t('actions')}</TableHead>
+          </TableRow>
+        </TableHeader>
+        <TableBody>
+          {users.map(user => (
+            <TableRow key={user.id}>
+              <TableCell>
+                <div className="font-bold text-feps-ink">{user.name}</div>
+                <div className="text-xs text-feps-ink-secondary mt-1">{user.email}</div>
+                {user.role === 'SUPERADMIN' ? (
+                  <span className="inline-block mt-2 bg-amber-100 text-amber-800 text-[10px] font-bold px-2 py-0.5 rounded-full uppercase tracking-wider">
+                    {t.has(`roles.${user.role}`) ? t(`roles.${user.role}` as Parameters<typeof t>[0]) : user.role}
+                  </span>
+                ) : (
+                  <span className="inline-block mt-2 bg-slate-100 text-slate-800 text-[10px] font-bold px-2 py-0.5 rounded-full uppercase tracking-wider">
+                    {t.has(`roles.${user.role}`) ? t(`roles.${user.role}` as Parameters<typeof t>[0]) : user.role}
+                  </span>
+                )}
+              </TableCell>
+              <TableCell>
+                <div className="flex flex-wrap gap-2">
+                  {user.role === 'SUPERADMIN' ? (
+                    <span className="text-xs text-feps-ink font-bold px-2 py-1 bg-feps-ink/10 border border-feps-ink/20">
+                      {t('fullAccess')}
                     </span>
-                  )}
-                </td>
-                <td className="p-4">
-                  <div className="flex flex-wrap gap-2">
-                    {user.role === 'SUPERADMIN' ? (
-                      <span className="text-xs text-feps-ink font-bold px-2 py-1 bg-feps-ink/10 border border-feps-ink/20">
-                        {t('fullAccess')}
-                      </span>
-                    ) : (
-                      user.permissions.map(perm => {
-                        const def = PERMISSION_DEF.find(p => p.id === perm)
-                        if (!def) return null
-                        return (
-                          <span key={perm} className="text-xs text-feps-navy px-2 py-1 bg-feps-navy/10 border border-feps-navy/20">
-                            {isAr ? def.labelAr : def.labelEn}
-                          </span>
-                        )
-                      })
-                    )}
-                  </div>
-                </td>
-                <td className="p-4 text-center">
-                  <div className="flex items-center justify-center gap-2">
-                    <button
-                      onClick={() => handleOpenEdit(user)}
-                      className="text-feps-ink/50 hover:text-feps-navy transition-colors p-1"
-                      disabled={user.role === 'SUPERADMIN' && currentUserRole !== 'SUPERADMIN'}
-                      title={t('edit')}
-                    >
-                      <Edit2 size={16} />
-                    </button>
-                    {user.role !== 'SUPERADMIN' && (
-                      <button
-                        onClick={() => handleDelete(user.id)}
-                        className="text-feps-ink/50 hover:text-red-600 transition-colors p-1"
-                        title={t('delete')}
-                      >
-                        <Trash2 size={16} />
-                      </button>
-                    )}
-                  </div>
-                </td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
-      </div>
-
-      {isModalOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-feps-navy/50 backdrop-blur-sm p-4">
-          <div className="bg-white w-full max-w-2xl border-t-4 border-feps-navy shadow-xl max-h-[90vh] overflow-y-auto">
-            <div className="p-6 md:p-8">
-              <h2 className="text-2xl font-serif text-feps-navy mb-6">
-                {editingUser ? t('editUser') : (t('newUser'))}
-              </h2>
-
-              {error && (
-                <div className="mb-6 bg-red-50 text-red-600 p-4 border-l-4 border-red-600 flex items-center gap-3 text-sm">
-                  <AlertCircle size={18} /> {error}
-                </div>
-              )}
-
-              <form onSubmit={handleSubmit} className="space-y-6">
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                  <div>
-                    <label className="block text-xs font-bold uppercase tracking-widest text-feps-ink-secondary mb-2">{t('name')}</label>
-                    <input
-                      type="text"
-                      required
-                      value={formData.name}
-                      onChange={e => setFormData({ ...formData, name: e.target.value })}
-                      className="w-full border border-feps-ink/20 bg-transparent p-3 focus:outline-none focus:border-feps-navy text-sm"
-                    />
-                  </div>
-                  <div>
-                    <label className="block text-xs font-bold uppercase tracking-widest text-feps-ink-secondary mb-2">{t('email')}</label>
-                    <input
-                      type="email"
-                      required
-                      value={formData.email}
-                      onChange={e => setFormData({ ...formData, email: e.target.value })}
-                      className="w-full border border-feps-ink/20 bg-transparent p-3 focus:outline-none focus:border-feps-navy text-sm text-left"
-                      dir="ltr"
-                    />
-                  </div>
-                </div>
-
-                <div>
-                  <label className="block text-xs font-bold uppercase tracking-widest text-feps-ink-secondary mb-2">
-                    {t('password')} {editingUser && (isAr ? '(اتركه فارغاً لعدم التغيير)' : '(Leave blank to keep unchanged)')}
-                  </label>
-                  <input
-                    type="password"
-                    required={!editingUser}
-                    value={formData.password}
-                    onChange={e => setFormData({ ...formData, password: e.target.value })}
-                    className="w-full border border-feps-ink/20 bg-transparent p-3 focus:outline-none focus:border-feps-navy text-sm"
-                    dir="ltr"
-                  />
-                </div>
-
-                <div className="border-t border-feps-ink/10 pt-6">
-                  <label className="block text-xs font-bold uppercase tracking-widest text-feps-ink-secondary mb-4">{t('granularPermissions')}</label>
-                  
-                  <div className="space-y-3 bg-feps-ink/5 p-4 border border-feps-ink/10">
-                    {PERMISSION_DEF.map(perm => (
-                      <label key={perm.id} className="flex items-center gap-3 cursor-pointer group">
-                        <div className="relative flex items-center justify-center">
-                          <input
-                            type="checkbox"
-                            checked={formData.permissions.includes(perm.id) || formData.role === 'SUPERADMIN'}
-                            onChange={() => handleTogglePermission(perm.id)}
-                            disabled={formData.role === 'SUPERADMIN'}
-                            className="peer sr-only"
-                          />
-                          <div className={`w-5 h-5 border-2 flex items-center justify-center transition-colors ${formData.role === 'SUPERADMIN' ? 'border-feps-ink/30 bg-feps-ink/10 cursor-not-allowed' : 'border-feps-ink/20 peer-checked:border-feps-navy peer-checked:bg-feps-navy'}`}>
-                            {(formData.permissions.includes(perm.id) || formData.role === 'SUPERADMIN') && <Check size={14} className="text-white" />}
-                          </div>
-                        </div>
-                        <span className={`text-sm ${formData.role === 'SUPERADMIN' ? 'text-feps-ink/50' : 'text-feps-ink group-hover:text-feps-navy'} transition-colors`}>
-                          {isAr ? perm.labelAr : perm.labelEn}
+                  ) : (
+                    user.permissions.map(perm => {
+                      const def = PERMISSION_DEF.find(p => p.id === perm)
+                      if (!def) return null
+                      return (
+                        <span key={perm} className="text-xs text-feps-navy px-2 py-1 bg-feps-navy/10 border border-feps-navy/20">
+                          {isAr ? def.labelAr : def.labelEn}
                         </span>
-                      </label>
-                    ))}
-                  </div>
-                  {formData.role === 'SUPERADMIN' && (
-                    <p className="text-xs text-amber-600 mt-2 font-bold flex items-center gap-1">
-                      <AlertCircle size={12} /> {t('allPermissionsAlert')}
-                    </p>
+                      )
+                    })
                   )}
                 </div>
-
-                <div className="flex gap-4 pt-6">
+              </TableCell>
+              <TableCell className="text-center">
+                <div className="flex items-center justify-center gap-2">
                   <button
-                    type="submit"
-                    disabled={loading}
-                    className="flex-1 bg-feps-navy text-white py-3 font-bold uppercase tracking-widest hover:bg-black transition-colors disabled:opacity-50 flex items-center justify-center gap-2"
+                    onClick={() => handleOpenEdit(user)}
+                    className="text-feps-ink/50 hover:text-feps-navy transition-colors p-1"
+                    disabled={user.role === 'SUPERADMIN' && currentUserRole !== 'SUPERADMIN'}
+                    title={t('edit')}
                   >
-                    {loading && <Loader size={16} className="animate-spin" />}
-                    {t('save')}
+                    <Edit2 size={16} />
                   </button>
-                  <button
-                    type="button"
-                    onClick={() => setIsModalOpen(false)}
-                    disabled={loading}
-                    className="flex-1 bg-feps-ink/10 text-feps-ink py-3 font-bold uppercase tracking-widest hover:bg-feps-ink/20 transition-colors disabled:opacity-50"
-                  >
-                    {t('cancel')}
-                  </button>
+                  {user.role !== 'SUPERADMIN' && (
+                    <button
+                      onClick={() => handleDelete(user.id)}
+                      className="text-feps-ink/50 hover:text-red-600 transition-colors p-1"
+                      title={t('delete')}
+                    >
+                      <Trash2 size={16} />
+                    </button>
+                  )}
                 </div>
-              </form>
+              </TableCell>
+            </TableRow>
+          ))}
+        </TableBody>
+      </Table>
+
+      <AdminModal
+        isOpen={isModalOpen}
+        onClose={() => setIsModalOpen(false)}
+        title={editingUser ? t('editUser') : t('newUser')}
+        maxWidthClass="max-w-2xl"
+      >
+        {error && (
+          <div className="mb-6 bg-red-50 text-red-600 p-4 border-l-4 border-red-600 flex items-center gap-3 text-sm">
+            <AlertCircle size={18} /> {error}
+          </div>
+        )}
+
+        <form onSubmit={handleSubmit} className="space-y-6">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div>
+              <label className="block text-xs font-bold uppercase tracking-widest text-feps-ink-secondary mb-2">{t('name')}</label>
+              <input
+                type="text"
+                required
+                value={formData.name}
+                onChange={e => setFormData({ ...formData, name: e.target.value })}
+                className="w-full border border-feps-ink/20 bg-transparent p-3 focus:outline-none focus:border-feps-navy text-sm"
+              />
+            </div>
+            <div>
+              <label className="block text-xs font-bold uppercase tracking-widest text-feps-ink-secondary mb-2">{t('email')}</label>
+              <input
+                type="email"
+                required
+                value={formData.email}
+                onChange={e => setFormData({ ...formData, email: e.target.value })}
+                className="w-full border border-feps-ink/20 bg-transparent p-3 focus:outline-none focus:border-feps-navy text-sm text-left"
+                dir="ltr"
+              />
             </div>
           </div>
-        </div>
-      )}
+
+          <div>
+            <label className="block text-xs font-bold uppercase tracking-widest text-feps-ink-secondary mb-2">
+              {t('password')} {editingUser && (isAr ? '(اتركه فارغاً لعدم التغيير)' : '(Leave blank to keep unchanged)')}
+            </label>
+            <input
+              type="password"
+              required={!editingUser}
+              value={formData.password}
+              onChange={e => setFormData({ ...formData, password: e.target.value })}
+              className="w-full border border-feps-ink/20 bg-transparent p-3 focus:outline-none focus:border-feps-navy text-sm"
+              dir="ltr"
+            />
+          </div>
+
+          <div className="border-t border-feps-ink/10 pt-6">
+            <label className="block text-xs font-bold uppercase tracking-widest text-feps-ink-secondary mb-4">{t('granularPermissions')}</label>
+            
+            <div className="space-y-3 bg-feps-ink/5 p-4 border border-feps-ink/10">
+              {PERMISSION_DEF.map(perm => (
+                <label key={perm.id} className="flex items-center gap-3 cursor-pointer group">
+                  <div className="relative flex items-center justify-center">
+                    <input
+                      type="checkbox"
+                      checked={formData.permissions.includes(perm.id) || formData.role === 'SUPERADMIN'}
+                      onChange={() => handleTogglePermission(perm.id)}
+                      disabled={formData.role === 'SUPERADMIN'}
+                      className="peer sr-only"
+                    />
+                    <div className={`w-5 h-5 border-2 flex items-center justify-center transition-colors ${formData.role === 'SUPERADMIN' ? 'border-feps-ink/30 bg-feps-ink/10 cursor-not-allowed' : 'border-feps-ink/20 peer-checked:border-feps-navy peer-checked:bg-feps-navy'}`}>
+                      {(formData.permissions.includes(perm.id) || formData.role === 'SUPERADMIN') && <Check size={14} className="text-white" />}
+                    </div>
+                  </div>
+                  <span className={`text-sm ${formData.role === 'SUPERADMIN' ? 'text-feps-ink/50' : 'text-feps-ink group-hover:text-feps-navy'} transition-colors`}>
+                    {isAr ? perm.labelAr : perm.labelEn}
+                  </span>
+                </label>
+              ))}
+            </div>
+            {formData.role === 'SUPERADMIN' && (
+              <p className="text-xs text-amber-600 mt-2 font-bold flex items-center gap-1">
+                <AlertCircle size={12} /> {t('allPermissionsAlert')}
+              </p>
+            )}
+          </div>
+
+          <div className="flex gap-4 pt-6">
+            <button
+              type="submit"
+              disabled={loading}
+              className="flex-1 bg-feps-navy text-white py-3 font-bold uppercase tracking-widest hover:bg-black transition-colors disabled:opacity-50 flex items-center justify-center gap-2"
+            >
+              {loading && <Loader size={16} className="animate-spin" />}
+              {t('save')}
+            </button>
+            <button
+              type="button"
+              onClick={() => setIsModalOpen(false)}
+              disabled={loading}
+              className="flex-1 bg-feps-ink/10 text-feps-ink py-3 font-bold uppercase tracking-widest hover:bg-feps-ink/20 transition-colors disabled:opacity-50"
+            >
+              {t('cancel')}
+            </button>
+          </div>
+        </form>
+      </AdminModal>
     </div>
   )
 }

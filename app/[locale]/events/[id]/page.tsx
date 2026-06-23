@@ -103,7 +103,7 @@ export default async function EventDetailPage({ params }: PageProps) {
             <span>{t('backToEvents')}</span>
           </Link>
           {isAdmin && (
-            <span className="font-mono text-xs font-bold bg-feps-ink text-feps-surface px-3 py-1 uppercase tracking-wider">
+            <span className="font-sans text-xs font-bold bg-feps-ink text-feps-surface px-3 py-1 uppercase tracking-wider">
               {t('adminMode')}
             </span>
           )}
@@ -126,7 +126,7 @@ export default async function EventDetailPage({ params }: PageProps) {
 
         {/* Draft Notice */}
         {!event.published && (
-          <div className="bg-feps-warning/10 border-l-4 border-feps-warning p-4 rounded-r-lg text-feps-warning-dark font-mono text-sm font-bold mb-8 flex items-center gap-3">
+          <div className="bg-feps-warning/10 border-l-4 border-feps-warning p-4 rounded-r-lg text-feps-warning-dark font-sans text-sm font-bold mb-8 flex items-center gap-3">
             <span className="w-2 h-2 bg-feps-warning rounded-full animate-pulse" />
             {t('draftPreview')}
           </div>
@@ -142,7 +142,7 @@ export default async function EventDetailPage({ params }: PageProps) {
             {event.agendaFile && (
               <div className="bg-feps-surface border-2 border-feps-navy p-8 md:p-12 mb-8">
                 <div className="flex items-center gap-4 mb-8 border-b-2 border-feps-navy pb-4">
-                  <h2 className={`text-2xl font-mono uppercase tracking-wider font-bold text-feps-navy ${isAr ? 'font-arabic' : ''}`}>
+                  <h2 className={`text-2xl font-sans uppercase tracking-wider font-bold text-feps-navy ${isAr ? 'font-arabic' : ''}`}>
                     {t('officialAgenda')}
                   </h2>
                 </div>
@@ -156,7 +156,7 @@ export default async function EventDetailPage({ params }: PageProps) {
                   />
                 </div>
                 <div className="flex justify-between items-center mt-8 pt-6 border-t-2 border-feps-navy/20 flex-wrap gap-4">
-                  <span className="text-sm font-mono text-feps-navy font-bold uppercase tracking-wider">
+                  <span className="text-sm font-sans text-feps-navy font-bold uppercase tracking-wider">
                     {t('downloadFallback')}
                   </span>
                   <a href={event.agendaFile} download className="flex items-center justify-center gap-2 px-6 py-3 bg-feps-navy hover:bg-white border-2 border-feps-navy hover:text-feps-navy text-white font-bold transition-colors">

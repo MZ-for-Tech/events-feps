@@ -15,14 +15,14 @@ export default async function PrivacyPage({ params }: { params: Promise<{ locale
         <div className="container max-w-5xl">
           <div className="flex items-center gap-4 mb-4">
             <div className="h-[40px] w-[3px] bg-feps-ink"></div>
-            <span className="font-mono text-xs uppercase tracking-widest font-semibold text-feps-ink-secondary">
+            <span className="font-sans text-xs uppercase tracking-widest font-semibold text-feps-ink-secondary">
               {t('privacy')}
             </span>
           </div>
           <h1 className="font-serif text-5xl md:text-6xl font-normal tracking-tight text-feps-ink leading-[1.1] mb-4">
             {title}
           </h1>
-          <p className="text-sm text-feps-ink-secondary font-mono">{lastUpdated}</p>
+          <p className="text-sm text-feps-ink-secondary font-sans">{lastUpdated}</p>
         </div>
       </div>
 

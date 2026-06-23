@@ -3,7 +3,7 @@
 import React, { useState, useEffect } from 'react'
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
-import { Calendar, FileText, Users, Settings, Menu, X, ChevronRight, ChevronLeft, Activity } from 'lucide-react'
+import { Calendar, FileText, Users, Settings, Menu, X, ChevronRight, ChevronLeft, Activity, Brain } from 'lucide-react'
 import { useSession } from 'next-auth/react'
 import { useTranslations, useLocale } from 'next-intl'
 
@@ -12,6 +12,7 @@ export default function AdminSidebar() {
   const { data: session } = useSession()
   const role = session?.user?.role
   const t = useTranslations('AdminSidebar')
+  const tRoles = useTranslations('AdminUsers.roles')
   const locale = useLocale()
   const isAr = locale === 'ar'
 
@@ -79,6 +80,14 @@ export default function AdminSidebar() {
         href: `/${locale}/admin/categories`,
         icon: <Settings size={20} />,
         active: pathname.includes('/admin/categories')
+      }
+    ] : []),
+    ...(permissions.includes('trivia:manage') || role === 'SUPERADMIN' ? [
+      {
+        label: t('trivia'),
+        href: `/${locale}/admin/trivia`,
+        icon: <Brain size={20} />,
+        active: pathname.includes('/admin/trivia')
       }
     ] : []),
     ...(permissions.includes('logs:view') || role === 'SUPERADMIN' ? [
@@ -151,10 +160,10 @@ export default function AdminSidebar() {
       <div className={`mt-auto mx-4 p-5 border border-white/10 bg-white/5 transition-all ${isCollapsed ? 'text-center px-2 py-4' : ''}`}>
         {!isCollapsed ? (
           <>
-            <div className="font-mono text-[0.65rem] uppercase tracking-widest text-white/50 mb-3 pb-2 border-b border-white/10">{t('loggedInAs')}</div>
+            <div className="font-sans text-[0.65rem] uppercase tracking-widest text-white/50 mb-3 pb-2 border-b border-white/10">{t('loggedInAs')}</div>
             <div className={`text-lg text-white truncate leading-tight ${isAr ? 'font-arabic font-bold' : 'font-serif'}`}>{session?.user?.name}</div>
-            <div className="font-mono text-[0.70rem] tracking-widest font-bold text-feps-gold mt-2 uppercase truncate">
-              {role}
+            <div className="font-sans text-[0.70rem] tracking-widest font-bold text-feps-gold mt-2 uppercase truncate">
+              {role ? (tRoles.has(role) ? tRoles(role as Parameters<typeof tRoles>[0]) : role) : ''}
             </div>
           </>
         ) : (
@@ -236,10 +245,10 @@ export default function AdminSidebar() {
         </nav>
 
         <div className="mt-auto mx-4 p-5 border border-white/10 bg-white/5 transition-all">
-          <div className="font-mono text-[0.65rem] uppercase tracking-widest text-white/50 mb-3 pb-2 border-b border-white/10">{t('loggedInAs')}</div>
+          <div className="font-sans text-[0.65rem] uppercase tracking-widest text-white/50 mb-3 pb-2 border-b border-white/10">{t('loggedInAs')}</div>
           <div className={`text-lg text-white truncate leading-tight ${isAr ? 'font-arabic font-bold' : 'font-serif'}`}>{session?.user?.name}</div>
-          <div className="font-mono text-[0.70rem] tracking-widest font-bold text-feps-gold mt-2 uppercase truncate">
-            {role}
+          <div className="font-sans text-[0.70rem] tracking-widest font-bold text-feps-gold mt-2 uppercase truncate">
+            {role ? (tRoles.has(role) ? tRoles(role as Parameters<typeof tRoles>[0]) : role) : ''}
           </div>
         </div>
       </div>

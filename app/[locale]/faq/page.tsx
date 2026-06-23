@@ -17,7 +17,7 @@ export default async function FAQPage({ params }: { params: Promise<{ locale: st
         <div className="container max-w-5xl">
           <div className="flex items-center gap-4 mb-4">
             <div className="h-[40px] w-[3px] bg-feps-gold"></div>
-            <span className="font-mono text-xs uppercase tracking-widest font-semibold text-feps-ink-secondary">FAQ</span>
+            <span className="font-sans text-xs uppercase tracking-widest font-semibold text-feps-ink-secondary">FAQ</span>
           </div>
           <h1 className="font-serif text-5xl md:text-6xl font-normal tracking-tight text-feps-ink leading-[1.1] mb-4">
             {title}

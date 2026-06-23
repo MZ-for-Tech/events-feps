@@ -40,7 +40,7 @@ export default function LoginForm() {
     <div className="w-full">
       <form onSubmit={handleSubmit} className="flex flex-col gap-5">
         <div>
-          <label htmlFor="email" className="block font-mono text-xs uppercase tracking-widest font-semibold text-feps-ink mb-2">
+          <label htmlFor="email" className="block font-sans text-xs uppercase tracking-widest font-semibold text-feps-ink mb-2">
             {t('emailLabel')}
           </label>
           <input
@@ -56,7 +56,7 @@ export default function LoginForm() {
         </div>
 
         <div>
-          <label htmlFor="password" className="block font-mono text-xs uppercase tracking-widest font-semibold text-feps-ink mb-2">
+          <label htmlFor="password" className="block font-sans text-xs uppercase tracking-widest font-semibold text-feps-ink mb-2">
             {t('passwordLabel')}
           </label>
           <input
@@ -76,7 +76,7 @@ export default function LoginForm() {
         <button
           type="submit"
           disabled={loading}
-          className="w-full mt-2 inline-flex justify-center items-center px-6 py-4 bg-feps-ink text-feps-paper font-mono text-xs uppercase tracking-widest font-semibold hover:bg-feps-navy transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+          className="w-full mt-2 inline-flex justify-center items-center px-6 py-4 bg-feps-ink text-feps-paper font-sans text-xs uppercase tracking-widest font-semibold hover:bg-feps-navy transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
         >
           {loading ? t('signingIn') : t('signIn')}
         </button>
@@ -84,7 +84,7 @@ export default function LoginForm() {
 
       {/* Quick Login for Testing */}
       <div className="mt-8 pt-6 border-t border-feps-border">
-        <p className="font-mono text-xs uppercase tracking-widest text-feps-ink-secondary mb-4 text-center">
+        <p className="font-sans text-xs uppercase tracking-widest text-feps-ink-secondary mb-4 text-center">
           {t('quickLogin')}
         </p>
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
@@ -97,7 +97,7 @@ export default function LoginForm() {
               key={role.label}
               type="button"
               disabled={loading}
-              className="px-3 py-2 border border-feps-border text-feps-ink font-mono text-[0.65rem] uppercase tracking-widest hover:bg-feps-ink hover:text-feps-paper hover:border-feps-ink transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+              className="px-3 py-2 border border-feps-border text-feps-ink font-sans text-[0.65rem] uppercase tracking-widest hover:bg-feps-ink hover:text-feps-paper hover:border-feps-ink transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
               onClick={async () => {
                 setLoading(true)
                 setError('')

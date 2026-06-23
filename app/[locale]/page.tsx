@@ -2,6 +2,7 @@ import { prisma } from '@/lib/prisma'
 import { getTranslations } from 'next-intl/server'
 import HeroHeader from '@/components/home/HeroHeader'
 import EventsFeed from '@/components/home/EventsFeed'
+import FepsTrivia from '@/components/home/FepsTrivia'
 
 async function getStats() {
   const now = new Date()
@@ -41,6 +42,7 @@ export default async function HomePage({ params }: { params: Promise<{ locale: s
     <div className="bg-feps-paper min-h-screen relative overflow-hidden">
       <HeroHeader locale={locale} stats={stats} />
       <EventsFeed locale={locale} upcomingEvents={upcomingEvents} />
+      <FepsTrivia />
     </div>
   )
 }

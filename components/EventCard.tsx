@@ -75,12 +75,12 @@ export default function EventCard({
       <div className="p-6 flex flex-col h-full pl-8">
         <div className="flex items-center justify-between mb-4 pb-4 border-b border-feps-border">
           <span 
-            className="font-mono text-xs uppercase tracking-widest font-semibold"
+            className="font-sans text-xs uppercase tracking-widest font-semibold"
             style={{ color: category.color }}
           >
             {categoryLabel}
           </span>
-          <span className="font-mono text-xs text-feps-ink-tertiary">
+          <span className="font-sans text-xs text-feps-ink-tertiary">
             {formattedDate}
           </span>
         </div>
@@ -100,12 +100,12 @@ export default function EventCard({
         )}
         
         <div className="mt-auto flex flex-col gap-2 pt-4">
-          <div className="flex items-center gap-2 text-xs text-feps-ink-secondary font-mono">
+          <div className="flex items-center gap-2 text-xs text-feps-ink-secondary font-sans">
             <Clock size={14} className="opacity-50" />
             <span>{formattedTime}</span>
           </div>
           {location && (
-            <div className="flex items-center gap-2 text-xs text-feps-ink-secondary font-mono">
+            <div className="flex items-center gap-2 text-xs text-feps-ink-secondary font-sans">
               <MapPin size={14} className="opacity-50" />
               <span className="truncate">{location}</span>
             </div>

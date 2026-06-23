@@ -4,10 +4,12 @@ import React, { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { useTranslations } from 'next-intl'
 import Link from 'next/link'
-import { ArrowLeft, Save, Plus, Trash2, FileText, CheckCircle, BarChart3, HelpCircle, Loader, Eye, Clock, Edit2 } from 'lucide-react'
+import { ArrowLeft, Save, Plus, Trash2, FileText, CheckCircle, BarChart3, HelpCircle, Loader, Eye, Clock, Edit2, Calendar } from 'lucide-react'
 import dynamic from 'next/dynamic'
 import SingleEventReportDocument from '@/components/admin/SingleEventReportDocument'
 import SurveyAnalytics from '@/components/admin/SurveyAnalytics'
+import { AdminPageHeader } from '@/components/admin/AdminPageHeader'
+import { AdminButton } from '@/components/admin/AdminButton'
 import { Event, SurveyResponse, EventCategory } from '@prisma/client'
 import { useSession } from 'next-auth/react'
 
@@ -17,7 +19,7 @@ const PDFDownloadLink = dynamic(() => import('@react-pdf/renderer').then(mod => 
 
 const PDFViewer = dynamic(() => import('@react-pdf/renderer').then(mod => mod.PDFViewer), {
   ssr: false,
-  loading: () => <div className="p-12 text-center font-mono">Loading PDF Viewer...</div>
+  loading: () => <div className="p-12 text-center font-sans">Loading PDF Viewer...</div>
 })
 
 export type CustomField = { id: string; title: string; content: string }
@@ -229,42 +231,49 @@ export default function AdminEventDetailClient({ event, locale, surveyResponses 
   }
 
   return (
-    <div className="p-6 md:p-8" dir={isAr ? 'rtl' : 'ltr'}>
-      <div className="mb-8 border-b border-feps-ink/20 pb-6 flex items-start justify-between gap-6">
-        <div>
-          <Link href={`/${locale}/admin/events`} className="text-feps-ink-secondary hover:text-feps-ink mb-4 inline-flex items-center gap-2 text-sm">
-            <ArrowLeft size={16} className={isAr ? 'rotate-180' : ''} />
-            {t('backToEvents')}
-          </Link>
-          <h1 className="font-serif text-3xl text-feps-ink mb-1">
-            {event.title}
-          </h1>
-          <p className="font-mono text-sm text-feps-ink-secondary">
-            {t('manageCustomReport')}
-          </p>
-        </div>
-        <div className="flex items-center gap-4">
-          {autoSaveStatus && !saveStatus && (
-            <span className="text-feps-ink-secondary flex items-center gap-1 text-sm font-bold animate-pulse">
-              <Loader size={14} className={autoSaveStatus.includes('جاري') || autoSaveStatus.includes('Auto-saving') ? 'animate-spin' : 'hidden'} /> 
-              {autoSaveStatus.includes('تم') || autoSaveStatus.includes('saved') ? <CheckCircle size={14} className="text-green-600" /> : null}
-              {autoSaveStatus}
-            </span>
-          )}
-          {saveStatus && (
-            <span className="text-green-600 flex items-center gap-1 text-sm font-bold animate-pulse">
-              <CheckCircle size={14} /> {saveStatus}
-            </span>
-          )}
-          <button
-            onClick={handleSave}
-            disabled={saving}
-            className="flex items-center gap-2 bg-feps-ink text-feps-paper px-6 py-2 font-mono text-sm tracking-widest uppercase hover:bg-black transition-colors disabled:opacity-50"
-          >
-            {saving ? <Loader size={16} className="animate-spin" /> : <Save size={16} />}
-            {t('saveChanges')}
-          </button>
-        </div>
+    <div dir={isAr ? 'rtl' : 'ltr'}>
+      <div className="mb-8 border-b border-feps-ink/20 pb-6">
+        <AdminPageHeader
+          title={event.title}
+          description={t('manageCustomReport')}
+          icon={Calendar}
+          breadcrumbs={
+            <Link href={`/${locale}/admin/events`} className="text-feps-ink-secondary hover:text-feps-ink inline-flex items-center gap-2 text-sm">
+              <ArrowLeft size={16} className={isAr ? 'rotate-180' : ''} />
+              {t('backToEvents')}
+            </Link>
+          }
+          action={
+            <div className="flex flex-col md:flex-row items-end md:items-center gap-4">
+              {autoSaveStatus && !saveStatus && (
+                <span className="text-feps-ink-secondary flex items-center gap-1 text-sm font-bold animate-pulse">
+                  <Loader size={14} className={autoSaveStatus.includes('جاري') || autoSaveStatus.includes('Auto-saving') ? 'animate-spin' : 'hidden'} /> 
+                  {autoSaveStatus.includes('تم') || autoSaveStatus.includes('saved') ? <CheckCircle size={14} className="text-green-600" /> : null}
+                  {autoSaveStatus}
+                </span>
+              )}
+              {saveStatus && (
+                <span className="text-green-600 flex items-center gap-1 text-sm font-bold animate-pulse">
+                  <CheckCircle size={14} /> {saveStatus}
+                </span>
+              )}
+              <AdminButton
+                onClick={handleSave}
+                disabled={saving}
+                icon={saving ? undefined : Save}
+              >
+                {saving ? (
+                  <span className="flex items-center gap-2">
+                    <Loader size={16} className="animate-spin" />
+                    {t('saveChanges')}
+                  </span>
+                ) : (
+                  t('saveChanges')
+                )}
+              </AdminButton>
+            </div>
+          }
+        />
       </div>
 
       <div className="border border-feps-ink/20 bg-feps-paper overflow-hidden">
@@ -294,7 +303,7 @@ export default function AdminEventDetailClient({ event, locale, surveyResponses 
           ))}
         </div>
 
-        <div className="p-6 md:p-8">
+        <div>
           {activeTab === 'details' && (
             <div className="space-y-4">
               <div className="flex justify-between items-start">
@@ -518,7 +527,7 @@ export default function AdminEventDetailClient({ event, locale, surveyResponses 
                         <div className={`w-[calc(100%-4rem)] md:w-[calc(50%-2.5rem)] p-4 rounded border shadow-sm ${isNote ? 'bg-blue-50 border-blue-100' : 'bg-white border-feps-ink/10'}`}>
                           <div className="flex items-center justify-between mb-1">
                             <div className="font-bold text-sm text-feps-navy">{(log.user as { name?: string })?.name || 'System'}</div>
-                            <time className="text-xs text-feps-ink-secondary font-mono">{new Date(log.timestamp as string).toLocaleString(isAr ? 'ar-EG' : 'en-US')}</time>
+                            <time className="text-xs text-feps-ink-secondary font-sans">{new Date(log.timestamp as string).toLocaleString(isAr ? 'ar-EG' : 'en-US')}</time>
                           </div>
                           <div className="text-sm">
                             <span className="font-bold text-xs uppercase tracking-widest bg-black/5 px-1 py-0.5 rounded mr-2 rtl:mr-0 rtl:ml-2">{log.action as string}</span>

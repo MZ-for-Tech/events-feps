@@ -2,8 +2,9 @@
 
 import React from 'react'
 import Link from 'next/link'
-import { X, Calendar, MapPin, Clock, ExternalLink } from 'lucide-react'
+import { X, Calendar, MapPin, Clock, ExternalLink, CalendarPlus } from 'lucide-react'
 import { CalendarEvent } from './types'
+import { generateGoogleCalendarUrl } from '@/lib/calendar'
 
 interface Props {
   selectedDay: number
@@ -87,7 +88,7 @@ export default function CalendarSidebar({
               >
                 <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '0.4rem', gap: '0.5rem' }}>
                   <span style={{
-                    fontFamily: 'var(--font-mono, monospace)',
+                    fontFamily: 'var(--font-sans, sans-serif)',
                     fontSize: '0.65rem',
                     fontWeight: 600,
                     color: meta.color,
@@ -115,17 +116,55 @@ export default function CalendarSidebar({
 
                 <div style={{ display: 'flex', flexDirection: 'column', gap: '0.25rem', marginTop: '0.5rem' }}>
                   {ev.location && (
-                    <div style={{ display: 'flex', alignItems: 'center', gap: '0.35rem', fontSize: '0.75rem', color: 'var(--feps-ink-secondary)', fontFamily: 'var(--font-mono, monospace)' }}>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '0.35rem', fontSize: '0.75rem', color: 'var(--feps-ink-secondary)', fontFamily: 'var(--font-sans, sans-serif)' }}>
                       <MapPin size={12} style={{ color: 'var(--feps-ink-tertiary)' }} />
                       <span>{ev.location}</span>
                     </div>
                   )}
                   {eventTime && (
-                    <div style={{ display: 'flex', alignItems: 'center', gap: '0.35rem', fontSize: '0.75rem', color: 'var(--feps-ink-secondary)', fontFamily: 'var(--font-mono, monospace)' }}>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '0.35rem', fontSize: '0.75rem', color: 'var(--feps-ink-secondary)', fontFamily: 'var(--font-sans, sans-serif)' }}>
                       <Clock size={12} style={{ color: 'var(--feps-ink-tertiary)' }} />
                       <span>{eventTime}</span>
                     </div>
                   )}
+                </div>
+
+                <div style={{ marginTop: '0.75rem', paddingTop: '0.5rem', borderTop: '1px dashed var(--feps-border)' }}>
+                  <button
+                    onClick={(e) => {
+                      e.preventDefault()
+                      e.stopPropagation()
+                      window.open(generateGoogleCalendarUrl(ev), '_blank', 'noopener,noreferrer')
+                    }}
+                    style={{
+                      display: 'inline-flex',
+                      alignItems: 'center',
+                      gap: '0.35rem',
+                      fontSize: '0.7rem',
+                      fontFamily: 'var(--font-sans, sans-serif)',
+                      fontWeight: 600,
+                      color: 'var(--feps-navy)',
+                      background: 'rgba(26,58,110,0.05)',
+                      padding: '0.35rem 0.6rem',
+                      borderRadius: 'var(--radius-feps, 2px)',
+                      border: '1px solid rgba(26,58,110,0.1)',
+                      cursor: 'pointer',
+                      transition: 'all 0.2s ease',
+                      textTransform: 'uppercase',
+                      letterSpacing: '0.02em'
+                    }}
+                    onMouseOver={(e) => {
+                      e.currentTarget.style.background = 'rgba(26,58,110,0.1)'
+                      e.currentTarget.style.borderColor = 'rgba(26,58,110,0.2)'
+                    }}
+                    onMouseOut={(e) => {
+                      e.currentTarget.style.background = 'rgba(26,58,110,0.05)'
+                      e.currentTarget.style.borderColor = 'rgba(26,58,110,0.1)'
+                    }}
+                  >
+                    <CalendarPlus size={12} />
+                    {isAr ? 'إضافة للتقويم' : isFr ? 'Ajouter à l\'agenda' : 'Add to Calendar'}
+                  </button>
                 </div>
               </Link>
             )
