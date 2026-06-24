@@ -7,7 +7,7 @@ import { auth } from '@/lib/auth'
 import { notFound } from 'next/navigation'
 import Link from 'next/link'
 import { getTranslations } from 'next-intl/server'
-import { ArrowLeft, Download, Shield } from 'lucide-react'
+import { ArrowLeft, Download } from 'lucide-react'
 
 import EventBanner from '@/components/event/EventBanner'
 import EventHeader from '@/components/event/EventHeader'
@@ -15,6 +15,7 @@ import EventAbout from '@/components/event/EventAbout'
 import EventAgenda from '@/components/event/EventAgenda'
 import EventSidebar from '@/components/event/EventSidebar'
 import EventSurveyForm from '@/components/event/EventSurveyForm'
+import AdminModeToggle from '@/components/admin/AdminModeToggle'
 
 interface PageProps {
   params: Promise<{ locale: string; id: string }>
@@ -34,7 +35,8 @@ export async function generateMetadata(
   if (!event) return {}
 
   const isAr = locale === 'ar'
-  const title = isAr && event.titleAr ? event.titleAr : event.title
+  const isFr = locale === 'fr'
+  const title = isAr && event.titleAr ? event.titleAr : (isFr && event.titleFr ? event.titleFr : event.title)
   const categoryLabel = event.category ? (isAr ? event.category.nameAr : locale === 'fr' ? event.category.nameFr : event.category.nameEn) : t('event')
 
   const searchParams = new URLSearchParams()
@@ -54,6 +56,7 @@ export async function generateMetadata(
 export default async function EventDetailPage({ params }: PageProps) {
   const { locale, id } = await params
   const isAr = locale === 'ar'
+  const isFr = locale === 'fr'
   const t = await getTranslations({ locale, namespace: 'EventDetail' })
 
   const session = await auth()
@@ -82,19 +85,19 @@ export default async function EventDetailPage({ params }: PageProps) {
   const start = new Date(event.startDate)
   const end = event.endDate ? new Date(event.endDate) : null
 
-  const formattedStartDate = start.toLocaleDateString(isAr ? 'ar-EG-u-nu-latn' : 'en-GB', {
+  const formattedStartDate = start.toLocaleDateString(isAr ? 'ar-EG-u-nu-latn' : isFr ? 'fr-FR' : 'en-GB', {
     weekday: 'long', day: 'numeric', month: 'long', year: 'numeric',
   })
-  const formattedStartTime = start.toLocaleTimeString(isAr ? 'ar-EG-u-nu-latn' : 'en-US', {
+  const formattedStartTime = start.toLocaleTimeString(isAr ? 'ar-EG-u-nu-latn' : isFr ? 'fr-FR' : 'en-US', {
     hour: '2-digit', minute: '2-digit',
   })
   const formattedEndDate = end
-    ? end.toLocaleDateString(isAr ? 'ar-EG-u-nu-latn' : 'en-GB', {
+    ? end.toLocaleDateString(isAr ? 'ar-EG-u-nu-latn' : isFr ? 'fr-FR' : 'en-GB', {
       weekday: 'long', day: 'numeric', month: 'long', year: 'numeric',
     })
     : null
   const formattedEndTime = end
-    ? end.toLocaleTimeString(isAr ? 'ar-EG-u-nu-latn' : 'en-US', {
+    ? end.toLocaleTimeString(isAr ? 'ar-EG-u-nu-latn' : isFr ? 'fr-FR' : 'en-US', {
       hour: '2-digit', minute: '2-digit',
     })
     : null
@@ -113,15 +116,7 @@ export default async function EventDetailPage({ params }: PageProps) {
           </Link>
           {isAdmin && (
             <div className="flex items-center gap-4 border-s-2 border-feps-border/50 ps-4">
-              <div
-                className="flex items-center gap-2 text-feps-ink-secondary/60 cursor-default"
-                title={isAr ? 'أنت تشاهد هذه الصفحة كمسؤول' : 'You are viewing this page as an Administrator'}
-              >
-                <Shield size={14} />
-                <span className="font-sans text-xs font-medium tracking-wide uppercase hidden sm:inline">
-                  {t('adminMode')}
-                </span>
-              </div>
+              <AdminModeToggle isAdmin={isAdmin} isAr={isAr} label={t('adminMode')} />
             </div>
           )}
         </div>
@@ -132,9 +127,13 @@ export default async function EventDetailPage({ params }: PageProps) {
         {/* Header Info */}
         <EventHeader
           isAr={isAr}
+          isFr={isFr}
           title={event.title}
           titleAr={event.titleAr}
+          titleFr={event.titleFr}
           location={event.location}
+          locationAr={event.locationAr}
+          locationFr={event.locationFr}
           formattedStartDate={formattedStartDate}
           formattedStartTime={formattedStartTime}
           formattedEndTime={formattedEndTime}
@@ -158,8 +157,8 @@ export default async function EventDetailPage({ params }: PageProps) {
         {/* Main Content Layout Grid */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-8 md:gap-12 mt-12 pt-8">
           <div className="md:col-span-2 flex flex-col md:border-e-2 md:border-feps-ink/20 md:pe-8 lg:pe-12 rtl:md:border-e-0 rtl:md:border-s-2 rtl:md:ps-8 rtl:lg:ps-12">
-            <EventAbout description={event.description} isAr={isAr} title={t('eventDetails')} isAdmin={isAdmin} eventId={event.id} />
-            <EventAgenda agendaText={event.agendaText} isAr={isAr} title={t('eventProgram')} isAdmin={isAdmin} eventId={event.id} />
+            <EventAbout description={event.description} descriptionAr={event.descriptionAr} descriptionFr={event.descriptionFr} isAr={isAr} isFr={isFr} title={t('eventDetails')} isAdmin={isAdmin} eventId={event.id} />
+            <EventAgenda agendaText={event.agendaText} agendaTextAr={event.agendaTextAr} agendaTextFr={event.agendaTextFr} isAr={isAr} isFr={isFr} title={t('eventProgram')} isAdmin={isAdmin} eventId={event.id} />
 
             {/* PDF Agenda Preview Card */}
             {event.agendaFile && (
@@ -194,12 +193,15 @@ export default async function EventDetailPage({ params }: PageProps) {
           <div className="md:col-span-1">
             <EventSidebar
               isAr={isAr}
+              isFr={isFr}
               title={event.title}
               formattedStartDate={formattedStartDate}
               formattedEndDate={formattedEndDate}
               formattedStartTime={formattedStartTime}
               formattedEndTime={formattedEndTime}
               location={event.location}
+              locationAr={event.locationAr}
+              locationFr={event.locationFr}
               agendaFile={event.agendaFile}
               labels={{
                 quickFacts: t('quickFacts'),

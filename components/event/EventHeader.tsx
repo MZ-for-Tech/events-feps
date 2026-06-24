@@ -4,9 +4,13 @@ import InlineEdit from '../admin/InlineEdit'
 
 interface EventHeaderProps {
   isAr: boolean
+  isFr: boolean
   title: string
   titleAr: string | null
+  titleFr: string | null
   location: string | null
+  locationAr?: string | null
+  locationFr?: string | null
   formattedStartDate: string
   formattedStartTime: string
   formattedEndTime: string | null
@@ -21,9 +25,13 @@ interface EventHeaderProps {
 
 export default function EventHeader({
   isAr,
+  isFr,
   title,
   titleAr,
+  titleFr,
   location,
+  locationAr,
+  locationFr,
   formattedStartDate,
   formattedStartTime,
   formattedEndTime,
@@ -35,12 +43,21 @@ export default function EventHeader({
   rawStartDate,
   rawEndDate
 }: EventHeaderProps) {
+  const localizedLocation = isAr && locationAr ? locationAr : (isFr && locationFr ? locationFr : location)
+  const locationFieldName = isAr ? 'locationAr' : (isFr ? 'locationFr' : 'location')
+
   return (
     <div className={`mt-4 mb-12 ${isAr ? 'text-right' : 'text-left'}`}>
       {/* Event Title - Massive Editorial Headline */}
       <h1 className={`text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-serif font-bold text-feps-ink leading-[1.1] tracking-tight mb-4 ${isAr ? 'font-arabic' : ''}`}>
-        <InlineEdit field={isAr && titleAr ? 'titleAr' : 'title'} value={(isAr && titleAr ? titleAr : title) || ''} eventId={eventId!} isAdmin={!!isAdmin} type="text">
-          {isAr && titleAr ? titleAr : title}
+        <InlineEdit 
+          field={isAr ? 'titleAr' : isFr ? 'titleFr' : 'title'} 
+          value={(isAr && titleAr ? titleAr : isFr && titleFr ? titleFr : title) || ''} 
+          eventId={eventId!} 
+          isAdmin={!!isAdmin} 
+          type="text"
+        >
+          {isAr && titleAr ? titleAr : isFr && titleFr ? titleFr : title}
         </InlineEdit>
       </h1>
 
@@ -79,11 +96,11 @@ export default function EventHeader({
           </InlineEdit>
         </div>
 
-        {(location || isAdmin) && (
+        {(localizedLocation || isAdmin) && (
           <div className="flex items-center gap-2 font-sans text-xs md:text-sm text-feps-ink font-bold uppercase tracking-widest px-4 md:px-6 py-4">
             <MapPin size={16} className="text-feps-ink-secondary flex-shrink-0" />
-            <InlineEdit field="location" value={location || ''} eventId={eventId!} isAdmin={!!isAdmin} type="text">
-              <span>{location || (isAr ? 'إضافة مكان' : 'Add Location')}</span>
+            <InlineEdit field={locationFieldName} value={localizedLocation || ''} eventId={eventId!} isAdmin={!!isAdmin} type="text">
+              <span>{localizedLocation || (isAr ? 'إضافة مكان' : 'Add Location')}</span>
             </InlineEdit>
           </div>
         )}

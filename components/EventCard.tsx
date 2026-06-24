@@ -15,10 +15,15 @@ export interface EventCardProps {
   id: string
   title: string
   titleAr?: string | null
+  titleFr?: string | null
   category: EventCategoryData
   startDate: string | Date
   location?: string | null
+  locationAr?: string | null
+  locationFr?: string | null
   description?: string | null
+  descriptionAr?: string | null
+  descriptionFr?: string | null
   imageUrl?: string | null
   locale?: string
 }
@@ -27,25 +32,32 @@ export default function EventCard({
   id,
   title,
   titleAr,
+  titleFr,
   category,
   startDate,
   location,
+  locationAr,
+  locationFr,
   description,
+  descriptionAr,
+  descriptionFr,
   imageUrl,
   locale = 'en',
 }: EventCardProps) {
   const start = new Date(startDate)
   const isAr = locale === 'ar'
   const categoryLabel = locale === 'ar' ? category.nameAr : locale === 'fr' ? category.nameFr : category.nameEn
+  const localizedLocation = isAr && locationAr ? locationAr : (locale === 'fr' && locationFr ? locationFr : location)
+  const localizedDescription = isAr && descriptionAr ? descriptionAr : (locale === 'fr' && descriptionFr ? descriptionFr : description)
 
-  const formattedDate = start.toLocaleDateString(isAr ? 'ar-EG-u-nu-latn' : 'en-US', {
+  const formattedDate = start.toLocaleDateString(isAr ? 'ar-EG-u-nu-latn' : locale === 'fr' ? 'fr-FR' : 'en-US', {
     weekday: 'long',
     day: 'numeric',
     month: 'short',
     year: 'numeric',
   })
 
-  const formattedTime = start.toLocaleTimeString(isAr ? 'ar-EG-u-nu-latn' : 'en-US', {
+  const formattedTime = start.toLocaleTimeString(isAr ? 'ar-EG-u-nu-latn' : locale === 'fr' ? 'fr-FR' : 'en-US', {
     hour: '2-digit',
     minute: '2-digit',
   })
@@ -86,16 +98,16 @@ export default function EventCard({
         </div>
         
         <h4 className="font-serif text-2xl leading-tight text-feps-ink mb-3 group-hover:text-feps-navy transition-colors">
-          {isAr && titleAr ? titleAr : title}
+          {isAr && titleAr ? titleAr : (locale === 'fr' && titleFr ? titleFr : title)}
         </h4>
         
         {titleAr && !isAr && (
            <p className="arabic text-sm text-feps-ink-secondary mb-3">{titleAr}</p>
         )}
         
-        {description && (
+        {localizedDescription && (
           <p className="text-sm text-feps-ink-secondary line-clamp-3 mb-6 leading-relaxed">
-            {description}
+            {localizedDescription}
           </p>
         )}
         
@@ -104,10 +116,10 @@ export default function EventCard({
             <Clock size={14} className="opacity-50" />
             <span>{formattedTime}</span>
           </div>
-          {location && (
+          {localizedLocation && (
             <div className="flex items-center gap-2 text-xs text-feps-ink-secondary font-sans">
               <MapPin size={14} className="opacity-50" />
-              <span className="truncate">{location}</span>
+              <span className="truncate">{localizedLocation}</span>
             </div>
           )}
         </div>

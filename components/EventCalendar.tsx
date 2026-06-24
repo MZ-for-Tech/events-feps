@@ -61,7 +61,8 @@ export default function EventCalendar({ initialEvents, categories }: Props) {
     const q = query.toLowerCase()
     return (
       (ev.title && ev.title.toLowerCase().includes(q)) ||
-      (ev.titleAr && ev.titleAr.toLowerCase().includes(q))
+      (ev.titleAr && ev.titleAr.toLowerCase().includes(q)) ||
+      (ev.titleFr && ev.titleFr.toLowerCase().includes(q))
     )
   }
 

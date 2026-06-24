@@ -1,9 +1,19 @@
 import { NextResponse } from 'next/server'
 import { prisma } from '@/lib/prisma'
 
-export async function GET() {
+export async function GET(req: Request) {
   try {
-    const questions = await prisma.triviaQuestion.findMany()
+    const url = new URL(req.url)
+    const categoryId = url.searchParams.get('categoryId')
+
+    let whereClause: import('@prisma/client').Prisma.TriviaQuestionWhereInput = {}
+    if (categoryId === 'uncategorized') {
+      whereClause = { categoryId: null }
+    } else if (categoryId) {
+      whereClause = { categoryId }
+    }
+
+    const questions = await prisma.triviaQuestion.findMany({ where: whereClause })
     
     if (questions.length === 0) {
       return NextResponse.json([])

@@ -9,18 +9,24 @@ interface AgendaTimelineItem {
 
 interface EventAgendaProps {
   agendaText: string | null
+  agendaTextAr?: string | null
+  agendaTextFr?: string | null
   isAr: boolean
+  isFr?: boolean
   title: string
   isAdmin?: boolean
   eventId?: string
 }
 
-export default function EventAgenda({ agendaText, isAr, title, isAdmin, eventId }: EventAgendaProps) {
-  if (!agendaText && !isAdmin) return null
+export default function EventAgenda({ agendaText, agendaTextAr, agendaTextFr, isAr, isFr, title, isAdmin, eventId }: EventAgendaProps) {
+  const localizedAgendaText = isAr && agendaTextAr ? agendaTextAr : (isFr && agendaTextFr ? agendaTextFr : agendaText)
+  const fieldName = isAr ? 'agendaTextAr' : (isFr ? 'agendaTextFr' : 'agendaText')
+
+  if (!localizedAgendaText && !isAdmin) return null
 
   let parsedAgenda: AgendaTimelineItem[] = []
 
-  const trimmed = (agendaText || '').trim()
+  const trimmed = (localizedAgendaText || '').trim()
   if (trimmed.startsWith('[')) {
     try {
       const cells = JSON.parse(trimmed) as { day?: string; startTime: string; endTime: string; text: string }[]
@@ -77,7 +83,7 @@ export default function EventAgenda({ agendaText, isAr, title, isAdmin, eventId 
         {title}
       </h2>
 
-      <InlineEdit field="agendaText" value={agendaText || ''} eventId={eventId!} isAdmin={!!isAdmin} type="textarea">
+      <InlineEdit field={fieldName} value={localizedAgendaText || ''} eventId={eventId!} isAdmin={!!isAdmin} type="textarea">
         {parsedAgenda.length > 0 ? (
           <div className="relative border-l-4 border-feps-ink ml-4 md:ml-6 rtl:ml-0 rtl:border-l-0 rtl:border-r-4 rtl:mr-4 md:rtl:mr-6">
             {parsedAgenda.map((item, idx) => (
@@ -105,7 +111,7 @@ export default function EventAgenda({ agendaText, isAr, title, isAdmin, eventId 
           </div>
         ) : (
           <div className={`p-8 border-l-4 border-feps-ink bg-feps-surface-alt text-lg leading-relaxed text-feps-ink whitespace-pre-line ${isAr ? 'font-arabic' : ''}`}>
-            {agendaText || (isAr ? 'إضافة البرنامج' : 'Add Agenda')}
+            {localizedAgendaText || (isAr ? 'إضافة البرنامج' : 'Add Agenda')}
           </div>
         )}
       </InlineEdit>

@@ -1,7 +1,7 @@
 "use client"
 
 import React, { useState } from 'react'
-import { useRouter } from 'next/navigation'
+import { useRouter, useSearchParams } from 'next/navigation'
 import { Check, X, Edit2 } from 'lucide-react'
 import toast from 'react-hot-toast'
 
@@ -30,8 +30,10 @@ export default function InlineEdit({
   const [currentValue, setCurrentValue] = useState(value)
   const [isSaving, setIsSaving] = useState(false)
   const router = useRouter()
+  const searchParams = useSearchParams()
+  const isEditMode = searchParams.get('edit') === 'true'
 
-  if (!isAdmin) {
+  if (!isAdmin || !isEditMode) {
     return <>{children}</>
   }
 

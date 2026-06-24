@@ -40,6 +40,7 @@ export async function POST(req: NextRequest) {
         textEn: data.textEn,
         textAr: data.textAr,
         textFr: data.textFr,
+        categoryId: data.categoryId || null,
         options: data.options,
         explanation: data.explanation || null,
         explanationAr: data.explanationAr || null,

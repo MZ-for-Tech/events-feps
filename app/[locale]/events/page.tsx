@@ -39,11 +39,16 @@ export default async function EventsPage({ params }: PageProps) {
     id: ev.id,
     title: ev.title,
     titleAr: ev.titleAr,
+    titleFr: ev.titleFr,
     category: ev.category,
     startDate: ev.startDate.toISOString(),
     endDate: ev.endDate ? ev.endDate.toISOString() : null,
     location: ev.location,
+    locationAr: ev.locationAr,
+    locationFr: ev.locationFr,
     description: ev.description,
+    descriptionAr: ev.descriptionAr,
+    descriptionFr: ev.descriptionFr,
     imageUrl: ev.imageUrl,
   }))
 

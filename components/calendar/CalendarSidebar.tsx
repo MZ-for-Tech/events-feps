@@ -105,7 +105,7 @@ export default function CalendarSidebar({
                 </div>
 
                 <div style={{ fontWeight: 'normal', fontFamily: 'var(--font-serif, serif)', color: 'var(--feps-ink)', fontSize: '1.25rem', lineHeight: 1.2, marginBottom: '0.25rem' }}>
-                  {isAr && ev.titleAr ? ev.titleAr : ev.title}
+                  {isAr && ev.titleAr ? ev.titleAr : (isFr && ev.titleFr ? ev.titleFr : ev.title)}
                 </div>
 
                 {ev.titleAr && !isAr && (
@@ -115,12 +115,18 @@ export default function CalendarSidebar({
                 )}
 
                 <div style={{ display: 'flex', flexDirection: 'column', gap: '0.25rem', marginTop: '0.5rem' }}>
-                  {ev.location && (
-                    <div style={{ display: 'flex', alignItems: 'center', gap: '0.35rem', fontSize: '0.75rem', color: 'var(--feps-ink-secondary)', fontFamily: 'var(--font-sans, sans-serif)' }}>
-                      <MapPin size={12} style={{ color: 'var(--feps-ink-tertiary)' }} />
-                      <span>{ev.location}</span>
-                    </div>
-                  )}
+                  {(() => {
+                    const localizedLocation = isAr && ev.locationAr ? ev.locationAr : (isFr && ev.locationFr ? ev.locationFr : ev.location)
+                    if (localizedLocation) {
+                      return (
+                        <div style={{ display: 'flex', alignItems: 'center', gap: '0.35rem', fontSize: '0.75rem', color: 'var(--feps-ink-secondary)', fontFamily: 'var(--font-sans, sans-serif)' }}>
+                          <MapPin size={12} style={{ color: 'var(--feps-ink-tertiary)' }} />
+                          <span>{localizedLocation}</span>
+                        </div>
+                      )
+                    }
+                    return null
+                  })()}
                   {eventTime && (
                     <div style={{ display: 'flex', alignItems: 'center', gap: '0.35rem', fontSize: '0.75rem', color: 'var(--feps-ink-secondary)', fontFamily: 'var(--font-sans, sans-serif)' }}>
                       <Clock size={12} style={{ color: 'var(--feps-ink-tertiary)' }} />

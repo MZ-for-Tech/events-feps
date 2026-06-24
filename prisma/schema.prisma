@@ -58,8 +58,14 @@ model Event {
   startDate             DateTime
   endDate               DateTime?
   location              String?
+  locationAr            String?
+  locationFr            String?
   description           String?
+  descriptionAr         String?
+  descriptionFr         String?
   agendaText            String?
+  agendaTextAr          String?
+  agendaTextFr          String?
   agendaFile            String?   // stored filepath
   imageUrl              String?   // stored filepath
   published             Boolean   @default(false)
@@ -85,15 +91,29 @@ model SurveyResponse {
   event     Event    @relation(fields: [eventId], references: [id], onDelete: Cascade)
 }
 
-model TriviaQuestion {
-  id          String   @id @default(cuid())
-  textEn      String
-  textAr      String
-  textFr      String
-  options     String   // JSON: [{textEn, textAr, textFr, isCorrect}]
-  explanation String?  // Optional fun fact shown after answering
-  explanationAr String?
-  explanationFr String?
-  createdAt   DateTime @default(now())
+model TriviaCategory {
+  id        String   @id @default(cuid())
+  nameEn    String
+  nameAr    String
+  nameFr    String
+  color     String   @default("#1A3A6E")
+  bg        String   @default("rgba(26,58,110,0.12)")
+  createdAt DateTime @default(now())
+
+  questions TriviaQuestion[]
 }
 
+model TriviaQuestion {
+  id            String   @id @default(cuid())
+  categoryId    String?
+  textEn        String
+  textAr        String
+  textFr        String
+  options       String   // JSON: [{textEn, textAr, textFr, isCorrect}]
+  explanation   String?  // Optional fun fact shown after answering
+  explanationAr String?
+  explanationFr String?
+  createdAt     DateTime @default(now())
+
+  category TriviaCategory? @relation(fields: [categoryId], references: [id], onDelete: Cascade)
+}

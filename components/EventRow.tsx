@@ -7,10 +7,13 @@ export interface EventRowProps {
   id: string
   title: string
   titleAr?: string | null
+  titleFr?: string | null
   category: EventCategoryData
   startDate: string | Date
   endDate?: string | Date | null
   location?: string | null
+  locationAr?: string | null
+  locationFr?: string | null
   description?: string | null
   locale?: string
   index?: number
@@ -20,21 +23,25 @@ export default function EventRow({
   id,
   title,
   titleAr,
+  titleFr,
   category,
   startDate,
   location,
+  locationAr,
+  locationFr,
   locale = 'en',
   index = 0,
 }: EventRowProps) {
   const start = new Date(startDate)
   const isAr = locale === 'ar'
   const categoryLabel = locale === 'ar' ? category.nameAr : locale === 'fr' ? category.nameFr : category.nameEn
+  const localizedLocation = isAr && locationAr ? locationAr : (locale === 'fr' && locationFr ? locationFr : location)
 
-  const month = start.toLocaleDateString(isAr ? 'ar-EG-u-nu-latn' : 'en-US', { month: 'short' })
-  const day = start.toLocaleDateString(isAr ? 'ar-EG-u-nu-latn' : 'en-US', { day: '2-digit' })
+  const month = start.toLocaleDateString(isAr ? 'ar-EG-u-nu-latn' : locale === 'fr' ? 'fr-FR' : 'en-US', { month: 'short' })
+  const day = start.toLocaleDateString(isAr ? 'ar-EG-u-nu-latn' : locale === 'fr' ? 'fr-FR' : 'en-US', { day: '2-digit' })
   const year = start.getFullYear()
 
-  const formattedTime = start.toLocaleTimeString(isAr ? 'ar-EG-u-nu-latn' : 'en-US', {
+  const formattedTime = start.toLocaleTimeString(isAr ? 'ar-EG-u-nu-latn' : locale === 'fr' ? 'fr-FR' : 'en-US', {
     hour: '2-digit',
     minute: '2-digit',
   })
@@ -71,19 +78,19 @@ export default function EventRow({
               <Clock size={12} className="text-feps-gold/70" />
               {formattedTime}
             </div>
-            {location && (
+            {localizedLocation && (
               <>
                 <div className="w-[4px] h-[4px] bg-feps-border rounded-full group-hover:bg-feps-navy/20 transition-colors duration-300"></div>
                 <div className="font-sans text-[0.65rem] uppercase tracking-[0.15em] text-feps-ink-secondary flex items-center gap-1.5 font-semibold">
                   <MapPin size={12} className="text-feps-gold/70" />
-                  <span className="line-clamp-1">{location}</span>
+                  <span className="line-clamp-1">{localizedLocation}</span>
                 </div>
               </>
             )}
           </div>
           
           <h4 className="font-serif text-2xl md:text-[1.7rem] leading-snug text-feps-ink group-hover:text-feps-navy transition-colors duration-300">
-            {isAr && titleAr ? titleAr : title}
+            {isAr && titleAr ? titleAr : (locale === 'fr' && titleFr ? titleFr : title)}
           </h4>
         </div>
 

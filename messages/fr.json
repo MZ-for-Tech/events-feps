@@ -1,27 +1,33 @@
 {
+  "NotFound": {
+    "title": "404",
+    "subtitle": "Page non trouvée",
+    "description": "L'événement ou la page que vous recherchez a été déplacé, supprimé ou n'existe pas.",
+    "returnHome": "Retour à l'accueil"
+  },
   "FepsTrivia": {
-    "trigger": "Testez Vos Connaissances",
-    "welcomeTitle": "Défi de Connaissances",
-    "welcomeDesc": "Testez vos connaissances sur la Faculté d'Économie et de Sciences Politiques. Découvrez des faits historiques et des jalons institutionnels.",
-    "loadingTrivia": "Chargement du quiz...",
-    "startBtn": "Démarrer le Quiz",
-    "question": "Question",
+    "trigger": "Évaluation Académique",
+    "welcomeTitle": "Centre d'Évaluation des Connaissances",
+    "welcomeDesc": "Bienvenue dans le module d'évaluation formelle des connaissances. Évaluez vos compétences sur divers sujets, allant des disciplines académiques aux événements mondiaux et à la culture générale.",
+    "loadingTrivia": "Chargement de l'évaluation...",
+    "startBtn": "Commencer l'évaluation",
+    "question": "Élément",
     "of": "sur",
-    "correct": "Correct!",
-    "wrong": "Incorrect",
+    "correct": "Précis",
+    "wrong": "Imprécis",
     "correctAnswer": "Bonne réponse:",
-    "next": "Suivant",
-    "finish": "Voir les Résultats",
-    "score": "Votre Score",
-    "shareScore": "Partager Mon Score",
-    "downloadImage": "Télécharger l'Image",
-    "playAgain": "Rejouer",
+    "next": "Élément suivant",
+    "finish": "Examiner les résultats",
+    "score": "Résultat final",
+    "shareScore": "Partager le certificat",
+    "downloadImage": "Télécharger le certificat",
+    "playAgain": "Repasser l'évaluation",
     "close": "Fermer",
     "scoreBands": {
-      "perfect": "Score Parfait! Vous êtes à votre place ici.",
-      "good": "Impressionnant! Un vrai chercheur FEPS.",
-      "average": "Pas mal — continuez à explorer.",
-      "poor": "FEPS a beaucoup à vous apprendre!"
+      "perfect": "Distinction avec mention. Performance académique exceptionnelle.",
+      "good": "Hautement recommandé. Excellente maîtrise théorique.",
+      "average": "Satisfaisant. Répond aux attentes de base.",
+      "poor": "Révision requise. Étude approfondie recommandée."
     }
   },
   "Home": {

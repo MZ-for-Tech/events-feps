@@ -24,6 +24,7 @@ interface TriviaQuestion {
   explanation: string | null
   explanationAr: string | null
   explanationFr: string | null
+  categoryId?: string | null
 }
 
 export default function AdminTriviaClient({ locale }: { locale: string }) {
@@ -74,6 +75,9 @@ export default function AdminTriviaClient({ locale }: { locale: string }) {
     { textEn: '', textAr: '', textFr: '', isCorrect: false },
   ])
 
+  const [categories, setCategories] = useState<{id: string, nameEn: string, nameAr: string}[]>([])
+  const [filterCategoryId, setFilterCategoryId] = useState<string>('ALL')
+
   const fetchQuestions = async () => {
     try {
       const res = await fetch('/api/admin/trivia')
@@ -87,13 +91,29 @@ export default function AdminTriviaClient({ locale }: { locale: string }) {
     }
   }
 
+  const fetchCategories = async () => {
+    try {
+      const res = await fetch('/api/admin/trivia/categories')
+      if (res.ok) {
+        const data = await res.json()
+        setCategories(data)
+      }
+    } catch (e) {
+      console.error(e)
+    }
+  }
+
   useEffect(() => {
     fetchQuestions()
+    fetchCategories()
   }, [])
+
+  const [categoryId, setCategoryId] = useState<string>('')
 
   const handleOpenModal = (q?: TriviaQuestion) => {
     if (q) {
       setEditingId(q.id)
+      setCategoryId(q.categoryId || 'uncategorized')
       setTextEn(q.textEn)
       setTextAr(q.textAr)
       setTextFr(q.textFr)
@@ -103,6 +123,7 @@ export default function AdminTriviaClient({ locale }: { locale: string }) {
       setOptions(JSON.parse(q.options))
     } else {
       setEditingId(null)
+      setCategoryId('')
       setTextEn('')
       setTextAr('')
       setTextFr('')
@@ -131,12 +152,13 @@ export default function AdminTriviaClient({ locale }: { locale: string }) {
   }
 
   const handleSave = () => {
-    if (!textEn || !textAr) {
-      toast.error('Please fill at least EN and AR question text')
+    if (!textEn || !textAr || !categoryId) {
+      toast.error(isAr ? 'يرجى إدخال السؤال وتحديد التصنيف' : 'Please fill EN, AR text and select a category')
       return
     }
 
     const payload = {
+      categoryId: categoryId === 'uncategorized' ? null : categoryId,
       textEn, textAr, textFr,
       explanation: explanationEn,
       explanationAr,
@@ -198,6 +220,10 @@ export default function AdminTriviaClient({ locale }: { locale: string }) {
     })
   }
 
+  const filteredQuestions = optimisticQuestions.filter(q => 
+    filterCategoryId === 'ALL' ? true : (q.categoryId || 'uncategorized') === filterCategoryId
+  )
+
   return (
     <div>
       <AdminPageHeader
@@ -212,13 +238,29 @@ export default function AdminTriviaClient({ locale }: { locale: string }) {
         }
       />
 
+      <div className="mb-6 flex items-center justify-between">
+        <div className="flex items-center gap-4">
+          <label className="text-sm font-bold text-feps-navy">{isAr ? 'تصفية حسب التصنيف:' : 'Filter by Category:'}</label>
+          <select 
+            value={filterCategoryId} 
+            onChange={(e) => setFilterCategoryId(e.target.value)}
+            className="p-2 border border-feps-border bg-white text-sm focus:outline-none focus:border-feps-navy"
+          >
+            <option value="ALL">{isAr ? 'الكل' : 'All Categories'}</option>
+            {categories.map(c => (
+              <option key={c.id} value={c.id}>{isAr ? c.nameAr : c.nameEn}</option>
+            ))}
+          </select>
+        </div>
+      </div>
+
       {loading ? (
         <div className="flex justify-center py-20 text-feps-gold"><Loader className="animate-spin" size={40} /></div>
       ) : error ? (
         <div className="bg-red-50 text-red-600 p-6 flex items-center gap-3 border border-red-200">
           <AlertCircle size={24} /> {error}
         </div>
-      ) : optimisticQuestions.length === 0 ? (
+      ) : filteredQuestions.length === 0 ? (
         <div className="text-center py-20 text-feps-ink-secondary bg-white border border-feps-ink/10">
           <Brain size={40} className="mx-auto mb-4 opacity-20" />
           <p>{isAr ? "لا توجد أسئلة مسجلة" : "No questions found"}</p>
@@ -228,18 +270,25 @@ export default function AdminTriviaClient({ locale }: { locale: string }) {
           <TableHeader>
             <TableRow>
               <TableHead>{isAr ? "السؤال" : "Question"}</TableHead>
+              <TableHead>{isAr ? "التصنيف" : "Category"}</TableHead>
               <TableHead>{isAr ? "عدد الخيارات" : "Options"}</TableHead>
               <TableHead className="text-end">{isAr ? "الإجراءات" : "Actions"}</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
-            {optimisticQuestions.map(q => {
+            {filteredQuestions.map(q => {
               const opts = JSON.parse(q.options)
+              const cat = categories.find(c => c.id === (q.categoryId || 'uncategorized'))
               return (
                 <TableRow key={q.id}>
                   <TableCell>
                     <div className="font-bold text-feps-navy">{isAr ? q.textAr : q.textEn}</div>
                     {q.explanation && <div className="text-xs text-feps-ink-secondary mt-1 max-w-lg truncate">{isAr ? q.explanationAr : q.explanation}</div>}
+                  </TableCell>
+                  <TableCell>
+                    <span className="text-sm font-medium text-feps-ink-secondary">
+                      {cat ? (isAr ? cat.nameAr : cat.nameEn) : '-'}
+                    </span>
                   </TableCell>
                   <TableCell>
                     <span className="px-2 py-1 bg-feps-paper border border-feps-border text-xs font-sans font-bold">
@@ -271,7 +320,21 @@ export default function AdminTriviaClient({ locale }: { locale: string }) {
         maxWidthClass="max-w-4xl"
       >
         <div className="flex flex-col gap-6" dir={isAr ? 'rtl' : 'ltr'}>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div>
+              <label className="block text-sm font-bold text-feps-navy mb-2">{isAr ? 'التصنيف' : 'Category'}</label>
+              <select
+                value={categoryId}
+                onChange={e => setCategoryId(e.target.value)}
+                className="w-full p-3 border border-feps-border bg-feps-paper focus:outline-none focus:border-feps-navy"
+                dir={isAr ? 'rtl' : 'ltr'}
+              >
+                <option value="" disabled>{isAr ? 'اختر التصنيف' : 'Select Category'}</option>
+                {categories.map(c => (
+                  <option key={c.id} value={c.id}>{isAr ? c.nameAr : c.nameEn}</option>
+                ))}
+              </select>
+            </div>
             <div>
               <label className="block text-sm font-bold text-feps-navy mb-2">Question (EN)</label>
               <input type="text" value={textEn} onChange={e => setTextEn(e.target.value)} className="w-full p-3 border border-feps-border bg-feps-paper focus:outline-none focus:border-feps-navy" dir="ltr" />

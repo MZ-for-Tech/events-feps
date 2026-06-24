@@ -11,7 +11,10 @@ interface EventSidebarProps {
   formattedStartTime: string
   formattedEndTime: string | null
   location: string | null
+  locationAr?: string | null
+  locationFr?: string | null
   agendaFile: string | null
+  isFr?: boolean
   labels: {
     quickFacts: string
     date: string
@@ -35,13 +38,19 @@ export default function EventSidebar({
   formattedStartTime,
   formattedEndTime,
   location,
+  locationAr,
+  locationFr,
   agendaFile,
   labels,
+  isFr,
   isAdmin,
   eventId,
   rawStartDate,
   rawEndDate
 }: EventSidebarProps) {
+  const localizedLocation = isAr && locationAr ? locationAr : (isFr && locationFr ? locationFr : location)
+  const locationFieldName = isAr ? 'locationAr' : (isFr ? 'locationFr' : 'location')
+
   return (
     <div className="sticky top-24 flex flex-col bg-feps-surface-alt border-t-4 border-feps-ink">
       {/* Quick Ledger Info Box */}
@@ -100,14 +109,14 @@ export default function EventSidebar({
           </div>
 
           {/* Location Ledger */}
-          {(location || isAdmin) && (
+          {(localizedLocation || isAdmin) && (
             <div className="flex flex-col gap-2">
               <div className="flex items-center gap-2 text-xs font-sans text-feps-ink-secondary font-bold uppercase tracking-widest">
                 <MapPin size={14} className="text-feps-ink" /> {labels.location}
               </div>
               <div className={`text-base font-serif font-bold text-feps-ink ${isAr ? 'font-arabic' : ''}`}>
-                <InlineEdit field="location" value={location || ''} eventId={eventId!} isAdmin={!!isAdmin} type="text">
-                  {location || (isAr ? 'إضافة مكان' : 'Add Location')}
+                <InlineEdit field={locationFieldName} value={localizedLocation || ''} eventId={eventId!} isAdmin={!!isAdmin} type="text">
+                  {localizedLocation || (isAr ? 'إضافة مكان' : 'Add Location')}
                 </InlineEdit>
               </div>
             </div>
@@ -141,10 +150,10 @@ export default function EventSidebar({
           title={title} 
           date={formattedStartDate}
           time={formattedStartTime}
-          location={location}
+          location={localizedLocation}
         />
 
-        {location && (
+        {localizedLocation && (
           <a
             href="https://maps.app.goo.gl/xTZ6WMdJuuzjPfqP7"
             target="_blank"

@@ -39,6 +39,9 @@ export default function CalendarAgenda({ events, locale, isAr, isFr }: Props) {
                   minute: '2-digit',
                 })
               : null
+            
+            const localizedLocation = isAr && ev.locationAr ? ev.locationAr : (isFr && ev.locationFr ? ev.locationFr : ev.location)
+            const localizedDescription = isAr && ev.descriptionAr ? ev.descriptionAr : (isFr && ev.descriptionFr ? ev.descriptionFr : ev.description)
 
             return (
               <Link
@@ -66,20 +69,20 @@ export default function CalendarAgenda({ events, locale, isAr, isFr }: Props) {
                   </div>
                   
                   <h3 className="agenda-event-title">
-                    {isAr && ev.titleAr ? ev.titleAr : ev.title}
+                    {isAr && ev.titleAr ? ev.titleAr : (isFr && ev.titleFr ? ev.titleFr : ev.title)}
                   </h3>
                   
-                  {ev.description && (
+                  {localizedDescription && (
                     <p className="agenda-event-desc">
-                      {ev.description}
+                      {localizedDescription}
                     </p>
                   )}
                   
                   <div className="agenda-meta-row">
-                    {ev.location && (
+                    {localizedLocation && (
                       <span className="meta-item">
                         <MapPin size={12} />
-                        {ev.location}
+                        {localizedLocation}
                       </span>
                     )}
                     {eventTime && (

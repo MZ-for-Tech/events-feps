@@ -1,27 +1,33 @@
 {
+  "NotFound": {
+    "title": "404",
+    "subtitle": "Page Not Found",
+    "description": "The event or page you are looking for has been moved, deleted, or does not exist.",
+    "returnHome": "Return to Hub"
+  },
   "FepsTrivia": {
-    "trigger": "Test Your Knowledge",
-    "welcomeTitle": "Faculty Knowledge Challenge",
-    "welcomeDesc": "Test your knowledge about the Faculty of Economics and Political Science. Discover historical facts, academic achievements, and institutional milestones.",
-    "loadingTrivia": "Loading Trivia...",
-    "startBtn": "Start Quiz",
-    "question": "Question",
+    "trigger": "Academic Assessment",
+    "welcomeTitle": "Knowledge Evaluation Hub",
+    "welcomeDesc": "Welcome to the formal knowledge assessment module. Evaluate your proficiency across diverse topics, ranging from academic disciplines to global events and general knowledge.",
+    "loadingTrivia": "Loading Assessment...",
+    "startBtn": "Begin Assessment",
+    "question": "Item",
     "of": "of",
-    "correct": "Correct!",
-    "wrong": "Incorrect",
+    "correct": "Accurate",
+    "wrong": "Inaccurate",
     "correctAnswer": "Correct answer:",
-    "next": "Next",
-    "finish": "See Results",
-    "score": "Your Score",
-    "shareScore": "Share My Score",
-    "downloadImage": "Download Score Card",
-    "playAgain": "Play Again",
+    "next": "Next Item",
+    "finish": "Review Results",
+    "score": "Final Result",
+    "shareScore": "Share Certificate",
+    "downloadImage": "Download Certificate",
+    "playAgain": "Retake Assessment",
     "close": "Close",
     "scoreBands": {
-      "perfect": "Perfect Score! You truly belong here.",
-      "good": "Impressive! A true FEPS scholar.",
-      "average": "Not bad — keep exploring.",
-      "poor": "FEPS has a lot to teach you!"
+      "perfect": "Distinction with Honors. Outstanding academic performance.",
+      "good": "Highly Commended. Excellent theoretical grasp.",
+      "average": "Satisfactory. Meets basic expectations.",
+      "poor": "Requires Review. Further study recommended."
     }
   },
   "Home": {
