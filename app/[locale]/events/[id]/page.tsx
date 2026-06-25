@@ -102,6 +102,13 @@ export default async function EventDetailPage({ params }: PageProps) {
     })
     : null
 
+  // Helper to format Date for <input type="datetime-local"> in server's local time
+  const toLocalDatetimeString = (date: Date | null) => {
+    if (!date) return null
+    const offset = date.getTimezoneOffset() * 60000
+    return new Date(date.getTime() - offset).toISOString().slice(0, 16)
+  }
+
   const direction = isAr ? 'rtl' : 'ltr'
 
   return (
@@ -142,8 +149,8 @@ export default async function EventDetailPage({ params }: PageProps) {
           eventId={event.id}
           categoryId={event.categoryId}
           categories={categoryOptions}
-          rawStartDate={event.startDate ? new Date(event.startDate).toISOString() : null}
-          rawEndDate={event.endDate ? new Date(event.endDate).toISOString() : null}
+          rawStartDate={toLocalDatetimeString(event.startDate ? new Date(event.startDate) : null)}
+          rawEndDate={toLocalDatetimeString(event.endDate ? new Date(event.endDate) : null)}
         />
 
         {/* Draft Notice */}
@@ -214,8 +221,8 @@ export default async function EventDetailPage({ params }: PageProps) {
               }}
               isAdmin={isAdmin}
               eventId={event.id}
-              rawStartDate={event.startDate ? new Date(event.startDate).toISOString() : null}
-              rawEndDate={event.endDate ? new Date(event.endDate).toISOString() : null}
+              rawStartDate={toLocalDatetimeString(event.startDate ? new Date(event.startDate) : null)}
+              rawEndDate={toLocalDatetimeString(event.endDate ? new Date(event.endDate) : null)}
             />
           </div>
         </div>

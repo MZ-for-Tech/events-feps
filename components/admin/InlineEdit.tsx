@@ -45,10 +45,15 @@ export default function InlineEdit({
 
     setIsSaving(true)
     try {
+      let payloadValue: string | null = currentValue
+      if (type === 'datetime-local' && currentValue) {
+        payloadValue = new Date(currentValue).toISOString()
+      }
+
       const res = await fetch(`/api/events/${eventId}`, {
         method: 'PATCH',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ [field]: currentValue })
+        body: JSON.stringify({ [field]: payloadValue })
       })
 
       if (!res.ok) throw new Error('Failed to update')
@@ -95,7 +100,7 @@ export default function InlineEdit({
              <input
               type="datetime-local"
               className="w-full bg-feps-surface-alt border-2 border-feps-gold outline-none p-1 font-inherit text-inherit text-base shadow-sm"
-              value={currentValue ? new Date(currentValue).toISOString().slice(0, 16) : ''}
+              value={currentValue || ''}
               onChange={(e) => setCurrentValue(e.target.value)}
               autoFocus
             />
