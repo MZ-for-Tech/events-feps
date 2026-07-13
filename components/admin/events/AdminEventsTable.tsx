@@ -213,6 +213,14 @@ export function AdminEventsTable({
                           </button>
                         )}
 
+                        <button
+                          onClick={() => router.push(`/${locale}/admin/events/${ev.id}`)}
+                          className="bg-feps-navy text-white w-8 h-8 flex items-center justify-center hover:bg-feps-gold hover:text-feps-navy transition-colors"
+                          title={t('manageEvent')}
+                        >
+                          <FileText size={14} />
+                        </button>
+
                         {activeTab === 'active' ? (
                           <button
                             onClick={() => onArchive(ev)}
@@ -222,22 +230,13 @@ export function AdminEventsTable({
                             <Archive size={14} />
                           </button>
                         ) : (
-                          <>
-                            <button
-                              onClick={() => router.push(`/${locale}/admin/events/${ev.id}`)}
-                              className="bg-feps-navy text-white w-8 h-8 flex items-center justify-center hover:bg-feps-gold hover:text-feps-navy transition-colors"
-                              title={t('manageEvent')}
-                            >
-                              <FileText size={14} />
-                            </button>
-                            <button
-                              onClick={() => onRestore(ev)}
-                              className="bg-green-50 text-green-700 w-8 h-8 flex items-center justify-center hover:bg-green-600 hover:text-white transition-colors"
-                              title={t('restoreActive')}
-                            >
-                              <ChevronRight size={14} />
-                            </button>
-                          </>
+                          <button
+                            onClick={() => onRestore(ev)}
+                            className="bg-green-50 text-green-700 w-8 h-8 flex items-center justify-center hover:bg-green-600 hover:text-white transition-colors"
+                            title={t('restoreActive')}
+                          >
+                            <ChevronRight size={14} />
+                          </button>
                         )}
                       </div>
                     </TableCell>
@@ -323,6 +322,13 @@ export function AdminEventsTable({
                         <Trash2 size={12} /> {t('actionDelete')}
                       </button>
                     )}
+                    <button
+                      onClick={() => router.push(`/${locale}/admin/events/${ev.id}`)}
+                      className="bg-feps-navy text-white flex-1 py-1.5 rounded flex items-center justify-center gap-2 hover:bg-feps-gold hover:text-feps-navy transition-colors text-xs font-bold uppercase tracking-wider"
+                    >
+                      <FileText size={12} /> {isAr ? 'إدارة' : 'Manage'}
+                    </button>
+
                     {activeTab === 'active' ? (
                       <button
                         onClick={() => onArchive(ev)}
@@ -331,20 +337,12 @@ export function AdminEventsTable({
                         <Archive size={12} /> {t('archive')}
                       </button>
                     ) : (
-                      <>
-                        <button
-                          onClick={() => onOpenReport(ev)}
-                          className="bg-feps-navy text-white flex-1 py-1.5 rounded flex items-center justify-center gap-2 hover:bg-feps-gold hover:text-feps-navy transition-colors text-xs font-bold uppercase tracking-wider"
-                        >
-                          <Printer size={12} /> {t('report')}
-                        </button>
-                        <button
-                          onClick={() => onRestore(ev)}
-                          className="bg-green-50 text-green-700 flex-1 py-1.5 rounded flex items-center justify-center gap-2 hover:bg-green-600 hover:text-white transition-colors text-xs font-bold uppercase tracking-wider"
-                        >
-                          <ChevronRight size={12} /> {t('restore')}
-                        </button>
-                      </>
+                      <button
+                        onClick={() => onRestore(ev)}
+                        className="bg-green-50 text-green-700 flex-1 py-1.5 rounded flex items-center justify-center gap-2 hover:bg-green-600 hover:text-white transition-colors text-xs font-bold uppercase tracking-wider"
+                      >
+                        <ChevronRight size={12} /> {t('restore')}
+                      </button>
                     )}
                   </div>
                 </div>
