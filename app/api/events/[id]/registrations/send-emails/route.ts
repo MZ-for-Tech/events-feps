@@ -2,9 +2,7 @@ import { NextRequest, NextResponse } from 'next/server'
 import { auth } from '@/lib/auth'
 import { prisma } from '@/lib/prisma'
 import { hasPermission, PERMISSIONS } from '@/lib/permissions'
-import { Resend } from 'resend'
-
-const resend = new Resend(process.env.RESEND_API_KEY)
+import nodemailer from 'nodemailer'
 
 export async function POST(
   req: NextRequest,
@@ -33,21 +31,32 @@ export async function POST(
       return new NextResponse('No registered attendees found for this event.', { status: 400 })
     }
 
-    if (!process.env.RESEND_API_KEY) {
-      return new NextResponse('Resend API key is not configured.', { status: 500 })
+    const smtpUser = process.env.EMAIL_SERVER_USER
+    const smtpPass = process.env.EMAIL_SERVER_PASSWORD
+
+    if (!smtpUser || !smtpPass) {
+      return new NextResponse('SMTP credentials are not configured in environment variables.', { status: 500 })
     }
 
-    const fromAddress = process.env.RESEND_FROM || 'onboarding@resend.dev'
+    // Configure Nodemailer with Gmail SMTP
+    const transporter = nodemailer.createTransport({
+      service: 'gmail',
+      auth: {
+        user: smtpUser,
+        pass: smtpPass
+      }
+    })
+
     const appUrl = process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000'
 
-    // Build the emails payload for Resend Batch API
-    const emailsPayload = registrations.map((r) => {
+    // Map each registration to a mail options object
+    const mailJobs = registrations.map((r) => {
       const isCreditCode = r.identifierType === 'CREDIT_CODE'
       const typeLabelAr = isCreditCode ? 'كود الساعات المعتمدة' : 'الرقم القومي'
       const typeLabelEn = isCreditCode ? 'Credit Hour Code' : 'National ID'
 
-      return {
-        from: fromAddress,
+      const mailOptions = {
+        from: `"FEPS Events" <${smtpUser}>`,
         to: r.email,
         subject: `FEPS Events: Feedback Evaluation - ${event.title}`,
         html: `
@@ -89,13 +98,16 @@ export async function POST(
           </div>
         `
       }
+
+      // Return a function wrapper to call transporter.sendMail
+      return () => transporter.sendMail(mailOptions)
     })
 
-    // Batch limit: Resend batch allows up to 150 emails per request. Chunk the payloads just in case.
-    const chunkSize = 100
-    for (let i = 0; i < emailsPayload.length; i += chunkSize) {
-      const chunk = emailsPayload.slice(i, i + chunkSize)
-      await resend.batch.send(chunk)
+    // Process mail sending in chunks of 5 concurrently to avoid Gmail SMTP throttling
+    const chunkSize = 5
+    for (let i = 0; i < mailJobs.length; i += chunkSize) {
+      const chunk = mailJobs.slice(i, i + chunkSize)
+      await Promise.all(chunk.map((job) => job()))
     }
 
     return NextResponse.json({ success: true, count: registrations.length })
