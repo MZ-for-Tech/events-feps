@@ -4,7 +4,7 @@ import React, { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { useTranslations } from 'next-intl'
 import Link from 'next/link'
-import { ArrowLeft, Save, Plus, Trash2, FileText, CheckCircle, BarChart3, HelpCircle, Loader, Eye, Clock, Edit2, Calendar, Users } from 'lucide-react'
+import { ArrowLeft, Save, Plus, Trash2, FileText, CheckCircle, BarChart3, HelpCircle, Loader, Eye, Clock, Edit2, Calendar, Users, Mail } from 'lucide-react'
 import dynamic from 'next/dynamic'
 import SingleEventReportDocument from '@/components/admin/SingleEventReportDocument'
 import SurveyAnalytics from '@/components/admin/SurveyAnalytics'
@@ -50,6 +50,7 @@ export default function AdminEventDetailClient({ event, locale, surveyResponses 
   const [surveyQuestions, setSurveyQuestions] = useState<SurveyQuestion[]>(initialSurveyQuestions)
   const [surveyEnabled, setSurveyEnabled] = useState<boolean>(!!event.surveyEnabled)
   const [includeRegistrationStats, setIncludeRegistrationStats] = useState<boolean>(false)
+  const [sendingEmails, setSendingEmails] = useState<boolean>(false)
 
   const [isLoaded, setIsLoaded] = useState(false)
 
@@ -201,6 +202,37 @@ export default function AdminEventDetailClient({ event, locale, surveyResponses 
 
   const handleRemoveSurveyQuestion = (id: string) => {
     setSurveyQuestions(surveyQuestions.filter(q => q.id !== id))
+  }
+
+  const handleSendSurveyEmails = async () => {
+    const confirmSend = window.confirm(
+      isAr 
+        ? 'هل أنت متأكد من رغبتك في إرسال أكواد التقييم لجميع الحضور المسجلين عبر البريد الإلكتروني؟'
+        : 'Are you sure you want to send evaluation codes to all registered attendees?'
+    )
+    if (!confirmSend) return
+
+    setSendingEmails(true)
+    try {
+      const res = await fetch(`/api/events/${event.id}/registrations/send-emails`, {
+        method: 'POST'
+      })
+      if (res.ok) {
+        const data = await res.json()
+        alert(
+          isAr 
+            ? `تم إرسال البريد الإلكتروني بنجاح لعدد ${data.count} مشارك.`
+            : `Emails sent successfully to ${data.count} registered attendees.`
+        )
+      } else {
+        const txt = await res.text()
+        alert(isAr ? `خطأ أثناء الإرسال: ${txt}` : `Error: ${txt}`)
+      }
+    } catch {
+      alert(isAr ? 'خطأ في الاتصال بالخادم' : 'Server error')
+    } finally {
+      setSendingEmails(false)
+    }
   }
 
   const handleSave = async () => {
@@ -459,6 +491,18 @@ export default function AdminEventDetailClient({ event, locale, surveyResponses 
                       <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] rtl:after:left-auto rtl:after:right-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-green-500"></div>
                     </div>
                   </label>
+                  
+                  {event.registrationEnabled && surveyEnabled && (
+                    <button
+                      onClick={handleSendSurveyEmails}
+                      disabled={sendingEmails || event._count?.registrations === 0}
+                      className="flex items-center gap-2 bg-feps-gold hover:bg-feps-gold/90 text-feps-navy px-4 py-2 text-xs font-bold uppercase tracking-wider transition-colors disabled:opacity-50"
+                      title={isAr ? 'إرسال أكواد التقييم للمسجلين عبر البريد' : 'Email Survey Codes to Attendees'}
+                    >
+                      {sendingEmails ? <Loader size={14} className="animate-spin" /> : <Mail size={14} />}
+                      {isAr ? 'إرسال أكواد التقييم عبر البريد' : 'Email Survey Codes'}
+                    </button>
+                  )}
                   
                   <div className="flex gap-2">
                     <button onClick={() => handleAddSurveyQuestion('text')} className="flex items-center gap-2 bg-feps-ink/5 text-feps-ink px-4 py-2 text-sm font-bold hover:bg-feps-ink/10 transition-colors">
