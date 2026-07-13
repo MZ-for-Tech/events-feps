@@ -2,6 +2,7 @@
 
 import React, { useState, useEffect } from 'react'
 import { Users, Download, Trash2, CheckCircle, Save, Loader } from 'lucide-react'
+import { ConfirmModal } from './ConfirmModal'
 
 interface Registration {
   id: string
@@ -36,6 +37,23 @@ export default function RegistrationAdmin({
   const [loading, setLoading] = useState(true)
   const [saving, setSaving] = useState(false)
   const [saveStatus, setSaveStatus] = useState<string | null>(null)
+
+  // Custom modal state
+  const [confirmModal, setConfirmModal] = useState<{
+    isOpen: boolean
+    title: string
+    message: string
+    confirmText?: string
+    cancelText?: string
+    onConfirm: () => void
+    onCancel?: () => void
+    type?: 'danger' | 'info' | 'success' | 'warning'
+  }>({
+    isOpen: false,
+    title: '',
+    message: '',
+    onConfirm: () => {}
+  })
 
   useEffect(() => {
     fetchRegistrations()
@@ -82,24 +100,31 @@ export default function RegistrationAdmin({
     }
   }
 
-  const handleDeleteRegistration = async (regId: string) => {
-    const confirmed = window.confirm(
-      isAr 
-        ? 'هل أنت متأكد من رغبتك في حذف هذا التسجيل؟' 
-        : 'Are you sure you want to delete this registration?'
-    )
-    if (!confirmed) return
-
-    try {
-      const res = await fetch(`/api/events/${eventId}/registrations?registrationId=${regId}`, {
-        method: 'DELETE'
-      })
-      if (res.ok) {
-        setRegistrations(registrations.filter((r) => r.id !== regId))
+  const handleDeleteRegistration = (regId: string) => {
+    setConfirmModal({
+      isOpen: true,
+      title: isAr ? 'تأكيد حذف الحضور' : 'Confirm Deletion',
+      message: isAr
+        ? 'هل أنت متأكد من رغبتك في حذف هذا التسجيل؟ لا يمكن التراجع عن هذا الإجراء.'
+        : 'Are you sure you want to delete this registration? This action cannot be undone.',
+      confirmText: isAr ? 'حذف' : 'Delete',
+      cancelText: isAr ? 'إلغاء' : 'Cancel',
+      type: 'danger',
+      onCancel: () => setConfirmModal(prev => ({ ...prev, isOpen: false })),
+      onConfirm: async () => {
+        setConfirmModal(prev => ({ ...prev, isOpen: false }))
+        try {
+          const res = await fetch(`/api/events/${eventId}/registrations?registrationId=${regId}`, {
+            method: 'DELETE'
+          })
+          if (res.ok) {
+            setRegistrations(registrations.filter((r) => r.id !== regId))
+          }
+        } catch (error) {
+          console.error('Error deleting registration:', error)
+        }
       }
-    } catch (error) {
-      console.error('Error deleting registration:', error)
-    }
+    })
   }
 
   const handleExportExcel = () => {
@@ -324,6 +349,18 @@ export default function RegistrationAdmin({
           )}
         </div>
       )}
+      
+      <ConfirmModal
+        isOpen={confirmModal.isOpen}
+        title={confirmModal.title}
+        message={confirmModal.message}
+        confirmText={confirmModal.confirmText}
+        cancelText={confirmModal.cancelText}
+        onConfirm={confirmModal.onConfirm}
+        onCancel={confirmModal.onCancel}
+        type={confirmModal.type}
+        isAr={isAr}
+      />
     </div>
   )
 }

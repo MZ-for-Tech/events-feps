@@ -10,6 +10,7 @@ import SingleEventReportDocument from '@/components/admin/SingleEventReportDocum
 import SurveyAnalytics from '@/components/admin/SurveyAnalytics'
 import RegistrationAdmin from '@/components/admin/RegistrationAdmin'
 import { AdminPageHeader } from '@/components/admin/AdminPageHeader'
+import { ConfirmModal } from '@/components/admin/ConfirmModal'
 import { AdminButton } from '@/components/admin/AdminButton'
 import { Event, SurveyResponse, EventCategory } from '@prisma/client'
 import { useSession } from 'next-auth/react'
@@ -51,6 +52,24 @@ export default function AdminEventDetailClient({ event, locale, surveyResponses 
   const [surveyEnabled, setSurveyEnabled] = useState<boolean>(!!event.surveyEnabled)
   const [includeRegistrationStats, setIncludeRegistrationStats] = useState<boolean>(false)
   const [sendingEmails, setSendingEmails] = useState<boolean>(false)
+
+  // Custom Confirmation Modal state
+  const [confirmModal, setConfirmModal] = useState<{
+    isOpen: boolean
+    title: string
+    message: string
+    confirmText?: string
+    cancelText?: string
+    isAlert?: boolean
+    onConfirm: () => void
+    onCancel?: () => void
+    type?: 'danger' | 'info' | 'success' | 'warning'
+  }>({
+    isOpen: false,
+    title: '',
+    message: '',
+    onConfirm: () => {}
+  })
 
   const [isLoaded, setIsLoaded] = useState(false)
 
@@ -204,35 +223,63 @@ export default function AdminEventDetailClient({ event, locale, surveyResponses 
     setSurveyQuestions(surveyQuestions.filter(q => q.id !== id))
   }
 
-  const handleSendSurveyEmails = async () => {
-    const confirmSend = window.confirm(
-      isAr 
+  const handleSendSurveyEmails = () => {
+    setConfirmModal({
+      isOpen: true,
+      title: isAr ? 'تأكيد إرسال البريد' : 'Confirm Email Broadcast',
+      message: isAr
         ? 'هل أنت متأكد من رغبتك في إرسال أكواد التقييم لجميع الحضور المسجلين عبر البريد الإلكتروني؟'
-        : 'Are you sure you want to send evaluation codes to all registered attendees?'
-    )
-    if (!confirmSend) return
-
-    setSendingEmails(true)
-    try {
-      const res = await fetch(`/api/events/${event.id}/registrations/send-emails`, {
-        method: 'POST'
-      })
-      if (res.ok) {
-        const data = await res.json()
-        alert(
-          isAr 
-            ? `تم إرسال البريد الإلكتروني بنجاح لعدد ${data.count} مشارك.`
-            : `Emails sent successfully to ${data.count} registered attendees.`
-        )
-      } else {
-        const txt = await res.text()
-        alert(isAr ? `خطأ أثناء الإرسال: ${txt}` : `Error: ${txt}`)
+        : 'Are you sure you want to send evaluation codes to all registered attendees?',
+      confirmText: isAr ? 'إرسال' : 'Send',
+      cancelText: isAr ? 'إلغاء' : 'Cancel',
+      type: 'warning',
+      onCancel: () => setConfirmModal(prev => ({ ...prev, isOpen: false })),
+      onConfirm: async () => {
+        setConfirmModal(prev => ({ ...prev, isOpen: false }))
+        setSendingEmails(true)
+        try {
+          const res = await fetch(`/api/events/${event.id}/registrations/send-emails`, {
+            method: 'POST'
+          })
+          if (res.ok) {
+            const data = await res.json()
+            setConfirmModal({
+              isOpen: true,
+              isAlert: true,
+              type: 'success',
+              title: isAr ? 'تم الإرسال بنجاح' : 'Sent Successfully',
+              message: isAr 
+                ? `تم إرسال البريد الإلكتروني بنجاح لعدد ${data.count} مشارك.`
+                : `Emails sent successfully to ${data.count} registered attendees.`,
+              onConfirm: () => setConfirmModal(prev => ({ ...prev, isOpen: false }))
+            })
+          } else {
+            const txt = await res.text()
+            setConfirmModal({
+              isOpen: true,
+              isAlert: true,
+              type: 'danger',
+              title: isAr ? 'فشل الإرسال' : 'Sending Failed',
+              message: isAr 
+                ? `حدث خطأ أثناء إرسال البريد:\n${txt}` 
+                : `Error sending emails:\n${txt}`,
+              onConfirm: () => setConfirmModal(prev => ({ ...prev, isOpen: false }))
+            })
+          }
+        } catch {
+          setConfirmModal({
+            isOpen: true,
+            isAlert: true,
+            type: 'danger',
+            title: isAr ? 'خطأ في النظام' : 'System Error',
+            message: isAr ? 'خطأ في الاتصال بالخادم' : 'Server connection error occurred',
+            onConfirm: () => setConfirmModal(prev => ({ ...prev, isOpen: false }))
+          })
+        } finally {
+          setSendingEmails(false)
+        }
       }
-    } catch {
-      alert(isAr ? 'خطأ في الاتصال بالخادم' : 'Server error')
-    } finally {
-      setSendingEmails(false)
-    }
+    })
   }
 
   const handleSave = async () => {
@@ -645,6 +692,19 @@ export default function AdminEventDetailClient({ event, locale, surveyResponses 
 
         </div>
       </div>
+      
+      <ConfirmModal
+        isOpen={confirmModal.isOpen}
+        title={confirmModal.title}
+        message={confirmModal.message}
+        confirmText={confirmModal.confirmText}
+        cancelText={confirmModal.cancelText}
+        isAlert={confirmModal.isAlert}
+        onConfirm={confirmModal.onConfirm}
+        onCancel={confirmModal.onCancel}
+        type={confirmModal.type}
+        isAr={isAr}
+      />
     </div>
   )
 }
