@@ -22,6 +22,7 @@ import Providers from '@/components/Providers'
 import Navbar from '@/components/Navbar'
 import Footer from '@/components/Footer'
 import GuidedTour from '@/components/GuidedTour'
+import PageTransitionWrapper from '@/components/PageTransitionWrapper'
 import { Toaster } from 'react-hot-toast'
 
 export const metadata: Metadata = {
@@ -68,7 +69,9 @@ export default async function RootLayout({
           <Providers>
             <Navbar />
             <main className="page-content">
-              {children}
+              <PageTransitionWrapper>
+                {children}
+              </PageTransitionWrapper>
             </main>
             <Footer />
             <GuidedTour />
