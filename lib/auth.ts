@@ -5,6 +5,9 @@ import bcrypt from 'bcryptjs'
 import type { Role } from '@/lib/types'
 
 export const { handlers, signIn, signOut, auth } = NextAuth({
+  // Required for non-Vercel deployments (Prisma Online, custom domains, etc.)
+  trustHost: true,
+  secret: process.env.AUTH_SECRET,
   providers: [
     Credentials({
       name: 'credentials',
