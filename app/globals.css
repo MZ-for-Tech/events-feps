@@ -392,71 +392,43 @@
 .delay-400 { animation-delay: 400ms; }
 .delay-500 { animation-delay: 500ms; }
 
-/* ─── Page Transitions ────────────────────────────────────── */
+/* ─── Page Curtain Transition ─────────────────────────────── */
 
-/* Gold progress bar — fixed at the very top, above the navbar */
-.page-progress-bar {
+/**
+ * White curtain that rises from the bottom (covers screen),
+ * pauses briefly, then exits upward (reveals new page).
+ *
+ * Phase 1 — curtainIn:  translateY(100%) → translateY(0%)    [0ms   – 320ms]
+ * Phase 2 — curtainOut: translateY(0%)   → translateY(-100%) [360ms – 760ms]
+ * The 40ms gap between phases = curtain fully covering the screen.
+ */
+
+@keyframes curtainIn {
+  from { transform: translateY(100%); }
+  to   { transform: translateY(0%);   }
+}
+
+@keyframes curtainOut {
+  from { transform: translateY(0%);    }
+  to   { transform: translateY(-100%); }
+}
+
+.page-curtain {
   position: fixed;
-  top: 0;
-  left: 0;
-  right: 0;
-  height: 3px;
-  z-index: 10000;
+  inset: 0;
+  background: #ffffff;
+  z-index: 9999;
   pointer-events: none;
-  background: var(--feps-gold);
-  transform-origin: left center;
-  will-change: transform, opacity;
+  will-change: transform;
+  animation:
+    curtainIn  0.32s cubic-bezier(0.76, 0, 0.24, 1) 0s      forwards,
+    curtainOut 0.42s cubic-bezier(0.76, 0, 0.24, 1) 0.36s   forwards;
 }
 
-@keyframes progress-fill {
-  0%   { transform: scaleX(0);    opacity: 1; }
-  20%  { transform: scaleX(0.4);  opacity: 1; }
-  60%  { transform: scaleX(0.75); opacity: 1; }
-  90%  { transform: scaleX(0.92); opacity: 1; }
-  100% { transform: scaleX(1);    opacity: 1; }
-}
-
-@keyframes progress-fade {
-  from { transform: scaleX(1); opacity: 1; }
-  to   { transform: scaleX(1); opacity: 0; }
-}
-
-.page-progress-bar.filling {
-  animation: progress-fill 0.48s cubic-bezier(0.22, 1, 0.36, 1) forwards;
-}
-
-.page-progress-bar.fading {
-  animation: progress-fade 0.22s ease-out forwards;
-}
-
-/* Page content — fade-in + slide-up (Option A) */
-@keyframes pageEnter {
-  from {
-    opacity: 0;
-    transform: translateY(14px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
-}
-
-.page-enter {
-  animation: pageEnter 0.38s cubic-bezier(0.22, 1, 0.36, 1) both;
-  will-change: opacity, transform;
-}
-
-/* Respect reduced-motion preference */
+/* Respect reduced-motion — skip the curtain entirely */
 @media (prefers-reduced-motion: reduce) {
-  .page-progress-bar,
-  .page-progress-bar.filling,
-  .page-progress-bar.fading {
-    animation: none;
-    opacity: 0;
-  }
-
-  .page-enter {
-    animation: none;
+  .page-curtain {
+    display: none;
   }
 }
 
