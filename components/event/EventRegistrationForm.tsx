@@ -6,10 +6,11 @@ import { CheckCircle, AlertCircle, Loader, KeyRound, Mail, User, ShieldCheck } f
 interface Props {
   eventId: string
   registrationMode: string // CREDIT_CODE | NATIONAL_ID | BOTH
+  registrationOpen: boolean
   isAr: boolean
 }
 
-export default function EventRegistrationForm({ eventId, registrationMode, isAr }: Props) {
+export default function EventRegistrationForm({ eventId, registrationMode, registrationOpen, isAr }: Props) {
   const [name, setName] = useState('')
   const [email, setEmail] = useState('')
   const [identifier, setIdentifier] = useState('')
@@ -286,6 +287,29 @@ export default function EventRegistrationForm({ eventId, registrationMode, isAr 
             </button>
           </div>
         </form>
+      ) : !registrationOpen ? (
+        /* Registration Closed Screen */
+        <div className="space-y-6">
+          <div className="bg-amber-50 border border-amber-200 p-4 text-amber-800 text-sm font-sans flex items-center gap-3">
+            <AlertCircle className="text-amber-600 shrink-0" />
+            <span>
+              {isAr 
+                ? 'تم إغلاق باب التسجيل لحضور هذه الفعالية. لم يعد من الممكن استقبال تسجيلات جديدة.' 
+                : 'Attendance registration for this event has closed. New registrations are no longer accepted.'}
+            </span>
+          </div>
+          
+          <div className="flex justify-start">
+            <button
+              type="button"
+              onClick={() => setShowVerify(true)}
+              className="text-sm text-feps-navy hover:underline font-bold uppercase tracking-wide flex items-center gap-2"
+            >
+              <KeyRound size={16} />
+              {isAr ? 'هل سجلت مسبقاً؟ اضغط هنا للتحقق من كودك والمشاركة في التقييم' : 'Already registered? Click here to verify code & review'}
+            </button>
+          </div>
+        </div>
       ) : (
         /* Standard Registration Form */
         <form onSubmit={handleRegister} className="space-y-4">

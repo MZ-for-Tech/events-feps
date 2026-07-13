@@ -118,6 +118,7 @@ export async function PATCH(
         surveyQuestions: data.surveyQuestions !== undefined ? (data.surveyQuestions ?? null) : undefined,
         surveyEnabled: data.surveyEnabled !== undefined ? data.surveyEnabled : undefined,
         registrationEnabled: data.registrationEnabled !== undefined ? data.registrationEnabled : undefined,
+        registrationOpen: data.registrationOpen !== undefined ? data.registrationOpen : undefined,
         registrationMode: data.registrationMode !== undefined ? data.registrationMode : undefined,
     }
     // Fetch current event to compare

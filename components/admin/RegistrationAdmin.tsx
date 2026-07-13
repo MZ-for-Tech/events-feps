@@ -15,6 +15,7 @@ interface Registration {
 interface Props {
   eventId: string
   initialEnabled: boolean
+  initialOpen: boolean
   initialMode: string
   isAr: boolean
   surveyResponsesCount: number
@@ -23,11 +24,13 @@ interface Props {
 export default function RegistrationAdmin({
   eventId,
   initialEnabled,
+  initialOpen,
   initialMode,
   isAr,
   surveyResponsesCount
 }: Props) {
   const [enabled, setEnabled] = useState(initialEnabled)
+  const [open, setOpen] = useState(initialOpen)
   const [mode, setMode] = useState(initialMode)
   const [registrations, setRegistrations] = useState<Registration[]>([])
   const [loading, setLoading] = useState(true)
@@ -62,6 +65,7 @@ export default function RegistrationAdmin({
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           registrationEnabled: enabled,
+          registrationOpen: open,
           registrationMode: mode
         })
       })
@@ -137,6 +141,36 @@ export default function RegistrationAdmin({
               <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full peer-checked:after:border-white after:content-[\'\'] after:absolute after:top-[2px] after:left-[2px] rtl:after:left-auto rtl:after:right-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-green-600"></div>
             </label>
           </div>
+
+          {/* Open/Close Toggle */}
+          {enabled && (
+            <div className="flex items-center justify-between pt-4 border-t border-feps-ink/10">
+              <div>
+                <label className="text-sm font-bold text-feps-ink block mb-1">
+                  {isAr ? 'حالة فترة التسجيل' : 'Registration Period Status'}
+                </label>
+                <span className="text-xs text-feps-ink-secondary">
+                  {isAr 
+                    ? 'عند الإغلاق، لا يمكن تسجيل حضور جديد ولكن يمكن للذين سجلوا سابقاً إتمام التقييم'
+                    : 'When closed, no new attendees can register, but existing registrants can still complete the survey'}
+                </span>
+              </div>
+              <div className="flex items-center gap-3">
+                <span className={`text-xs font-bold px-2 py-0.5 rounded ${open ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'}`}>
+                  {open ? (isAr ? 'مفتوح للتسجيل' : 'Open') : (isAr ? 'مغلق للتسجيل' : 'Closed')}
+                </span>
+                <label className="relative inline-flex items-center cursor-pointer">
+                  <input
+                    type="checkbox"
+                    checked={open}
+                    onChange={(e) => setOpen(e.target.checked)}
+                    className="sr-only peer"
+                  />
+                  <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full peer-checked:after:border-white after:content-[\'\'] after:absolute after:top-[2px] after:left-[2px] rtl:after:left-auto rtl:after:right-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-green-600"></div>
+                </label>
+              </div>
+            </div>
+          )}
 
           {/* Mode Selection */}
           {enabled && (

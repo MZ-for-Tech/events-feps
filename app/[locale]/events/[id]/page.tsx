@@ -232,6 +232,7 @@ export default async function EventDetailPage({ params }: PageProps) {
           <EventRegistrationForm
             eventId={event.id}
             registrationMode={event.registrationMode}
+            registrationOpen={event.registrationOpen}
             isAr={isAr}
           />
         )}

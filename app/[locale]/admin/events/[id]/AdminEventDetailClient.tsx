@@ -311,6 +311,7 @@ export default function AdminEventDetailClient({ event, locale, surveyResponses 
             <RegistrationAdmin
               eventId={event.id}
               initialEnabled={event.registrationEnabled}
+              initialOpen={event.registrationOpen}
               initialMode={event.registrationMode}
               isAr={isAr}
               surveyResponsesCount={surveyResponses.length}

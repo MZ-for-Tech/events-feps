@@ -54,6 +54,10 @@ export async function POST(
       return new NextResponse('Registration is not enabled for this event', { status: 400 })
     }
 
+    if (!event.registrationOpen) {
+      return new NextResponse('Registration period has ended for this event', { status: 400 })
+    }
+
     // Validation rules
     const isCredit = /^\d{7}$/.test(identifier)
     const isNational = /^\d{14}$/.test(identifier)

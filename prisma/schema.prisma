@@ -77,6 +77,7 @@ model Event {
   surveyQuestions       String?   // JSON array of {id, type, text, options}
   surveyEnabled         Boolean   @default(false) // Whether the survey is currently open
   registrationEnabled Boolean @default(false)
+  registrationOpen    Boolean @default(true)
   registrationMode    String  @default("CREDIT_CODE") // CREDIT_CODE | NATIONAL_ID | BOTH
   createdAt             DateTime  @default(now())
   updatedAt             DateTime  @updatedAt
