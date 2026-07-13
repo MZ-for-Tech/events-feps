@@ -104,6 +104,30 @@ const styles = StyleSheet.create({
     borderTopWidth: 0,
     backgroundColor: '#e6e6e6'
   },
+  tableColHeaderShort: {
+    width: '15%',
+    borderStyle: 'solid',
+    borderWidth: 1,
+    borderLeftWidth: 0,
+    borderTopWidth: 0,
+    backgroundColor: '#e6e6e6'
+  },
+  tableColHeaderMed: {
+    width: '20%',
+    borderStyle: 'solid',
+    borderWidth: 1,
+    borderLeftWidth: 0,
+    borderTopWidth: 0,
+    backgroundColor: '#e6e6e6'
+  },
+  tableColHeaderLarge45: {
+    width: '45%',
+    borderStyle: 'solid',
+    borderWidth: 1,
+    borderLeftWidth: 0,
+    borderTopWidth: 0,
+    backgroundColor: '#e6e6e6'
+  },
   tableCol: {
     width: '25%',
     borderStyle: 'solid',
@@ -113,6 +137,27 @@ const styles = StyleSheet.create({
   },
   tableColLarge: {
     width: '50%',
+    borderStyle: 'solid',
+    borderWidth: 1,
+    borderLeftWidth: 0,
+    borderTopWidth: 0
+  },
+  tableColShort: {
+    width: '15%',
+    borderStyle: 'solid',
+    borderWidth: 1,
+    borderLeftWidth: 0,
+    borderTopWidth: 0
+  },
+  tableColMed: {
+    width: '20%',
+    borderStyle: 'solid',
+    borderWidth: 1,
+    borderLeftWidth: 0,
+    borderTopWidth: 0
+  },
+  tableColLarge45: {
+    width: '45%',
     borderStyle: 'solid',
     borderWidth: 1,
     borderLeftWidth: 0,
@@ -212,6 +257,7 @@ export interface ReportTranslations {
 interface AdminReportEvent extends CalendarEvent {
   agendaText?: string | null
   published?: boolean
+  registrationCount?: number
 }
 
 interface AcademicReportDocumentProps {
@@ -293,15 +339,17 @@ export default function AcademicReportDocument({ events, reportTitle, monthYear,
             <View style={{ ...styles.tableRow, flexDirection: isAr ? 'row-reverse' : 'row' }}>
               {isAr ? (
                 <>
-                  <View style={styles.tableColHeader}><Text style={{ ...styles.tableCellHeader, fontFamily: boldFont, textAlign: 'right' }}>{ar(translations.colCategory)}</Text></View>
-                  <View style={styles.tableColHeaderLarge}><Text style={{ ...styles.tableCellHeader, fontFamily: boldFont, textAlign: 'right' }}>{ar(translations.colEventLocation)}</Text></View>
-                  <View style={{ ...styles.tableColHeader, borderRightWidth: 0 }}><Text style={{ ...styles.tableCellHeader, fontFamily: boldFont, textAlign: 'right' }}>{ar(translations.colDateTime)}</Text></View>
+                  <View style={styles.tableColHeaderMed}><Text style={{ ...styles.tableCellHeader, fontFamily: boldFont, textAlign: 'right' }}>{ar(translations.colCategory)}</Text></View>
+                  <View style={styles.tableColHeaderLarge45}><Text style={{ ...styles.tableCellHeader, fontFamily: boldFont, textAlign: 'right' }}>{ar(translations.colEventLocation)}</Text></View>
+                  <View style={styles.tableColHeaderShort}><Text style={{ ...styles.tableCellHeader, fontFamily: boldFont, textAlign: 'right' }}>{ar('المسجلين')}</Text></View>
+                  <View style={{ ...styles.tableColHeaderMed, borderRightWidth: 0 }}><Text style={{ ...styles.tableCellHeader, fontFamily: boldFont, textAlign: 'right' }}>{ar(translations.colDateTime)}</Text></View>
                 </>
               ) : (
                 <>
-                  <View style={styles.tableColHeader}><Text style={{ ...styles.tableCellHeader, fontFamily: boldFont, textAlign: 'left' }}>{translations.colDateTime}</Text></View>
-                  <View style={styles.tableColHeaderLarge}><Text style={{ ...styles.tableCellHeader, fontFamily: boldFont, textAlign: 'left' }}>{translations.colEventLocation}</Text></View>
-                  <View style={{ ...styles.tableColHeader, borderRightWidth: 0 }}><Text style={{ ...styles.tableCellHeader, fontFamily: boldFont, textAlign: 'left' }}>{translations.colCategory}</Text></View>
+                  <View style={styles.tableColHeaderMed}><Text style={{ ...styles.tableCellHeader, fontFamily: boldFont, textAlign: 'left' }}>{translations.colDateTime}</Text></View>
+                  <View style={styles.tableColHeaderLarge45}><Text style={{ ...styles.tableCellHeader, fontFamily: boldFont, textAlign: 'left' }}>{translations.colEventLocation}</Text></View>
+                  <View style={styles.tableColHeaderShort}><Text style={{ ...styles.tableCellHeader, fontFamily: boldFont, textAlign: 'left' }}>Registrations</Text></View>
+                  <View style={{ ...styles.tableColHeaderMed, borderRightWidth: 0 }}><Text style={{ ...styles.tableCellHeader, fontFamily: boldFont, textAlign: 'left' }}>{translations.colCategory}</Text></View>
                 </>
               )}
             </View>
@@ -323,15 +371,16 @@ export default function AcademicReportDocument({ events, reportTitle, monthYear,
                 const h = d.getHours()
                 const mm = d.getMinutes().toString().padStart(2, '0')
                 const ampm = h >= 12 ? 'م' : 'ص'
+                const regCount = ev.registrationCount || 0
 
                 return (
                   <View style={{ ...styles.tableRow, flexDirection: isAr ? 'row-reverse' : 'row' }} key={ev.id || i}>
                     {isAr ? (
                       <>
-                        <View style={styles.tableCol}>
+                        <View style={styles.tableColMed}>
                           <Text style={{ ...styles.tableCell, textAlign: 'right' }}>{ar(meta.nameAr)}</Text>
                         </View>
-                        <View style={styles.tableColLarge}>
+                        <View style={styles.tableColLarge45}>
                           <Text style={{ ...styles.tableCell, fontFamily: boldFont, textAlign: 'right' }}>{ar(ev.title)}</Text>
                           {ev.location && (
                             <Text style={{ fontSize: 10, color: '#444', margin: 5, marginTop: 0, textAlign: 'right' }}>
@@ -341,7 +390,12 @@ export default function AcademicReportDocument({ events, reportTitle, monthYear,
                             </Text>
                           )}
                         </View>
-                        <View style={{ ...styles.tableCol, borderRightWidth: 0, padding: 5 }}>
+                        <View style={styles.tableColShort}>
+                          <Text style={{ ...styles.tableCell, textAlign: 'center', fontFamily: boldFont }}>
+                            {regCount}
+                          </Text>
+                        </View>
+                        <View style={{ ...styles.tableColMed, borderRightWidth: 0, padding: 5 }}>
                           <Text style={{ fontSize: 10, textAlign: 'right' }}>
                             {rtl(`${d.getDate()} ${ar(monthNameAr)} ${d.getFullYear()}`)}
                           </Text>
@@ -352,15 +406,20 @@ export default function AcademicReportDocument({ events, reportTitle, monthYear,
                       </>
                     ) : (
                       <>
-                        <View style={styles.tableCol}>
+                        <View style={styles.tableColMed}>
                           <Text style={{ ...styles.tableCell, textAlign: 'left' }}>{dateStrEn}</Text>
                           <Text style={{ ...styles.tableCell, color: '#666', marginTop: 0, textAlign: 'left' }}>{timeStrEn}</Text>
                         </View>
-                        <View style={styles.tableColLarge}>
+                        <View style={styles.tableColLarge45}>
                           <Text style={{ ...styles.tableCell, fontFamily: boldFont, textAlign: 'left' }}>{ev.title}</Text>
                           {ev.location && <Text style={{ ...styles.tableCell, color: '#444', marginTop: 0, textAlign: 'left' }}>{ev.location}</Text>}
                         </View>
-                        <View style={{ ...styles.tableCol, borderRightWidth: 0 }}>
+                        <View style={styles.tableColShort}>
+                          <Text style={{ ...styles.tableCell, textAlign: 'center', fontFamily: boldFont }}>
+                            {regCount}
+                          </Text>
+                        </View>
+                        <View style={{ ...styles.tableColMed, borderRightWidth: 0 }}>
                           <Text style={{ ...styles.tableCell, textAlign: 'left' }}>{meta.nameEn}</Text>
                         </View>
                       </>

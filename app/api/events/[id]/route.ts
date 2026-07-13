@@ -117,6 +117,8 @@ export async function PATCH(
         reportCustomFields: data.reportCustomFields !== undefined ? (data.reportCustomFields ?? null) : undefined,
         surveyQuestions: data.surveyQuestions !== undefined ? (data.surveyQuestions ?? null) : undefined,
         surveyEnabled: data.surveyEnabled !== undefined ? data.surveyEnabled : undefined,
+        registrationEnabled: data.registrationEnabled !== undefined ? data.registrationEnabled : undefined,
+        registrationMode: data.registrationMode !== undefined ? data.registrationMode : undefined,
     }
     // Fetch current event to compare
     const currentEvent = await prisma.event.findUnique({ where: { id } })

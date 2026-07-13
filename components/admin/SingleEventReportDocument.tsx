@@ -56,6 +56,29 @@ const styles = StyleSheet.create({
     lineHeight: 1.5,
     marginBottom: 15
   },
+  statsGrid: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    marginTop: 10,
+    marginBottom: 20,
+    borderWidth: 1,
+    borderColor: '#cccccc',
+    padding: 10,
+    backgroundColor: '#f9f9f9'
+  },
+  statsBox: {
+    width: '30%',
+    alignItems: 'center'
+  },
+  statsLabel: {
+    fontSize: 9,
+    color: '#666666',
+    marginBottom: 4
+  },
+  statsValue: {
+    fontSize: 16,
+    fontFamily: 'Times-Bold'
+  },
   footer: {
     position: 'absolute',
     bottom: 30,
@@ -74,9 +97,19 @@ interface Props {
   event: Record<string, unknown> & { title: string, titleAr?: string | null }
   reportFields: CustomField[]
   isAr: boolean
+  includeRegistrationStats?: boolean
+  registrationCount?: number
+  responsesCount?: number
 }
 
-export default function SingleEventReportDocument({ event, reportFields, isAr }: Props) {
+export default function SingleEventReportDocument({
+  event,
+  reportFields,
+  isAr,
+  includeRegistrationStats = false,
+  registrationCount = 0,
+  responsesCount = 0
+}: Props) {
   const baseFont = isAr ? 'Amiri' : 'Times-Roman'
   const boldFont = isAr ? 'Amiri' : 'Times-Bold'
   const ar = (str: string) => isAr ? reshapeArabic(str) : str
@@ -106,6 +139,30 @@ export default function SingleEventReportDocument({ event, reportFields, isAr }:
         <Text style={{ fontSize: 16, fontFamily: boldFont, textAlign: 'center', marginBottom: 20 }}>
           {ar(isAr ? (event.titleAr || event.title) : event.title)}
         </Text>
+
+        {includeRegistrationStats && (
+          <View wrap={false}>
+            <Text style={{ ...styles.sectionTitle, fontFamily: boldFont, textAlign: isAr ? 'right' : 'left' }}>
+              {ar(isAr ? 'إحصاءات التسجيل والتقييم' : 'Attendance & Survey Statistics')}
+            </Text>
+            <View style={{ ...styles.statsGrid, flexDirection: isAr ? 'row-reverse' : 'row' }}>
+              <View style={styles.statsBox}>
+                <Text style={styles.statsLabel}>{ar(isAr ? 'إجمالي المسجلين' : 'Total Registrations')}</Text>
+                <Text style={{ ...styles.statsValue, fontFamily: boldFont }}>{registrationCount}</Text>
+              </View>
+              <View style={styles.statsBox}>
+                <Text style={styles.statsLabel}>{ar(isAr ? 'مستجيبي الاستبيان' : 'Survey Responses')}</Text>
+                <Text style={{ ...styles.statsValue, fontFamily: boldFont }}>{responsesCount}</Text>
+              </View>
+              <View style={styles.statsBox}>
+                <Text style={styles.statsLabel}>{ar(isAr ? 'نسبة الاستجابة' : 'Response Completion Rate')}</Text>
+                <Text style={{ ...styles.statsValue, fontFamily: boldFont }}>
+                  {registrationCount > 0 ? `${Math.min(100, Math.round((responsesCount / registrationCount) * 100))}%` : '0%'}
+                </Text>
+              </View>
+            </View>
+          </View>
+        )}
 
         {reportFields.map((field) => (
           <View key={field.id} wrap={false}>

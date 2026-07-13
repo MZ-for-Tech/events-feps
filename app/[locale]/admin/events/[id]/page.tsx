@@ -15,7 +15,10 @@ export default async function AdminEventDetailPage({ params }: PageProps) {
     where: { id },
     include: {
       surveyResponses: true,
-      category: true
+      category: true,
+      _count: {
+        select: { registrations: true }
+      }
     }
   })
 

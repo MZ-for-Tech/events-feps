@@ -14,6 +14,7 @@ import EventHeader from '@/components/event/EventHeader'
 import EventAbout from '@/components/event/EventAbout'
 import EventAgenda from '@/components/event/EventAgenda'
 import EventSidebar from '@/components/event/EventSidebar'
+import EventRegistrationForm from '@/components/event/EventRegistrationForm'
 import EventSurveyForm from '@/components/event/EventSurveyForm'
 import AdminModeToggle from '@/components/admin/AdminModeToggle'
 
@@ -227,11 +228,20 @@ export default async function EventDetailPage({ params }: PageProps) {
           </div>
         </div>
 
+        {event.registrationEnabled && (
+          <EventRegistrationForm
+            eventId={event.id}
+            registrationMode={event.registrationMode}
+            isAr={isAr}
+          />
+        )}
+
         {event.surveyEnabled && event.surveyQuestions && JSON.parse(event.surveyQuestions).length > 0 && (
           <EventSurveyForm
             eventId={event.id}
             questions={JSON.parse(event.surveyQuestions)}
             isAr={isAr}
+            registrationEnabled={event.registrationEnabled}
           />
         )}
         <div id="debug-dump" style={{ display: 'none' }}>{JSON.stringify({ enabled: event.surveyEnabled, qs: event.surveyQuestions })}</div>

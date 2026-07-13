@@ -14,7 +14,10 @@ export default async function AdminReportsPage() {
   // but for the demo fetching all is fine or we can let the client fetch. For SEO/SSR, we fetch all.
   const rawEvents = await prisma.event.findMany({
     orderBy: { startDate: 'asc' },
-    include: { category: true }
+    include: {
+      category: true,
+      _count: { select: { registrations: true } }
+    }
   })
 
   const events = rawEvents.map(ev => ({
@@ -28,7 +31,8 @@ export default async function AdminReportsPage() {
     description: ev.description,
     agendaText: ev.agendaText,
     published: ev.published,
-    imageUrl: ev.imageUrl
+    imageUrl: ev.imageUrl,
+    registrationCount: ev._count?.registrations || 0
   }))
 
   const categories = await prisma.eventCategory.findMany({

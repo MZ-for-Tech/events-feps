@@ -4,10 +4,11 @@ import React, { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { useTranslations } from 'next-intl'
 import Link from 'next/link'
-import { ArrowLeft, Save, Plus, Trash2, FileText, CheckCircle, BarChart3, HelpCircle, Loader, Eye, Clock, Edit2, Calendar } from 'lucide-react'
+import { ArrowLeft, Save, Plus, Trash2, FileText, CheckCircle, BarChart3, HelpCircle, Loader, Eye, Clock, Edit2, Calendar, Users } from 'lucide-react'
 import dynamic from 'next/dynamic'
 import SingleEventReportDocument from '@/components/admin/SingleEventReportDocument'
 import SurveyAnalytics from '@/components/admin/SurveyAnalytics'
+import RegistrationAdmin from '@/components/admin/RegistrationAdmin'
 import { AdminPageHeader } from '@/components/admin/AdminPageHeader'
 import { AdminButton } from '@/components/admin/AdminButton'
 import { Event, SurveyResponse, EventCategory } from '@prisma/client'
@@ -25,7 +26,7 @@ const PDFViewer = dynamic(() => import('@react-pdf/renderer').then(mod => mod.PD
 export type CustomField = { id: string; title: string; content: string }
 export type SurveyQuestion = { id: string; type: 'text' | 'choice'; text: string; options?: string[]; required?: boolean }
 
-export default function AdminEventDetailClient({ event, locale, surveyResponses }: { event: Event & { category: EventCategory }, locale: string, surveyResponses: SurveyResponse[] }) {
+export default function AdminEventDetailClient({ event, locale, surveyResponses }: { event: Event & { category: EventCategory, _count?: { registrations: number } }, locale: string, surveyResponses: SurveyResponse[] }) {
   const router = useRouter()
   const { data: session } = useSession()
   const role = session?.user?.role
@@ -35,7 +36,7 @@ export default function AdminEventDetailClient({ event, locale, surveyResponses 
   const canManageSurveys = role === 'SUPERADMIN' || role === 'MANAGER' || permissions.includes('events:reports')
   const isAr = locale === 'ar'
   const t = useTranslations('AdminEventDetail')
-  const [activeTab, setActiveTab] = useState<'details' | 'report' | 'survey' | 'analytics' | 'history'>('report')
+  const [activeTab, setActiveTab] = useState<'details' | 'report' | 'survey' | 'analytics' | 'history' | 'registration'>('report')
 
   const lsKeyReport = `feps_draft_report_${event.id}`
   const lsKeySurvey = `feps_draft_survey_${event.id}`
@@ -48,6 +49,7 @@ export default function AdminEventDetailClient({ event, locale, surveyResponses 
   const initialSurveyQuestions = event.surveyQuestions ? JSON.parse(event.surveyQuestions) : []
   const [surveyQuestions, setSurveyQuestions] = useState<SurveyQuestion[]>(initialSurveyQuestions)
   const [surveyEnabled, setSurveyEnabled] = useState<boolean>(!!event.surveyEnabled)
+  const [includeRegistrationStats, setIncludeRegistrationStats] = useState<boolean>(false)
 
   const [isLoaded, setIsLoaded] = useState(false)
 
@@ -280,6 +282,7 @@ export default function AdminEventDetailClient({ event, locale, surveyResponses 
         <div className="flex border-b border-feps-ink/20 overflow-x-auto">
           {[
             { id: 'details', icon: <FileText size={16} />, label: t('details') },
+            { id: 'registration', icon: <Users size={16} />, label: isAr ? 'التسجيل والتحضير' : 'Registration & Attendance' },
             ...(canManageReports ? [{ id: 'report', icon: <FileText size={16} />, label: t('reportBuilder') }] : []),
             ...(canManageSurveys ? [
               { id: 'survey', icon: <HelpCircle size={16} />, label: t('surveyBuilder') },
@@ -289,7 +292,7 @@ export default function AdminEventDetailClient({ event, locale, surveyResponses 
           ].map(tab => (
             <button
               key={tab.id}
-              onClick={() => setActiveTab(tab.id as 'details' | 'report' | 'survey' | 'analytics' | 'history')}
+              onClick={() => setActiveTab(tab.id as 'details' | 'report' | 'survey' | 'analytics' | 'history' | 'registration')}
               className={`flex items-center gap-2 px-6 py-4 text-sm font-bold uppercase tracking-widest border-b-2 transition-colors whitespace-nowrap ${activeTab === tab.id ? 'border-feps-navy text-feps-navy bg-feps-navy/5' : 'border-transparent text-feps-ink-secondary hover:text-feps-ink'}`}
             >
               {tab.icon}
@@ -304,6 +307,16 @@ export default function AdminEventDetailClient({ event, locale, surveyResponses 
         </div>
 
         <div>
+          {activeTab === 'registration' && (
+            <RegistrationAdmin
+              eventId={event.id}
+              initialEnabled={event.registrationEnabled}
+              initialMode={event.registrationMode}
+              isAr={isAr}
+              surveyResponsesCount={surveyResponses.length}
+            />
+          )}
+
           {activeTab === 'details' && (
             <div className="space-y-4">
               <div className="flex justify-between items-start">
@@ -335,7 +348,16 @@ export default function AdminEventDetailClient({ event, locale, surveyResponses 
                     <Plus size={16} /> {t('addField')}
                   </button>
                   <PDFDownloadLink
-                    document={<SingleEventReportDocument event={event} reportFields={reportFields} isAr={isAr} />}
+                    document={
+                      <SingleEventReportDocument
+                        event={event}
+                        reportFields={reportFields}
+                        isAr={isAr}
+                        includeRegistrationStats={includeRegistrationStats}
+                        registrationCount={event._count?.registrations || 0}
+                        responsesCount={surveyResponses.length}
+                      />
+                    }
                     fileName={`Report_${event.id}.pdf`}
                     className="flex items-center gap-2 bg-feps-navy text-white px-4 py-2 text-sm font-bold hover:bg-feps-navy/90 transition-colors"
                   >
@@ -351,6 +373,21 @@ export default function AdminEventDetailClient({ event, locale, surveyResponses 
                   </button>
                 </div>
               </div>
+
+              {event.registrationEnabled && (
+                <div className="mb-6 p-4 border border-feps-navy/20 bg-feps-navy/5 flex items-center gap-3">
+                  <input
+                    type="checkbox"
+                    id="includeRegStats"
+                    checked={includeRegistrationStats}
+                    onChange={(e) => setIncludeRegistrationStats(e.target.checked)}
+                    className="w-4 h-4 text-feps-navy focus:ring-feps-navy border-gray-300 rounded cursor-pointer"
+                  />
+                  <label htmlFor="includeRegStats" className="text-sm font-bold text-feps-navy select-none cursor-pointer">
+                    {isAr ? 'تضمين إحصاءات التسجيل والتقييم في ملف التقرير' : 'Include registration & survey stats in PDF report'}
+                  </label>
+                </div>
+              )}
               
               <div className="space-y-6">
                 {reportFields.length === 0 ? (
@@ -386,7 +423,14 @@ export default function AdminEventDetailClient({ event, locale, surveyResponses 
               {showPreview && (
                 <div className="mt-8 h-[800px] border border-feps-ink/20">
                   <PDFViewer width="100%" height="100%">
-                    <SingleEventReportDocument event={event} reportFields={reportFields} isAr={isAr} />
+                    <SingleEventReportDocument
+                      event={event}
+                      reportFields={reportFields}
+                      isAr={isAr}
+                      includeRegistrationStats={includeRegistrationStats}
+                      registrationCount={event._count?.registrations || 0}
+                      responsesCount={surveyResponses.length}
+                    />
                   </PDFViewer>
                 </div>
               )}
@@ -484,7 +528,13 @@ export default function AdminEventDetailClient({ event, locale, surveyResponses 
           )}
 
           {activeTab === 'analytics' && (
-            <SurveyAnalytics responses={surveyResponses} questions={surveyQuestions} />
+            <SurveyAnalytics 
+              responses={surveyResponses} 
+              questions={surveyQuestions} 
+              registrationCount={event._count?.registrations}
+              registrationEnabled={event.registrationEnabled}
+              isAr={isAr}
+            />
           )}
 
           {activeTab === 'history' && (

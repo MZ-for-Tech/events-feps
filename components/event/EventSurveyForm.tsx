@@ -10,13 +10,33 @@ interface Props {
   eventId: string
   questions: SurveyQuestion[]
   isAr: boolean
+  registrationEnabled?: boolean
 }
 
-export default function EventSurveyForm({ eventId, questions, isAr }: Props) {
+export default function EventSurveyForm({ eventId, questions, isAr, registrationEnabled = false }: Props) {
   const t = useTranslations('EventSurvey')
   const [answers, setAnswers] = useState<Record<string, string>>({})
   const [submitted, setSubmitted] = useState(false)
   const [isPending, startTransition] = useTransition()
+  const [registrationId, setRegistrationId] = useState<string | null>(null)
+  const [checkingRegistration, setCheckingRegistration] = useState(registrationEnabled)
+
+  React.useEffect(() => {
+    if (registrationEnabled) {
+      const stored = localStorage.getItem(`feps_event_registration_${eventId}`)
+      if (stored) {
+        try {
+          const info = JSON.parse(stored)
+          if (info.registrationId) {
+            setRegistrationId(info.registrationId)
+          }
+        } catch {
+          // ignore
+        }
+      }
+      setCheckingRegistration(false)
+    }
+  }, [eventId, registrationEnabled])
 
   const [optimisticSubmitted, addOptimisticSubmit] = useOptimistic(
     submitted,
@@ -24,6 +44,7 @@ export default function EventSurveyForm({ eventId, questions, isAr }: Props) {
   )
 
   if (questions.length === 0) return null
+
   if (optimisticSubmitted) {
     return (
       <div className="bg-feps-navy/5 border-2 border-feps-navy p-8 text-center mt-12">
@@ -38,6 +59,22 @@ export default function EventSurveyForm({ eventId, questions, isAr }: Props) {
     )
   }
 
+  // If registration is required but the attendee has not registered on this device
+  if (registrationEnabled && !checkingRegistration && !registrationId) {
+    return (
+      <div className="mt-12 bg-red-50 border-2 border-red-200 p-8 text-center text-red-800 font-sans">
+        <h3 className="text-xl font-bold mb-2">
+          {isAr ? 'عذراً، يجب التسجيل أولاً للمشاركة في تقييم الفعالية' : 'Registration Required for Survey'}
+        </h3>
+        <p className="text-sm text-red-700">
+          {isAr
+            ? 'هذه الفعالية مغلقة؛ يرجى استخدام نموذج التسجيل في الأعلى للحصول على رمز تسجيل وتأكيد حضورك.'
+            : 'Feedback submission is restricted to registered attendees. Please register above to obtain a code.'}
+        </p>
+      </div>
+    )
+  }
+
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault()
     
@@ -47,13 +84,14 @@ export default function EventSurveyForm({ eventId, questions, isAr }: Props) {
         const res = await fetch(`/api/events/${eventId}/survey`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ answers })
+          body: JSON.stringify({ answers, registrationId })
         })
         if (res.ok) {
           setSubmitted(true)
           toast.success(isAr ? 'تم إرسال التقييم بنجاح' : 'Feedback submitted successfully')
         } else {
-          toast.error(isAr ? 'حدث خطأ' : 'Error submitting feedback')
+          const txt = await res.text()
+          toast.error(isAr ? `فشل إرسال التقييم: ${txt}` : `Error: ${txt}`)
         }
       } catch (err) {
         console.error(err)

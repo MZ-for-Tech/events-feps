@@ -76,19 +76,39 @@ model Event {
   reportCustomFields    String?   // JSON array of {title, content}
   surveyQuestions       String?   // JSON array of {id, type, text, options}
   surveyEnabled         Boolean   @default(false) // Whether the survey is currently open
+  registrationEnabled Boolean @default(false)
+  registrationMode    String  @default("CREDIT_CODE") // CREDIT_CODE | NATIONAL_ID | BOTH
   createdAt             DateTime  @default(now())
   updatedAt             DateTime  @updatedAt
 
   surveyResponses SurveyResponse[]
+  registrations   EventRegistration[]
+}
+
+model EventRegistration {
+  id             String   @id @default(cuid())
+  eventId        String
+  identifier     String   // Credit hour code or National ID
+  identifierType String   @default("CREDIT_CODE") // CREDIT_CODE | NATIONAL_ID
+  name           String?  // Optional name
+  email          String   // Required email for confirmation
+  createdAt      DateTime @default(now())
+
+  event Event @relation(fields: [eventId], references: [id], onDelete: Cascade)
+  surveyResponses SurveyResponse[]
+
+  @@unique([eventId, identifier])
 }
 
 model SurveyResponse {
-  id        String   @id @default(cuid())
-  eventId   String
-  answers   String   // JSON of { questionId: string, answer: string }
-  createdAt DateTime @default(now())
+  id             String   @id @default(cuid())
+  eventId        String
+  registrationId String?  // Optional link if registered
+  answers        String   // JSON of { questionId: string, answer: string }
+  createdAt      DateTime @default(now())
 
-  event     Event    @relation(fields: [eventId], references: [id], onDelete: Cascade)
+  event        Event    @relation(fields: [eventId], references: [id], onDelete: Cascade)
+  registration EventRegistration? @relation(fields: [registrationId], references: [id], onDelete: SetNull)
 }
 
 model TriviaCategory {
