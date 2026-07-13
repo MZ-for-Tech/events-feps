@@ -492,12 +492,18 @@ export default function AdminEventDetailClient({ event, locale, surveyResponses 
                     </div>
                   </label>
                   
-                  {event.registrationEnabled && surveyEnabled && (
+                  {event.registrationEnabled && (
                     <button
                       onClick={handleSendSurveyEmails}
-                      disabled={sendingEmails || event._count?.registrations === 0}
+                      disabled={sendingEmails || !surveyEnabled || event._count?.registrations === 0}
                       className="flex items-center gap-2 bg-feps-gold hover:bg-feps-gold/90 text-feps-navy px-4 py-2 text-xs font-bold uppercase tracking-wider transition-colors disabled:opacity-50"
-                      title={isAr ? 'إرسال أكواد التقييم للمسجلين عبر البريد' : 'Email Survey Codes to Attendees'}
+                      title={
+                        !surveyEnabled
+                          ? (isAr ? 'يجب إتاحة الاستبيان للجمهور أولاً قبل الإرسال' : 'You must enable the survey first')
+                          : event._count?.registrations === 0
+                            ? (isAr ? 'لا يوجد حضور مسجلين لإرسال إيميلات لهم' : 'No registered attendees to email')
+                            : (isAr ? 'إرسال أكواد التقييم للمسجلين عبر البريد' : 'Email Survey Codes to Attendees')
+                      }
                     >
                       {sendingEmails ? <Loader size={14} className="animate-spin" /> : <Mail size={14} />}
                       {isAr ? 'إرسال أكواد التقييم عبر البريد' : 'Email Survey Codes'}
