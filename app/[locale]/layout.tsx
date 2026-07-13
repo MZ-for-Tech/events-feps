@@ -26,16 +26,38 @@ import { Toaster } from 'react-hot-toast'
 
 export const metadata: Metadata = {
   metadataBase: new URL(process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000'),
-  title: 'FEPS Events — Faculty of Economics & Political Science',
-  description: 'The official academic materials platform for FEPS, Cairo University. Access lecture slides, section notes, assignments, past papers, and datasets.',
-  keywords: ['FEPS', 'Cairo University', 'economics', 'political science', 'academic materials'],
+  title: {
+    default: 'بوابة فعاليات كلية الاقتصاد والعلوم السياسية | FEPS Events Hub',
+    template: '%s | FEPS Events'
+  },
+  description: 'البوابة الرسمية لفعاليات كلية الاقتصاد والعلوم السياسية - جامعة القاهرة. سجل حضورك بالفعاليات، وشارك في تقييمها واستبياناتها، واعرض تقارير التوصيات الأكاديمية.',
+  keywords: ['FEPS Events', 'كلية الاقتصاد والعلوم السياسية', 'جامعة القاهرة', 'استبيان الفعاليات', 'تسجيل حضور الفعاليات', 'Cairo University Events'],
   appleWebApp: {
     title: 'FEPS Events',
     statusBarStyle: 'default',
   },
   openGraph: {
-    images: ['/api/og'],
+    title: 'بوابة فعاليات كلية الاقتصاد والعلوم السياسية — جامعة القاهرة',
+    description: 'البوابة الرسمية لتسجيل حضور وتقييم فعاليات كلية الاقتصاد والعلوم السياسية. سجل حضورك بكود الساعات المعتمدة أو الرقم القومي للمشاركة في التقييم واستعراض توصيات المؤتمرات.',
+    url: './',
+    siteName: 'FEPS Events Portal',
+    images: [
+      {
+        url: '/api/og',
+        width: 1200,
+        height: 630,
+        alt: 'FEPS Events Portal - جامعة القاهرة',
+      },
+    ],
+    locale: 'ar_EG',
+    type: 'website',
   },
+  twitter: {
+    card: 'summary_large_image',
+    title: 'FEPS Events Portal — Cairo University',
+    description: 'The official events and academic reporting portal of the Faculty of Economics and Political Science, Cairo University.',
+    images: ['/api/og'],
+  }
 }
 
 export const viewport: Viewport = {

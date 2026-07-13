@@ -45,11 +45,28 @@ export async function generateMetadata(
   searchParams.set('category', categoryLabel)
 
   return {
-    title: `${title} | FEPS Events`,
-    description: event.description,
+    title: title,
+    description: event.description || undefined,
     openGraph: {
-      images: [`/api/og?${searchParams.toString()}`],
+      title: `${title} | FEPS Events`,
+      description: event.description || undefined,
+      url: './',
+      type: 'article',
+      images: [
+        {
+          url: `/api/og?${searchParams.toString()}`,
+          width: 1200,
+          height: 630,
+          alt: title,
+        },
+      ],
     },
+    twitter: {
+      card: 'summary_large_image',
+      title: title,
+      description: event.description || undefined,
+      images: [`/api/og?${searchParams.toString()}`],
+    }
   }
 }
 
