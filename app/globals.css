@@ -392,45 +392,6 @@
 .delay-400 { animation-delay: 400ms; }
 .delay-500 { animation-delay: 500ms; }
 
-/* ─── Page Curtain Transition ─────────────────────────────── */
-
-/**
- * Curtain REVEAL approach — eliminates the "flash of new content" problem.
- *
- * When a new page mounts, this div is inserted at translateY(0) = fully
- * covering the screen. `animation-fill-mode: both` (the `both` keyword)
- * ensures the FROM state is painted on the very first frame, BEFORE the
- * animation delay, so the new page is never visible without the curtain.
- *
- * Timeline:
- *   0ms    → curtain inserted, immediately at translateY(0) [covers screen]
- *   60ms   → animation begins
- *   60ms–560ms → curtain slides up to translateY(-105%) [reveals page]
- *   560ms+ → curtain is off-screen, removed by React on next navigation
- */
-
-@keyframes curtainReveal {
-  from { transform: translateY(0%);    }
-  to   { transform: translateY(-105%); } /* 105% avoids sub-pixel gap at top */
-}
-
-.page-curtain {
-  position: fixed;
-  inset: 0;
-  background: #ffffff;
-  z-index: 9999;
-  pointer-events: none;
-  will-change: transform;
-  /* `both` = apply from-state before delay (covers immediately on mount) */
-  animation: curtainReveal 0.55s cubic-bezier(0.76, 0, 0.24, 1) 60ms both;
-}
-
-/* Respect reduced-motion — skip the curtain entirely */
-@media (prefers-reduced-motion: reduce) {
-  .page-curtain {
-    display: none;
-  }
-}
 
 @keyframes shimmer {
   0% {
