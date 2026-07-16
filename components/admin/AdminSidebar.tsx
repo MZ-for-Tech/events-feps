@@ -19,15 +19,6 @@ export default function AdminSidebar() {
   const [isCollapsed, setIsCollapsed] = useState(false)
   const [isMobileOpen, setIsMobileOpen] = useState(false)
 
-  // Scroll position for top bar shadow
-  const [scrolled, setScrolled] = useState(false)
-
-  useEffect(() => {
-    const handleScroll = () => setScrolled(window.scrollY > 2)
-    window.addEventListener('scroll', handleScroll, { passive: true })
-    return () => window.removeEventListener('scroll', handleScroll)
-  }, [])
-
   // Prevent scrolling when mobile menu is open
   useEffect(() => {
     if (isMobileOpen) {
@@ -187,20 +178,26 @@ export default function AdminSidebar() {
     </aside>
   )
 
-  // Mobile Top Bar — sticky below the fixed navbar (top-16 = 4rem)
+  // Mobile Top Bar — FIXED below the navbar, z-40 ensures it's always on top and tappable
   const mobileTopBar = (
-    <div
-      className={`lg:hidden sticky top-16 z-30 flex items-center justify-between px-4 py-3 bg-feps-navy-dark border-b border-feps-navy shrink-0 transition-shadow duration-200 ${scrolled ? 'shadow-lg shadow-black/30' : ''}`}
-    >
-      <div className={`text-white ${isAr ? 'font-arabic font-bold text-base' : 'font-serif font-bold'}`}>{t('controlPanel')}</div>
-      <button
-        onClick={() => setIsMobileOpen(true)}
-        aria-label="Open navigation menu"
-        className="flex items-center gap-2 text-white/70 hover:text-feps-gold transition-colors p-1.5 -mr-1.5 rounded"
-      >
-        <Menu size={22} />
-      </button>
-    </div>
+    <>
+      {/* Spacer: same height as the fixed top bar so content isn't hidden underneath */}
+      <div className="lg:hidden h-[49px] shrink-0" />
+      {/* Fixed bar */}
+      <div className="lg:hidden fixed top-16 left-0 right-0 z-40 flex items-center justify-between px-4 py-3 bg-feps-navy-dark border-b border-feps-navy shadow-md">
+        <div className={`text-white ${isAr ? 'font-arabic font-bold text-base' : 'font-serif font-bold'}`}>
+          {t('controlPanel')}
+        </div>
+        <button
+          type="button"
+          onClick={() => setIsMobileOpen(true)}
+          aria-label="Open navigation menu"
+          className="flex items-center justify-center text-white/70 hover:text-feps-gold transition-colors p-3 -mr-3 touch-manipulation"
+        >
+          <Menu size={22} />
+        </button>
+      </div>
+    </>
   )
 
   // Mobile Drawer Overlay
