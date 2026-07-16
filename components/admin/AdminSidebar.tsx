@@ -19,6 +19,15 @@ export default function AdminSidebar() {
   const [isCollapsed, setIsCollapsed] = useState(false)
   const [isMobileOpen, setIsMobileOpen] = useState(false)
 
+  // Scroll position for top bar shadow
+  const [scrolled, setScrolled] = useState(false)
+
+  useEffect(() => {
+    const handleScroll = () => setScrolled(window.scrollY > 2)
+    window.addEventListener('scroll', handleScroll, { passive: true })
+    return () => window.removeEventListener('scroll', handleScroll)
+  }, [])
+
   // Prevent scrolling when mobile menu is open
   useEffect(() => {
     if (isMobileOpen) {
@@ -178,77 +187,106 @@ export default function AdminSidebar() {
     </aside>
   )
 
-  // Mobile Top Bar
+  // Mobile Top Bar — sticky below the fixed navbar (top-16 = 4rem)
   const mobileTopBar = (
-    <div className="lg:hidden flex items-center justify-between px-4 py-3 bg-feps-navy-dark border-b border-feps-navy z-30 relative shrink-0">
-      <div className="font-bold text-white font-serif">{t('controlPanel')}</div>
-      <button 
+    <div
+      className={`lg:hidden sticky top-16 z-30 flex items-center justify-between px-4 py-3 bg-feps-navy-dark border-b border-feps-navy shrink-0 transition-shadow duration-200 ${scrolled ? 'shadow-lg shadow-black/30' : ''}`}
+    >
+      <div className={`text-white ${isAr ? 'font-arabic font-bold text-base' : 'font-serif font-bold'}`}>{t('controlPanel')}</div>
+      <button
         onClick={() => setIsMobileOpen(true)}
-        className="text-white hover:text-feps-gold transition-colors"
+        aria-label="Open navigation menu"
+        className="flex items-center gap-2 text-white/70 hover:text-feps-gold transition-colors p-1.5 -mr-1.5 rounded"
       >
-        <Menu size={24} />
+        <Menu size={22} />
       </button>
     </div>
   )
 
   // Mobile Drawer Overlay
-  // Determine translation class based on language
-  const slideClass = isMobileOpen 
-    ? 'translate-x-0' 
+  // Drawer slides in from the correct edge; positioned below the fixed navbar (top-16)
+  const slideClass = isMobileOpen
+    ? 'translate-x-0'
     : (isAr ? 'translate-x-full' : '-translate-x-full')
 
   const mobileDrawer = (
     <>
-      <div 
-        className={`fixed inset-0 bg-black/60 z-[100] transition-opacity duration-300 lg:hidden ${isMobileOpen ? 'opacity-100 visible' : 'opacity-0 invisible'}`}
+      {/* Backdrop */}
+      <div
+        className={`fixed inset-0 bg-black/60 backdrop-blur-sm z-[100] transition-all duration-300 lg:hidden ${isMobileOpen ? 'opacity-100 pointer-events-auto' : 'opacity-0 pointer-events-none'}`}
         onClick={() => setIsMobileOpen(false)}
+        aria-hidden="true"
       />
-      <div 
-        className={`fixed top-0 bottom-0 ${isAr ? 'right-0' : 'left-0'} w-[280px] bg-feps-navy-dark z-[101] flex flex-col py-6 shadow-2xl transition-transform duration-300 lg:hidden ${slideClass}`}
+
+      {/* Drawer panel — starts below the navbar */}
+      <div
+        className={`fixed top-16 bottom-0 ${isAr ? 'right-0' : 'left-0'} w-[300px] max-w-[85vw] bg-feps-navy-dark z-[101] flex flex-col shadow-2xl transition-transform duration-300 ease-in-out lg:hidden ${slideClass}`}
+        role="dialog"
+        aria-modal="true"
+        aria-label={t('controlPanel')}
       >
-        <div className="flex items-center justify-between mb-8 px-6">
-          <div className="flex flex-col">
-            <h3 className={`text-xl text-white mb-2 ${isAr ? 'font-arabic font-bold' : 'font-serif'}`}>
-              {t('controlPanel')}
-            </h3>
-            <div className="w-10 h-1 bg-feps-gold"></div>
+        {/* Drawer Header */}
+        <div className="flex items-center justify-between px-5 py-4 border-b border-white/10 shrink-0">
+          <div className="flex items-center gap-3">
+            <div className="w-8 h-8 bg-feps-gold/10 border border-feps-gold/30 flex items-center justify-center">
+              <Settings size={16} className="text-feps-gold" />
+            </div>
+            <div>
+              <h3 className={`text-sm text-white leading-tight ${isAr ? 'font-arabic font-bold' : 'font-serif font-bold'}`}>
+                {t('controlPanel')}
+              </h3>
+              <div className="w-6 h-0.5 bg-feps-gold mt-1"></div>
+            </div>
           </div>
-          <button 
+          <button
             onClick={() => setIsMobileOpen(false)}
-            className="text-white/60 hover:text-white"
+            aria-label="Close menu"
+            className="w-8 h-8 flex items-center justify-center text-white/50 hover:text-white hover:bg-white/10 transition-colors rounded"
           >
-            <X size={24} />
+            <X size={20} />
           </button>
         </div>
 
-        <nav className="flex flex-col border-t border-white/10">
+        {/* Nav Items */}
+        <nav className="flex-1 overflow-y-auto py-2">
           {navItems.map(item => (
             <Link
               key={item.href}
               href={item.href}
               className={`
-                flex items-center gap-4 px-6 py-4 transition-all group border-b border-white/10
-                ${item.active 
-                  ? `bg-white/5 text-feps-gold ${isAr ? 'border-r-4 border-r-feps-gold' : 'border-l-4 border-l-feps-gold'}` 
-                  : `bg-transparent text-white/70 hover:bg-white/5 hover:text-white ${isAr ? 'border-r-4 border-r-transparent' : 'border-l-4 border-l-transparent'}`}
+                flex items-center gap-4 px-5 py-3.5 transition-all group
+                ${item.active
+                  ? `bg-feps-gold/10 text-feps-gold ${isAr ? 'border-r-[3px] border-r-feps-gold' : 'border-l-[3px] border-l-feps-gold'}`
+                  : `text-white/70 hover:bg-white/5 hover:text-white ${isAr ? 'border-r-[3px] border-r-transparent' : 'border-l-[3px] border-l-transparent'}`}
               `}
               onClick={() => setIsMobileOpen(false)}
             >
-              <div className={item.active ? 'text-feps-gold' : 'text-white/50 group-hover:text-white'}>
+              <div className={`flex-shrink-0 ${item.active ? 'text-feps-gold' : 'text-white/40 group-hover:text-white/80'}`}>
                 {item.icon}
               </div>
-              <span className={`text-sm tracking-wide ${item.active ? 'font-bold' : 'font-medium'} ${isAr ? 'font-arabic' : ''}`}>
+              <span className={`text-sm ${item.active ? 'font-bold' : 'font-medium'} ${isAr ? 'font-arabic' : ''}`}>
                 {item.label}
               </span>
+              {item.active && (
+                <div className="ms-auto w-1.5 h-1.5 rounded-full bg-feps-gold" />
+              )}
             </Link>
           ))}
         </nav>
 
-        <div className="mt-auto mx-4 p-5 border border-white/10 bg-white/5 transition-all">
-          <div className="font-sans text-[0.65rem] uppercase tracking-widest text-white/50 mb-3 pb-2 border-b border-white/10">{t('loggedInAs')}</div>
-          <div className={`text-lg text-white truncate leading-tight ${isAr ? 'font-arabic font-bold' : 'font-serif'}`}>{session?.user?.name}</div>
-          <div className="font-sans text-[0.70rem] tracking-widest font-bold text-feps-gold mt-2 uppercase truncate">
-            {role ? (tRoles.has(role) ? tRoles(role as Parameters<typeof tRoles>[0]) : role) : ''}
+        {/* User Info Footer */}
+        <div className="shrink-0 mx-4 mb-4 p-4 border border-white/10 bg-white/5">
+          <div className="font-sans text-[0.6rem] uppercase tracking-widest text-white/40 mb-2">{t('loggedInAs')}</div>
+          <div className="flex items-center gap-3">
+            <div className="w-9 h-9 bg-feps-gold flex items-center justify-center text-feps-navy font-bold text-sm shrink-0">
+              {session?.user?.name?.charAt(0).toUpperCase()}
+            </div>
+            <div className="min-w-0">
+              <div className={`text-sm text-white truncate leading-tight ${isAr ? 'font-arabic font-bold' : 'font-serif font-bold'}`}>{session?.user?.name}</div>
+              <div className="font-sans text-[0.65rem] tracking-widest font-bold text-feps-gold mt-0.5 uppercase truncate">
+                {role ? (tRoles.has(role) ? tRoles(role as Parameters<typeof tRoles>[0]) : role) : ''}
+              </div>
+            </div>
           </div>
         </div>
       </div>

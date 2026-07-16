@@ -18,6 +18,7 @@ export default function Navbar() {
 
   const currentPathWithoutLocale = pathname.replace(`/${locale}`, '') || '/'
   const isLoginPage = currentPathWithoutLocale === '/login'
+  const isAdminPage = currentPathWithoutLocale.startsWith('/admin')
 
   const isAdmin = session?.user?.role === 'SUPERADMIN' || session?.user?.role === 'MANAGER'
   const isEditor = session?.user?.role === 'EDITOR' || isAdmin
@@ -140,7 +141,7 @@ export default function Navbar() {
             )}
           </div>
 
-          {!isLoginPage && (
+          {!isLoginPage && !isAdminPage && (
             <button 
               className="lg:hidden text-white hover:text-feps-gold p-2 -mr-2" 
               onClick={toggleMenu}
@@ -152,8 +153,8 @@ export default function Navbar() {
         </div>
       </div>
 
-      {/* Mobile Menu Overlay */}
-      {menuOpen && (
+      {/* Mobile Menu Overlay — hidden on admin pages (they use AdminSidebar drawer) */}
+      {menuOpen && !isAdminPage && (
         <div className="lg:hidden fixed top-16 left-0 right-0 bottom-0 bg-feps-navy-dark border-t-2 border-feps-navy p-6 flex flex-col gap-6 z-40 overflow-y-auto">
           <Link href={`/${locale}`} className="font-serif font-bold text-2xl text-white pb-4 border-b-2 border-white/10 flex items-center gap-3 hover:text-feps-gold transition-colors" onClick={toggleMenu}>
             <Home size={20} className="text-white/50" />
