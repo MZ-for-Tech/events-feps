@@ -86,9 +86,7 @@ export default function AdminEventsClient({ initialEvents, categories, locale, p
     setIsModalOpen(true)
   }
 
-  function handleOpenReport(ev: AdminEvent) {
-    setReportModalEvent(ev)
-  }
+
 
   // Handle file uploads helper
   async function uploadFile(file: File, type: 'image' | 'agenda'): Promise<string> {
@@ -302,7 +300,6 @@ export default function AdminEventsClient({ initialEvents, categories, locale, p
         onDelete={handleDelete}
         onArchive={handleArchive}
         onRestore={handleRestore}
-        onOpenReport={handleOpenReport}
       />
 
       <EventFormModal

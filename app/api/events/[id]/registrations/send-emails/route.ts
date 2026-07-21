@@ -76,7 +76,7 @@ export async function POST(
             </div>
 
             <p style="margin: 25px 0; text-align: center;">
-              <a href="${appUrl}/ar/events/${event.id}" 
+              <a href="${appUrl}/ar/events/${event.id}/survey" 
                  style="background: #1A3A6E; color: white; padding: 12px 30px; text-decoration: none; font-weight: bold; border-radius: 4px; display: inline-block; font-size: 14px; box-shadow: 0 2px 4px rgba(0,0,0,0.1);">
                 الذهاب لصفحة الاستبيان والتقييم
               </a>
@@ -89,7 +89,7 @@ export async function POST(
               <p style="font-weight: bold;">Dear Attendee,</p>
               <p>Feedback evaluation is now open for: <strong>${event.title}</strong>.</p>
               <p>Your verification code is: <strong style="color: #1A3A6E; font-family: monospace; font-size: 16px;">${r.identifier}</strong> (${typeLabelEn})</p>
-              <p>Please click the button above or visit <a href="${appUrl}/en/events/${event.id}" style="color: #bc9c65; font-weight: bold;">this link</a> to enter your code and submit feedback.</p>
+              <p>Please click the button above or visit <a href="${appUrl}/en/events/${event.id}/survey" style="color: #bc9c65; font-weight: bold;">this link</a> to enter your code and submit feedback.</p>
             </div>
 
             <p style="color: #999; font-size: 11px; margin-top: 40px; border-top: 1px solid #eee; padding-top: 10px; text-align: center;">

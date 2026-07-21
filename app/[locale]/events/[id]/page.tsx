@@ -15,7 +15,6 @@ import EventAbout from '@/components/event/EventAbout'
 import EventAgenda from '@/components/event/EventAgenda'
 import EventSidebar from '@/components/event/EventSidebar'
 import EventRegistrationForm from '@/components/event/EventRegistrationForm'
-import EventSurveyForm from '@/components/event/EventSurveyForm'
 import AdminModeToggle from '@/components/admin/AdminModeToggle'
 
 interface PageProps {
@@ -76,6 +75,7 @@ export default async function EventDetailPage({ params }: PageProps) {
   const isAr = locale === 'ar'
   const isFr = locale === 'fr'
   const t = await getTranslations({ locale, namespace: 'EventDetail' })
+  const tSurvey = await getTranslations({ locale, namespace: 'EventSurvey' })
 
   const session = await auth()
   const isAdmin = !!session?.user
@@ -255,14 +255,18 @@ export default async function EventDetailPage({ params }: PageProps) {
         )}
 
         {event.surveyEnabled && event.surveyQuestions && JSON.parse(event.surveyQuestions).length > 0 && (
-          <EventSurveyForm
-            eventId={event.id}
-            questions={JSON.parse(event.surveyQuestions)}
-            isAr={isAr}
-            registrationEnabled={event.registrationEnabled}
-          />
+          <div className="bg-feps-surface border-2 border-feps-navy p-8 md:p-12 mb-16 text-center mt-16">
+            <h2 className={`text-2xl font-sans uppercase tracking-wider font-bold text-feps-navy mb-4 ${isAr ? 'font-arabic' : ''}`}>
+              {tSurvey('feedbackTitle')}
+            </h2>
+            <p className="text-feps-ink/70 mb-8 max-w-2xl mx-auto">
+              {tSurvey('feedbackDesc')}
+            </p>
+            <Link href={`/${locale}/events/${event.id}/survey`} className="inline-flex items-center justify-center gap-2 px-8 py-4 bg-feps-navy hover:bg-black text-white font-bold transition-colors shadow-solid uppercase tracking-widest">
+              <span>{tSurvey('startSurvey', { fallback: 'Start Survey' })}</span>
+            </Link>
+          </div>
         )}
-        <div id="debug-dump" style={{ display: 'none' }}>{JSON.stringify({ enabled: event.surveyEnabled, qs: event.surveyQuestions })}</div>
       </div>
     </div>
   )

@@ -20,20 +20,6 @@ export async function POST(
       return new NextResponse('Event not found', { status: 404 })
     }
 
-    if (event.registrationEnabled) {
-      if (!registrationId) {
-        return new NextResponse('Registration is required to submit feedback for this event', { status: 400 })
-      }
-
-      // Check if registration exists
-      const reg = await prisma.eventRegistration.findFirst({
-        where: { id: registrationId, eventId: id }
-      })
-
-      if (!reg) {
-        return new NextResponse('Invalid registration code', { status: 400 })
-      }
-    }
 
     const response = await prisma.surveyResponse.create({
       data: {

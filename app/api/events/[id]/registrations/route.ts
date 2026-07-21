@@ -2,9 +2,7 @@ import { NextRequest, NextResponse } from 'next/server'
 import { auth } from '@/lib/auth'
 import { prisma } from '@/lib/prisma'
 import { hasPermission, PERMISSIONS } from '@/lib/permissions'
-import { Resend } from 'resend'
 
-const resend = new Resend(process.env.RESEND_API_KEY)
 
 // Fetch all registrations for an event (Admin only)
 export async function GET(
@@ -117,8 +115,7 @@ export async function POST(
 
 // Delete registration (Admin only)
 export async function DELETE(
-  req: NextRequest,
-  { params }: { params: Promise<{ id: string }> }
+  req: NextRequest
 ) {
   const session = await auth()
   if (!session?.user || !hasPermission(session, PERMISSIONS.EVENTS_CREATE)) {

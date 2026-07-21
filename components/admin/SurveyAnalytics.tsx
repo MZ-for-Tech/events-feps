@@ -3,7 +3,7 @@
 import React from 'react'
 import { useTranslations } from 'next-intl'
 import { PieChart, Pie, Cell, Tooltip, Legend, ResponsiveContainer } from 'recharts'
-import type { SurveyQuestion } from '@/app/[locale]/admin/events/[id]/AdminEventDetailClient'
+import type { SurveyQuestion } from '@/types/survey'
 
 interface Props {
   responses: Array<{ id: string, answers: string | Record<string, string>, createdAt: string | Date }>

@@ -56,23 +56,22 @@ export default function RegistrationAdmin({
   })
 
   useEffect(() => {
+    const fetchRegistrations = async () => {
+      try {
+        setLoading(true)
+        const res = await fetch(`/api/events/${eventId}/registrations`)
+        if (res.ok) {
+          const data = await res.json()
+          setRegistrations(data)
+        }
+      } catch (error) {
+        console.error('Error fetching registrations:', error)
+      } finally {
+        setLoading(false)
+      }
+    }
     fetchRegistrations()
   }, [eventId])
-
-  const fetchRegistrations = async () => {
-    try {
-      setLoading(true)
-      const res = await fetch(`/api/events/${eventId}/registrations`)
-      if (res.ok) {
-        const data = await res.json()
-        setRegistrations(data)
-      }
-    } catch (error) {
-      console.error('Error fetching registrations:', error)
-    } finally {
-      setLoading(false)
-    }
-  }
 
   const handleSaveSettings = async () => {
     setSaving(true)

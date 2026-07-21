@@ -363,7 +363,8 @@
     "feedbackTitle": "Event Feedback",
     "feedbackDesc": "Please answer the following questions to help us improve future events.",
     "answerPlaceholder": "Write your answer here...",
-    "submitFeedback": "Submit Feedback"
+    "submitFeedback": "Submit Feedback",
+    "startSurvey": "Start Survey"
   },
   "AdminEventDetail": {
     "autoSaving": "Auto-saving...",
@@ -487,5 +488,12 @@
         "content": "You have the right to request a copy of your data or its deletion at any time by contacting the system administrator."
       }
     ]
+  },
+  "SurveyPage": {
+    "pageTitle": "Event Survey",
+    "pageDesc": "Please take a moment to answer our survey.",
+    "backToEvent": "Back to Event",
+    "surveyClosed": "Survey Closed",
+    "surveyClosedDesc": "The survey for this event is currently closed."
   }
 }

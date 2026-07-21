@@ -14,6 +14,7 @@ import { ConfirmModal } from '@/components/admin/ConfirmModal'
 import { AdminButton } from '@/components/admin/AdminButton'
 import { Event, SurveyResponse, EventCategory } from '@prisma/client'
 import { useSession } from 'next-auth/react'
+import type { SurveyQuestion } from '@/types/survey'
 
 const PDFDownloadLink = dynamic(() => import('@react-pdf/renderer').then(mod => mod.PDFDownloadLink), {
   ssr: false
@@ -25,7 +26,6 @@ const PDFViewer = dynamic(() => import('@react-pdf/renderer').then(mod => mod.PD
 })
 
 export type CustomField = { id: string; title: string; content: string }
-export type SurveyQuestion = { id: string; type: 'text' | 'choice'; text: string; options?: string[]; required?: boolean }
 
 export default function AdminEventDetailClient({ event, locale, surveyResponses }: { event: Event & { category: EventCategory, _count?: { registrations: number } }, locale: string, surveyResponses: SurveyResponse[] }) {
   const router = useRouter()

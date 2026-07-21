@@ -3,7 +3,7 @@
 import React, { useState, useOptimistic, useTransition } from 'react'
 import { useTranslations } from 'next-intl'
 import toast from 'react-hot-toast'
-import type { SurveyQuestion } from '@/app/[locale]/admin/events/[id]/AdminEventDetailClient'
+import type { SurveyQuestion } from '@/types/survey'
 import { Send, CheckCircle, Loader } from 'lucide-react'
 
 interface Props {
@@ -59,21 +59,7 @@ export default function EventSurveyForm({ eventId, questions, isAr, registration
     )
   }
 
-  // If registration is required but the attendee has not registered on this device
-  if (registrationEnabled && !checkingRegistration && !registrationId) {
-    return (
-      <div className="mt-12 bg-red-50 border-2 border-red-200 p-8 text-center text-red-800 font-sans">
-        <h3 className="text-xl font-bold mb-2">
-          {isAr ? 'عذراً، يجب التسجيل أولاً للمشاركة في تقييم الفعالية' : 'Registration Required for Survey'}
-        </h3>
-        <p className="text-sm text-red-700">
-          {isAr
-            ? 'هذه الفعالية مغلقة؛ يرجى استخدام نموذج التسجيل في الأعلى للحصول على رمز تسجيل وتأكيد حضورك.'
-            : 'Feedback submission is restricted to registered attendees. Please register above to obtain a code.'}
-        </p>
-      </div>
-    )
-  }
+
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault()

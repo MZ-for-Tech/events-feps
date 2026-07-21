@@ -347,7 +347,8 @@
     "feedbackTitle": "Commentaires sur l'événement",
     "feedbackDesc": "Veuillez répondre aux questions suivantes pour nous aider à améliorer nos futurs événements.",
     "answerPlaceholder": "Écrivez votre réponse ici...",
-    "submitFeedback": "Soumettre les commentaires"
+    "submitFeedback": "Soumettre les commentaires",
+    "startSurvey": "Commencer l'enquête"
   },
   "AdminEventDetail": {
     "autoSaving": "Sauvegarde automatique...",
@@ -471,5 +472,12 @@
         "content": "Vous avez le droit de demander une copie de vos données ou leur suppression en contactant l'administrateur."
       }
     ]
+  },
+  "SurveyPage": {
+    "pageTitle": "Enquête sur l'Événement",
+    "pageDesc": "Veuillez prendre un moment pour répondre à notre enquête.",
+    "backToEvent": "Retour à l'Événement",
+    "surveyClosed": "Enquête Fermée",
+    "surveyClosedDesc": "L'enquête pour cet événement est actuellement fermée."
   }
 }

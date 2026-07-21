@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { auth } from '@/lib/auth'
 import { prisma } from '@/lib/prisma'
-import * as xlsx from 'xlsx'
+import * as xlsx from '@e965/xlsx'
 
 export async function GET(
   req: NextRequest,

@@ -3,7 +3,7 @@
 import React from 'react'
 import {
   Calendar, MapPin, Clock, ToggleLeft, ToggleRight, FileText,
-  Archive, FolderOpen, ChevronRight, Edit2, Trash2, Printer
+  Archive, FolderOpen, ChevronRight, Edit2, Trash2
 } from 'lucide-react'
 import { useRouter } from 'next/navigation'
 import { useTranslations } from 'next-intl'
@@ -23,7 +23,6 @@ interface AdminEventsTableProps {
   onDelete: (id: string) => void
   onArchive: (ev: AdminEvent) => void
   onRestore: (ev: AdminEvent) => void
-  onOpenReport: (ev: AdminEvent) => void
 }
 
 export function AdminEventsTable({
@@ -39,7 +38,6 @@ export function AdminEventsTable({
   onDelete,
   onArchive,
   onRestore,
-  onOpenReport,
 }: AdminEventsTableProps) {
   const router = useRouter()
   const t = useTranslations('AdminEvents')
