@@ -3,6 +3,7 @@ import { auth } from '@/lib/auth'
 import { prisma } from '@/lib/prisma'
 import { hasPermission, PERMISSIONS } from '@/lib/permissions'
 import { logAction } from '@/lib/logger'
+import { TriviaCategoryCreateSchema, formatZodError } from '@/lib/validators'
 
 export async function GET() {
   const session = await auth()
@@ -49,20 +50,17 @@ export async function POST(req: NextRequest) {
   }
 
   try {
-    const data = await req.json()
-    
-    if (!data.nameEn || !data.nameAr || !data.nameFr) {
-      return new NextResponse('Missing required fields', { status: 400 })
+    const body = await req.json()
+
+    const parsed = TriviaCategoryCreateSchema.safeParse(body)
+    if (!parsed.success) {
+      return new NextResponse(formatZodError(parsed.error), { status: 400 })
     }
 
+    const { nameEn, nameAr, nameFr, color, bg } = parsed.data
+
     const category = await prisma.triviaCategory.create({
-      data: {
-        nameEn: data.nameEn,
-        nameAr: data.nameAr,
-        nameFr: data.nameFr,
-        color: data.color || '#1A3A6E',
-        bg: data.bg || 'rgba(26,58,110,0.12)'
-      }
+      data: { nameEn, nameAr, nameFr, color, bg }
     })
 
     await logAction(session.user.id, 'CREATE', 'TRIVIA_CATEGORY', category.id, JSON.stringify({ action: `Created trivia category: ${category.nameEn}` }))

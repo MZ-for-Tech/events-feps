@@ -4,6 +4,7 @@ import { prisma } from '@/lib/prisma'
 import { hasPermission, PERMISSIONS } from '@/lib/permissions'
 import bcrypt from 'bcryptjs'
 import { logAction } from '@/lib/logger'
+import { UserUpdateSchema, formatZodError } from '@/lib/validators'
 
 export async function PATCH(
   req: NextRequest,
@@ -24,16 +25,26 @@ export async function PATCH(
   }
 
   try {
-    const data = await req.json()
-    const updateData: Record<string, unknown> = {
-      name: data.name ?? undefined,
-      email: data.email ?? undefined,
-      role: data.role ?? undefined,
-      permissions: data.permissions ? JSON.stringify(data.permissions) : undefined
+    const body = await req.json()
+
+    // Validate with Zod — whitelists role and permission values
+    const parsed = UserUpdateSchema.safeParse(body)
+    if (!parsed.success) {
+      return new NextResponse(formatZodError(parsed.error), { status: 400 })
     }
 
-    if (data.password) {
-      updateData.password = await bcrypt.hash(data.password, 10)
+    const { name, email, password, role, permissions } = parsed.data
+
+    const updateData: Record<string, unknown> = {
+      name:        name        ?? undefined,
+      email:       email       ?? undefined,
+      role:        role        ?? undefined,
+      permissions: permissions ? JSON.stringify(permissions) : undefined,
+    }
+
+    if (password) {
+      // Use bcrypt rounds of 12 for stronger hashing
+      updateData.password = await bcrypt.hash(password, 12)
     }
 
     const updated = await prisma.user.update({

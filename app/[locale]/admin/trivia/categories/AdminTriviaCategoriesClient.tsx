@@ -1,8 +1,9 @@
 'use client'
 
 import React, { useState, useEffect, useOptimistic, useTransition } from 'react'
-import { Plus, Loader, AlertCircle, Edit, Trash2, LibraryBig } from 'lucide-react'
+import { Plus, Loader, AlertCircle, Edit, Trash2, LibraryBig, ChevronRight } from 'lucide-react'
 import toast from 'react-hot-toast'
+import Link from 'next/link'
 import { AdminPageHeader } from '@/components/admin/AdminPageHeader'
 import { Table, TableHeader, TableBody, TableRow, TableHead, TableCell } from '@/components/admin/AdminTable'
 import { AdminModal } from '@/components/admin/AdminModal'
@@ -159,6 +160,15 @@ export default function AdminTriviaCategoriesClient({ locale }: { locale: string
 
   return (
     <div>
+      {/* Back navigation breadcrumb */}
+      <Link
+        href={`/${locale}/admin/trivia`}
+        className="inline-flex items-center gap-1.5 text-xs font-bold uppercase tracking-widest text-feps-ink-secondary hover:text-feps-navy transition-colors mb-4"
+      >
+        <ChevronRight size={14} className={isAr ? 'rotate-0' : 'rotate-180'} />
+        {isAr ? 'العودة إلى الأسئلة' : 'Back to Questions'}
+      </Link>
+
       <AdminPageHeader
         title={isAr ? "إدارة تصنيفات الأسئلة" : "Trivia Categories"}
         description={isAr ? "إضافة وتعديل التصنيفات المختلفة." : "Manage categories for trivia questions."}

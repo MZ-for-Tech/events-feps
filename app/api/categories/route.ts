@@ -4,8 +4,14 @@ import { prisma } from '@/lib/prisma'
 import { hasPermission, PERMISSIONS } from '@/lib/permissions'
 import { translate } from 'google-translate-api-x'
 import { logAction } from '@/lib/logger'
+import { publicApiLimiter, getClientIp, rateLimitResponse } from '@/lib/rateLimit'
 
-export async function GET() {
+export async function GET(req: NextRequest) {
+  // Rate limit public reads of categories
+  const ip = getClientIp(req)
+  const rl = publicApiLimiter(ip)
+  if (rl.limited) return rateLimitResponse(rl.resetInMs)
+
   try {
     const categories = await prisma.eventCategory.findMany()
     return NextResponse.json(categories)

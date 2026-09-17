@@ -206,7 +206,8 @@ export default function RegistrationAdmin({
                 {[
                   { value: 'CREDIT_CODE', labelAr: 'كود الساعات المعتمدة (7 أرقام)', labelEn: 'Credit Hour Code (7 digits)' },
                   { value: 'NATIONAL_ID', labelAr: 'الرقم القومي (14 رقم)', labelEn: 'National ID (14 digits)' },
-                  { value: 'BOTH', labelAr: 'كلاهما مقبول', labelEn: 'Both Allowed' }
+                  { value: 'PHONE', labelAr: 'رقم الهاتف (11 رقم)', labelEn: 'Phone Number (11 digits)' },
+                  { value: 'ANY', labelAr: 'أي منهم مقبول', labelEn: 'Any Allowed' }
                 ].map((item) => (
                   <label
                     key={item.value}
@@ -322,10 +323,16 @@ export default function RegistrationAdmin({
                       <td className="px-6 py-4 text-feps-ink-secondary font-mono">{r.email}</td>
                       <td className="px-6 py-4 font-mono font-bold text-feps-navy">{r.identifier}</td>
                       <td className="px-6 py-4">
-                        <span className={`px-2 py-0.5 rounded text-[11px] font-bold ${r.identifierType === 'CREDIT_CODE' ? 'bg-blue-100 text-blue-800' : 'bg-purple-100 text-purple-800'}`}>
+                        <span className={`px-2 py-0.5 rounded text-[11px] font-bold ${
+                          r.identifierType === 'CREDIT_CODE' ? 'bg-blue-100 text-blue-800' : 
+                          r.identifierType === 'NATIONAL_ID' ? 'bg-purple-100 text-purple-800' :
+                          'bg-green-100 text-green-800'
+                        }`}>
                           {r.identifierType === 'CREDIT_CODE'
                             ? (isAr ? 'ساعات معتمدة' : 'Credit Hours')
-                            : (isAr ? 'رقم قومي' : 'National ID')}
+                            : r.identifierType === 'NATIONAL_ID'
+                              ? (isAr ? 'رقم قومي' : 'National ID')
+                              : (isAr ? 'رقم هاتف' : 'Phone Number')}
                         </span>
                       </td>
                       <td className="px-6 py-4 text-feps-ink-secondary text-xs font-mono">

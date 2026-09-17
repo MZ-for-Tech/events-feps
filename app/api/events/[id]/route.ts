@@ -6,14 +6,24 @@ import { logAction } from '@/lib/logger'
 import translate from 'google-translate-api-x'
 
 export async function GET(
-  _req: NextRequest,
+  req: NextRequest,
   { params }: { params: Promise<{ id: string }> }
 ) {
   const { id } = await params
   try {
     const event = await prisma.event.findUnique({ where: { id } })
     if (!event) return new NextResponse('Not Found', { status: 404 })
-    // Public can see published; admins can see drafts too
+
+    // Guard: unpublished events are only visible to authenticated admins
+    if (!event.published) {
+      const session = await auth()
+      const canView = session?.user && (
+        hasPermission(session, PERMISSIONS.EVENTS_CREATE) ||
+        hasPermission(session, PERMISSIONS.EVENTS_PUBLISH)
+      )
+      if (!canView) return new NextResponse('Not Found', { status: 404 })
+    }
+
     return NextResponse.json(event)
   } catch {
     return new NextResponse('Internal Server Error', { status: 500 })

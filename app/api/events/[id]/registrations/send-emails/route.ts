@@ -51,9 +51,15 @@ export async function POST(
 
     // Map each registration to a mail options object
     const mailJobs = registrations.map((r) => {
-      const isCreditCode = r.identifierType === 'CREDIT_CODE'
-      const typeLabelAr = isCreditCode ? 'كود الساعات المعتمدة' : 'الرقم القومي'
-      const typeLabelEn = isCreditCode ? 'Credit Hour Code' : 'National ID'
+      let typeLabelAr = 'الرقم القومي'
+      let typeLabelEn = 'National ID'
+      if (r.identifierType === 'CREDIT_CODE') {
+        typeLabelAr = 'كود الساعات المعتمدة'
+        typeLabelEn = 'Credit Hour Code'
+      } else if (r.identifierType === 'PHONE') {
+        typeLabelAr = 'رقم الهاتف'
+        typeLabelEn = 'Phone Number'
+      }
 
       const mailOptions = {
         from: `"FEPS Events" <${smtpUser}>`,

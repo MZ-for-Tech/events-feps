@@ -4,6 +4,7 @@ import { prisma } from '@/lib/prisma'
 import { hasPermission, PERMISSIONS } from '@/lib/permissions'
 import bcrypt from 'bcryptjs'
 import { logAction } from '@/lib/logger'
+import { UserCreateSchema, formatZodError } from '@/lib/validators'
 
 export async function GET() {
   const session = await auth()
@@ -29,27 +30,31 @@ export async function POST(req: NextRequest) {
   }
 
   try {
-    const data = await req.json()
-    const { name, email, password, role, permissions } = data
+    const body = await req.json()
 
-    if (!name || !email || !password) {
-      return new NextResponse('Missing required fields', { status: 400 })
+    // Validate with Zod — enforces password min length, email format, role whitelist, permission whitelist
+    const parsed = UserCreateSchema.safeParse(body)
+    if (!parsed.success) {
+      return new NextResponse(formatZodError(parsed.error), { status: 400 })
     }
+
+    const { name, email, password, role, permissions } = parsed.data
 
     const exists = await prisma.user.findUnique({ where: { email } })
     if (exists) {
       return new NextResponse('User already exists', { status: 400 })
     }
 
-    const hashedPassword = await bcrypt.hash(password, 10)
+    // Use bcrypt rounds of 12 for stronger hashing
+    const hashedPassword = await bcrypt.hash(password, 12)
 
     const user = await prisma.user.create({
       data: {
         name,
         email,
         password: hashedPassword,
-        role: role || 'EDITOR',
-        permissions: permissions ? JSON.stringify(permissions) : '[]'
+        role,
+        permissions: JSON.stringify(permissions)
       },
       select: { id: true, name: true, email: true, role: true, permissions: true }
     })

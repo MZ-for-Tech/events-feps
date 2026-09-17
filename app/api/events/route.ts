@@ -2,18 +2,36 @@ import { NextRequest, NextResponse } from 'next/server'
 import { auth } from '@/lib/auth'
 import { prisma } from '@/lib/prisma'
 import translate from 'google-translate-api-x'
+import { publicApiLimiter, getClientIp, rateLimitResponse } from '@/lib/rateLimit'
+import { EventsQuerySchema } from '@/lib/validators'
+import { hasPermission, PERMISSIONS } from '@/lib/permissions'
+import { logAction } from '@/lib/logger'
 
 export async function GET(req: NextRequest) {
+  // Rate limit public reads
+  const ip = getClientIp(req)
+  const rl = publicApiLimiter(ip)
+  if (rl.limited) return rateLimitResponse(rl.resetInMs)
+
   try {
     const { searchParams } = new URL(req.url)
-    const month = searchParams.get('month')
-    const year = searchParams.get('year')
 
+    // Validate and sanitize query params
+    const parsed = EventsQuerySchema.safeParse({
+      month: searchParams.get('month') ?? undefined,
+      year:  searchParams.get('year')  ?? undefined,
+    })
+
+    if (!parsed.success) {
+      return new NextResponse('Invalid query parameters', { status: 400 })
+    }
+
+    const { month, year } = parsed.data
     const where: Record<string, unknown> = { published: true }
 
-    if (month && year) {
-      const start = new Date(parseInt(year), parseInt(month) - 1, 1)
-      const end = new Date(parseInt(year), parseInt(month), 0, 23, 59, 59)
+    if (month !== undefined && year !== undefined) {
+      const start = new Date(year, month - 1, 1)
+      const end   = new Date(year, month,     0, 23, 59, 59)
       where.startDate = { gte: start, lte: end }
     }
 
@@ -29,12 +47,9 @@ export async function GET(req: NextRequest) {
   }
 }
 
-import { hasPermission, PERMISSIONS } from '@/lib/permissions'
-import { logAction } from '@/lib/logger'
-
 export async function POST(req: NextRequest) {
   const session = await auth()
-  
+
   if (!hasPermission(session, PERMISSIONS.EVENTS_CREATE)) {
     return new NextResponse('Unauthorized', { status: 401 })
   }

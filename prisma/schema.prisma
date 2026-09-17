@@ -78,7 +78,7 @@ model Event {
   surveyEnabled         Boolean   @default(false) // Whether the survey is currently open
   registrationEnabled Boolean @default(false)
   registrationOpen    Boolean @default(true)
-  registrationMode    String  @default("CREDIT_CODE") // CREDIT_CODE | NATIONAL_ID | BOTH
+  registrationMode    String  @default("CREDIT_CODE") // CREDIT_CODE | NATIONAL_ID | PHONE | ANY
   createdAt             DateTime  @default(now())
   updatedAt             DateTime  @updatedAt
 
@@ -89,8 +89,8 @@ model Event {
 model EventRegistration {
   id             String   @id @default(cuid())
   eventId        String
-  identifier     String   // Credit hour code or National ID
-  identifierType String   @default("CREDIT_CODE") // CREDIT_CODE | NATIONAL_ID
+  identifier     String   // Credit hour code, National ID, or Phone Number
+  identifierType String   @default("CREDIT_CODE") // CREDIT_CODE | NATIONAL_ID | PHONE
   name           String?  // Optional name
   email          String   // Required email for confirmation
   createdAt      DateTime @default(now())

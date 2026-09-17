@@ -1,25 +1,41 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { auth } from '@/lib/auth'
 import { prisma } from '@/lib/prisma'
+import { submissionLimiter, getClientIp, rateLimitResponse } from '@/lib/rateLimit'
+import { SurveyResponseSchema, formatZodError } from '@/lib/validators'
 
 // Submit a survey response
 export async function POST(
   req: NextRequest,
   { params }: { params: Promise<{ id: string }> }
 ) {
+  // Rate limit — prevent survey spam
+  const ip = getClientIp(req)
+  const rl = submissionLimiter(ip)
+  if (rl.limited) return rateLimitResponse(rl.resetInMs)
+
   const { id } = await params
   try {
-    const data = await req.json()
-    const { registrationId, answers } = data
+    const body = await req.json()
 
-    const event = await prisma.event.findUnique({
-      where: { id }
-    })
+    // Validate input with Zod (includes size limit on answers)
+    const parsed = SurveyResponseSchema.safeParse(body)
+    if (!parsed.success) {
+      return new NextResponse(formatZodError(parsed.error), { status: 400 })
+    }
+
+    const { registrationId, answers } = parsed.data
+
+    const event = await prisma.event.findUnique({ where: { id } })
 
     if (!event) {
       return new NextResponse('Event not found', { status: 404 })
     }
 
+    // Guard: only accept submissions when survey is actively enabled
+    if (!event.surveyEnabled) {
+      return new NextResponse('Survey is not currently open for this event', { status: 400 })
+    }
 
     const response = await prisma.surveyResponse.create({
       data: {

@@ -42,13 +42,16 @@ export default function EventRegistrationForm({ eventId, registrationMode, regis
     const clean = val.trim()
     const isCredit = /^\d{7}$/.test(clean)
     const isNational = /^\d{14}$/.test(clean)
+    const isPhone = /^01\d{9}$/.test(clean)
 
     if (registrationMode === 'CREDIT_CODE') {
       return isCredit
     } else if (registrationMode === 'NATIONAL_ID') {
       return isNational
-    } else if (registrationMode === 'BOTH') {
-      return isCredit || isNational
+    } else if (registrationMode === 'PHONE') {
+      return isPhone
+    } else if (registrationMode === 'BOTH' || registrationMode === 'ANY') {
+      return isCredit || isNational || isPhone
     }
     return false
   }
@@ -72,7 +75,9 @@ export default function EventRegistrationForm({ eventId, registrationMode, regis
           ? (isAr ? 'كود الساعات المعتمدة يجب أن يتكون من 7 أرقام بالضبط' : 'Credit hour code must be exactly 7 digits')
           : registrationMode === 'NATIONAL_ID'
             ? (isAr ? 'الرقم القومي يجب أن يتكون من 14 رقماً بالضبط' : 'National ID must be exactly 14 digits')
-            : (isAr ? 'الرمز يجب أن يكون كود ساعات (7 أرقام) أو رقم قومي (14 رقماً)' : 'Identifier must be either a 7-digit credit code or 14-digit national ID')
+            : registrationMode === 'PHONE'
+              ? (isAr ? 'رقم الهاتف يجب أن يتكون من 11 رقم ويبدأ بـ 01' : 'Phone number must be 11 digits starting with 01')
+              : (isAr ? 'الرمز يجب أن يكون كود ساعات (7 أرقام)، رقم قومي (14 رقماً)، أو رقم هاتف مصري (11 رقم)' : 'Identifier must be a 7-digit credit code, 14-digit national ID, or 11-digit phone number')
       )
       return
     }
@@ -179,7 +184,8 @@ export default function EventRegistrationForm({ eventId, registrationMode, regis
   const getIdentifierPlaceholder = () => {
     if (registrationMode === 'CREDIT_CODE') return isAr ? 'كود الساعات المعتمدة (7 أرقام)' : 'Credit Hour Code (7 digits)'
     if (registrationMode === 'NATIONAL_ID') return isAr ? 'الرقم القومي (14 رقم)' : 'National ID (14 digits)'
-    return isAr ? 'كود الساعات (7 أرقام) أو الرقم القومي (14 رقماً)' : 'Credit code (7 digits) or National ID (14 digits)'
+    if (registrationMode === 'PHONE') return isAr ? 'رقم الهاتف (11 رقم)' : 'Phone Number (11 digits)'
+    return isAr ? 'كود الساعات، الرقم القومي، أو رقم الهاتف' : 'Credit code, National ID, or Phone'
   }
 
   if (registeredInfo) {

@@ -3,7 +3,7 @@
 import React, { useState, useEffect, useRef, useCallback } from 'react'
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
-import { Calendar, FileText, Users, Settings, Menu, X, ChevronRight, ChevronLeft, Activity, Brain } from 'lucide-react'
+import { Calendar, FileText, Users, Settings, Menu, X, ChevronRight, ChevronLeft, Activity, Brain, LibraryBig } from 'lucide-react'
 import { useSession } from 'next-auth/react'
 import { useTranslations, useLocale } from 'next-intl'
 
@@ -108,8 +108,14 @@ export default function AdminSidebar() {
         label: t('trivia'),
         href: `/${locale}/admin/trivia`,
         icon: <Brain size={20} />,
-        active: pathname.includes('/admin/trivia')
-      }
+        active: pathname === `/${locale}/admin/trivia` || pathname.startsWith(`/${locale}/admin/trivia`) && !pathname.includes('/categories')
+      },
+      {
+        label: isAr ? 'تصنيفات الأسئلة' : 'Trivia Categories',
+        href: `/${locale}/admin/trivia/categories`,
+        icon: <LibraryBig size={20} />,
+        active: pathname.includes('/admin/trivia/categories')
+      },
     ] : []),
     ...(permissions.includes('logs:view') || role === 'SUPERADMIN' ? [
       {

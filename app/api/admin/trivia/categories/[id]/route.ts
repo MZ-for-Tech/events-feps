@@ -3,6 +3,7 @@ import { auth } from '@/lib/auth'
 import { prisma } from '@/lib/prisma'
 import { hasPermission, PERMISSIONS } from '@/lib/permissions'
 import { logAction } from '@/lib/logger'
+import { TriviaCategoryUpdateSchema, formatZodError } from '@/lib/validators'
 
 export async function PATCH(req: NextRequest, props: { params: Promise<{ id: string }> }) {
   const params = await props.params;
@@ -13,20 +14,23 @@ export async function PATCH(req: NextRequest, props: { params: Promise<{ id: str
   }
 
   try {
-    const data = await req.json()
-    
-    if (!data.nameEn || !data.nameAr || !data.nameFr) {
-      return new NextResponse('Missing required fields', { status: 400 })
+    const body = await req.json()
+
+    const parsed = TriviaCategoryUpdateSchema.safeParse(body)
+    if (!parsed.success) {
+      return new NextResponse(formatZodError(parsed.error), { status: 400 })
     }
+
+    const { nameEn, nameAr, nameFr, color, bg } = parsed.data
 
     const category = await prisma.triviaCategory.update({
       where: { id: params.id },
       data: {
-        nameEn: data.nameEn,
-        nameAr: data.nameAr,
-        nameFr: data.nameFr,
-        color: data.color || '#1A3A6E',
-        bg: data.bg || 'rgba(26,58,110,0.12)'
+        nameEn,
+        nameAr,
+        nameFr,
+        ...(color !== undefined ? { color } : {}),
+        ...(bg    !== undefined ? { bg }    : {}),
       }
     })
 

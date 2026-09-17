@@ -1,8 +1,9 @@
 'use client'
 
 import React, { useState, useEffect, useOptimistic, useTransition } from 'react'
-import { Brain, Plus, Loader, AlertCircle, Edit, Trash2 } from 'lucide-react'
+import { Brain, Plus, Loader, AlertCircle, Edit, Trash2, LibraryBig } from 'lucide-react'
 import toast from 'react-hot-toast'
+import Link from 'next/link'
 import { AdminPageHeader } from '@/components/admin/AdminPageHeader'
 import { Table, TableHeader, TableBody, TableRow, TableHead, TableCell } from '@/components/admin/AdminTable'
 import { AdminModal } from '@/components/admin/AdminModal'
@@ -231,10 +232,19 @@ export default function AdminTriviaClient({ locale }: { locale: string }) {
         description={isAr ? "أضف وعدل أسئلة اختبار المعلومات للكلية." : "Manage FEPS trivia questions."}
         icon={Brain}
         action={
-          <button onClick={() => handleOpenModal()} className="flex items-center gap-2 px-4 py-2 bg-feps-navy text-white text-sm hover:bg-feps-navy-dark transition-colors font-bold uppercase tracking-wider">
-            <Plus size={16} />
-            {isAr ? "إضافة سؤال" : "Add Question"}
-          </button>
+          <div className="flex items-center gap-2">
+            <Link
+              href={`/${locale}/admin/trivia/categories`}
+              className="flex items-center gap-2 px-4 py-2 bg-transparent border-2 border-feps-navy text-feps-navy text-sm hover:bg-feps-navy hover:text-white transition-colors font-bold uppercase tracking-wider"
+            >
+              <LibraryBig size={16} />
+              {isAr ? "إدارة التصنيفات" : "Manage Categories"}
+            </Link>
+            <button onClick={() => handleOpenModal()} className="flex items-center gap-2 px-4 py-2 bg-feps-navy text-white text-sm hover:bg-feps-navy-dark transition-colors font-bold uppercase tracking-wider">
+              <Plus size={16} />
+              {isAr ? "إضافة سؤال" : "Add Question"}
+            </button>
+          </div>
         }
       />
 

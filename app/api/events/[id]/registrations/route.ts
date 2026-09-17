@@ -2,6 +2,8 @@ import { NextRequest, NextResponse } from 'next/server'
 import { auth } from '@/lib/auth'
 import { prisma } from '@/lib/prisma'
 import { hasPermission, PERMISSIONS } from '@/lib/permissions'
+import { submissionLimiter, getClientIp, rateLimitResponse } from '@/lib/rateLimit'
+import { RegistrationCreateSchema, formatZodError } from '@/lib/validators'
 
 
 // Fetch all registrations for an event (Admin only)
@@ -31,18 +33,24 @@ export async function POST(
   req: NextRequest,
   { params }: { params: Promise<{ id: string }> }
 ) {
+  // Rate limit public submissions
+  const ip = getClientIp(req)
+  const rl = submissionLimiter(ip)
+  if (rl.limited) return rateLimitResponse(rl.resetInMs)
+
   const { id } = await params
   try {
-    const data = await req.json()
-    const { name, email, identifier } = data
+    const body = await req.json()
 
-    if (!identifier || !email) {
-      return new NextResponse('Identifier and Email are required', { status: 400 })
+    // Validate input with Zod
+    const parsed = RegistrationCreateSchema.safeParse(body)
+    if (!parsed.success) {
+      return new NextResponse(formatZodError(parsed.error), { status: 400 })
     }
 
-    const event = await prisma.event.findUnique({
-      where: { id }
-    })
+    const { identifier, email, name } = parsed.data
+
+    const event = await prisma.event.findUnique({ where: { id } })
 
     if (!event) {
       return new NextResponse('Event not found', { status: 404 })
@@ -57,10 +65,11 @@ export async function POST(
     }
 
     // Validation rules
-    const isCredit = /^\d{7}$/.test(identifier)
+    const isCredit   = /^\d{7}$/.test(identifier)
     const isNational = /^\d{14}$/.test(identifier)
+    const isPhone    = /^01\d{9}$/.test(identifier)
 
-    let detectedType: 'CREDIT_CODE' | 'NATIONAL_ID' | null = null
+    let detectedType: 'CREDIT_CODE' | 'NATIONAL_ID' | 'PHONE' | null = null
 
     if (event.registrationMode === 'CREDIT_CODE') {
       if (!isCredit) {
@@ -72,13 +81,20 @@ export async function POST(
         return new NextResponse('National ID must be exactly 14 digits', { status: 400 })
       }
       detectedType = 'NATIONAL_ID'
-    } else if (event.registrationMode === 'BOTH') {
+    } else if (event.registrationMode === 'PHONE') {
+      if (!isPhone) {
+        return new NextResponse('Phone number must be an 11-digit Egyptian number starting with 01', { status: 400 })
+      }
+      detectedType = 'PHONE'
+    } else if (event.registrationMode === 'BOTH' || event.registrationMode === 'ANY') {
       if (isCredit) {
         detectedType = 'CREDIT_CODE'
       } else if (isNational) {
         detectedType = 'NATIONAL_ID'
+      } else if (isPhone) {
+        detectedType = 'PHONE'
       } else {
-        return new NextResponse('Identifier must be either a 7-digit Credit Code or a 14-digit National ID', { status: 400 })
+        return new NextResponse('Identifier must be a 7-digit Credit Code, 14-digit National ID, or 11-digit Egyptian Phone Number', { status: 400 })
       }
     }
 
@@ -102,7 +118,7 @@ export async function POST(
         identifier,
         identifierType: detectedType || 'CREDIT_CODE',
         name: name || null,
-        email: email
+        email
       }
     })
 
