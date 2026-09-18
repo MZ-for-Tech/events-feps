@@ -10,6 +10,8 @@ const withPWA = withPWAInit({
 
 /** @type {import('next').NextConfig} */
 const nextConfig = {
+  // Required for Prisma Compute deployment
+  output: 'standalone',
   async headers() {
     return [
       {
