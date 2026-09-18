@@ -95,7 +95,7 @@ model EventRegistration {
   email          String   // Required email for confirmation
   createdAt      DateTime @default(now())
 
-  event Event @relation(fields: [eventId], references: [id], onDelete: Cascade)
+  event          Event    @relation(fields: [eventId], references: [id], onDelete: Cascade)
   surveyResponses SurveyResponse[]
 
   @@unique([eventId, identifier])
