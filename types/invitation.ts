@@ -6,7 +6,8 @@ export interface InvitationMinister {
 
 export interface InvitationPartner {
   name: string
-  logoUrl?: string
+  logoImage?: string
+  logoUrl?: string // Backward compatibility for invitations saved before file uploads were added.
 }
 
 export interface InvitationConfig {
@@ -42,6 +43,19 @@ export interface InvitationConfig {
   // Background
   bgImageUrl?: string
   bgColor: string             // hex color, default "#EBF4FF"
+}
+
+export type InvitationLocale = 'ar' | 'en' | 'fr'
+
+export interface LocalizedInvitationConfig {
+  version: 2
+  locales: Partial<Record<InvitationLocale, InvitationConfig>>
+}
+
+export type SavedInvitationConfig = InvitationConfig | LocalizedInvitationConfig
+
+export function isLocalizedInvitationConfig(config: SavedInvitationConfig): config is LocalizedInvitationConfig {
+  return 'version' in config && config.version === 2 && 'locales' in config
 }
 
 export const DEFAULT_INVITATION_CONFIG: InvitationConfig = {

@@ -1,8 +1,10 @@
 'use client'
 
-import React from 'react'
+import { forwardRef } from 'react'
 import Image from 'next/image'
-import type { InvitationConfig } from '@/types/invitation'
+import { CalendarDays, Clock3, MapPin } from 'lucide-react'
+import type { InvitationConfig, InvitationLocale } from '@/types/invitation'
+import { getInvitationCopy } from './invitation-builder/i18n'
 
 interface InvitationCardProps {
   config: InvitationConfig
@@ -10,9 +12,14 @@ interface InvitationCardProps {
   eventLocation?: string
   eventDate?: string
   forPrint?: boolean
+  locale?: InvitationLocale
 }
 
-export default function InvitationCard({ config, eventTitle, eventLocation, eventDate, forPrint = false }: InvitationCardProps) {
+const InvitationCard = forwardRef<HTMLDivElement, InvitationCardProps>(function InvitationCard(
+  { config, eventTitle, eventLocation, eventDate, forPrint = false, locale = 'ar' },
+  ref,
+) {
+  const t = getInvitationCopy(locale)
   const {
     hasMinistersPatronage, ministers,
     universityPresidentTitle, universityPresidentName, universityPresidentSuffix,
@@ -30,8 +37,9 @@ export default function InvitationCard({ config, eventTitle, eventLocation, even
 
   return (
     <div
-      dir="rtl"
-      className={`relative w-full overflow-hidden font-arabic select-none ${forPrint ? '' : 'rounded-xl shadow-2xl'}`}
+      ref={ref}
+      dir={t.dir}
+      className={`relative w-full overflow-hidden border border-feps-ink/10 font-arabic select-none ${forPrint ? '' : 'shadow-xl'}`}
       style={{
         background: bgImageUrl ? `url(${bgImageUrl}) center/cover no-repeat` : bgColor,
         minHeight: 520,
@@ -49,8 +57,8 @@ export default function InvitationCard({ config, eventTitle, eventLocation, even
         <div className="flex items-center justify-between px-6 pt-5 pb-3">
           {/* Cairo University logo — LEFT (in RTL = right side visually) */}
           <div className="flex flex-col items-center gap-1">
-            <Image src="/cu-logo.png" alt="جامعة القاهرة" width={72} height={72} className="object-contain" />
-            <span className="text-[10px] font-bold text-gray-600 tracking-wide">جامعة القاهرة</span>
+            <Image src="/cu-logo.png" alt={t.cairoUniversityFull} width={72} height={72} className="h-[72px] w-[72px] object-contain" />
+            <span className="text-[10px] font-bold text-gray-600 tracking-wide">{t.cairoUniversityFull}</span>
           </div>
 
           {/* Partner logos in the center */}
@@ -58,13 +66,14 @@ export default function InvitationCard({ config, eventTitle, eventLocation, even
             <div className="flex items-center gap-4 flex-wrap justify-center">
               {partnerEntities.map((p, i) => (
                 <div key={i} className="flex flex-col items-center gap-1">
-                  {p.logoUrl ? (
-                    <img src={p.logoUrl} alt={p.name} className="h-14 w-14 object-contain" />
+                  {p.logoImage || p.logoUrl ? (
+                    <Image src={p.logoImage || p.logoUrl || ''} alt={p.name || `${t.entityLogoAlt} ${i + 1}`} width={56} height={56} unoptimized className="h-14 w-14 object-contain" />
                   ) : (
-                    <div className="h-14 w-14 rounded-full border-2 border-gray-300 flex items-center justify-center bg-white/80">
+                    <div className="flex h-14 w-14 items-center justify-center border border-feps-ink/20 bg-white/80">
                       <span className="text-[9px] text-center text-gray-500 leading-tight px-1">{p.name}</span>
                     </div>
                   )}
+                  {p.name && <span className="max-w-24 text-center text-[9px] font-bold text-gray-600">{p.name}</span>}
                 </div>
               ))}
             </div>
@@ -72,18 +81,18 @@ export default function InvitationCard({ config, eventTitle, eventLocation, even
 
           {/* FEPS logo — RIGHT (in RTL = left side visually) */}
           <div className="flex flex-col items-center gap-1">
-            <Image src="/feps-logo.png" alt="كلية الاقتصاد والعلوم السياسية" width={72} height={72} className="object-contain" />
-            <span className="text-[10px] font-bold text-gray-600 tracking-wide text-center">كلية الاقتصاد والعلوم السياسية</span>
+            <Image src="/feps-logo.png" alt={t.facultyFull} width={72} height={72} className="h-[72px] w-[72px] object-contain" />
+            <span className="text-[10px] font-bold text-gray-600 tracking-wide text-center">{t.facultyFull}</span>
           </div>
         </div>
 
         {/* ── GOLD SEPARATOR ── */}
-        <div className="mx-6 h-[2px] bg-gradient-to-l from-[#bc9c65] via-[#D4AF37] to-[#bc9c65] rounded-full mb-4" />
+        <div className="mx-6 mb-4 h-[2px] bg-gradient-to-l from-[#bc9c65] via-[#D4AF37] to-[#bc9c65]" />
 
         {/* ── CARD TITLE ── */}
         <div className="text-center mb-3 px-4">
           <h1 className="text-2xl font-black text-[#1A3A6E] tracking-wide">
-            {hasPatrons ? 'دعوة عامة' : 'دعوة'}
+            {hasPatrons ? t.publicInvitation : t.invitation}
           </h1>
           {eventType && (
             <p className="text-sm text-gray-500 mt-0.5">{eventType}</p>
@@ -96,7 +105,7 @@ export default function InvitationCard({ config, eventTitle, eventLocation, even
           {/* Ministers */}
           {hasPatrons && (
             <>
-              <p className="text-sm font-bold text-gray-700">تحت رعاية وتشريف</p>
+              <p className="text-sm font-bold text-gray-700">{t.underPatronageAndHonor}</p>
               {ministers.map((m, i) => (
                 <div key={i} className="mb-1">
                   <p className="text-base font-bold text-[#1A3A6E]">{m.fullTitle} {m.name}</p>
@@ -109,7 +118,7 @@ export default function InvitationCard({ config, eventTitle, eventLocation, even
 
           {/* University President */}
           <p className="text-sm font-bold text-gray-700">
-            {hasPatrons ? '' : 'تحت رعاية'}
+            {hasPatrons ? '' : t.underPatronage}
           </p>
           <p className="text-base font-bold text-[#1A3A6E]">
             {universityPresidentTitle} {universityPresidentName}
@@ -145,7 +154,7 @@ export default function InvitationCard({ config, eventTitle, eventLocation, even
           {/* Day + Date */}
           {(eventDay || displayDate) && (
             <div className="flex items-center gap-2 text-white text-[13px] font-bold">
-              <span>📅</span>
+              <CalendarDays size={16} aria-hidden="true" />
               <span>{eventDay}{eventDay && displayDate ? ' ' : ''}{displayDate}</span>
             </div>
           )}
@@ -153,7 +162,7 @@ export default function InvitationCard({ config, eventTitle, eventLocation, even
           {/* Time */}
           {eventTimeDisplay && (
             <div className="flex items-center gap-2 text-white text-[13px] font-bold">
-              <span>🕐</span>
+              <Clock3 size={16} aria-hidden="true" />
               <span>{eventTimeDisplay}</span>
             </div>
           )}
@@ -161,7 +170,7 @@ export default function InvitationCard({ config, eventTitle, eventLocation, even
           {/* Location */}
           {displayLocation && (
             <div className="flex items-center gap-2 text-white text-[13px] font-bold">
-              <span>📍</span>
+              <MapPin size={16} aria-hidden="true" />
               <span>{displayLocation}</span>
             </div>
           )}
@@ -170,4 +179,8 @@ export default function InvitationCard({ config, eventTitle, eventLocation, even
       </div>
     </div>
   )
-}
+})
+
+InvitationCard.displayName = 'InvitationCard'
+
+export default InvitationCard
