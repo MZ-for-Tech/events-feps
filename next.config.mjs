@@ -10,6 +10,14 @@ const withPWA = withPWAInit({
 
 /** @type {import('next').NextConfig} */
 const nextConfig = {
+  images: {
+    remotePatterns: [
+      {
+        protocol: 'https',
+        hostname: '**.supabase.co',
+      },
+    ],
+  },
   async headers() {
     return [
       {
@@ -44,16 +52,16 @@ const nextConfig = {
               "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com",
               // Fonts: Google Fonts CDN
               "font-src 'self' https://fonts.gstatic.com",
-              // Images: self + data URIs (for base64 images)
-              "img-src 'self' data: blob:",
+              // Images: self + data URIs + Supabase
+              "img-src 'self' data: blob: https://*.supabase.co https://ullguucwgaclitfitsvy.supabase.co",
               // Fetch/XHR: self + Supabase
-              "connect-src 'self' https://ullguucwgaclitfitsvy.supabase.co",
-              // Frames: nothing allowed
-              "frame-src 'none'",
+              "connect-src 'self' https://*.supabase.co https://ullguucwgaclitfitsvy.supabase.co",
+              // Frames: allow Supabase storage for embedding documents
+              "frame-src 'self' https://*.supabase.co https://ullguucwgaclitfitsvy.supabase.co",
               // Media: self only
               "media-src 'self'",
-              // Objects: nothing allowed (no Flash, etc.)
-              "object-src 'none'",
+              // Objects: allow Supabase for PDF embed
+              "object-src 'self' https://*.supabase.co https://ullguucwgaclitfitsvy.supabase.co",
               // Base URI: self only (prevent base tag injection)
               "base-uri 'self'",
               // Form actions: self only

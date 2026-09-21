@@ -17,6 +17,7 @@ export default function EventBanner({ imageUrl, title }: EventBannerProps) {
         alt={title}
         fill
         priority
+        unoptimized
       />
     </div>
   )

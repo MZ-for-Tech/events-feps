@@ -182,33 +182,51 @@ export default async function EventDetailPage({ params }: PageProps) {
             <EventAbout description={event.description} descriptionAr={event.description_ar} descriptionFr={event.description_fr} isAr={isAr} isFr={isFr} title={t('eventDetails')} isAdmin={isAdmin} eventId={event.id} />
             <EventAgenda agendaText={event.agenda_text} agendaTextAr={event.agenda_text_ar} agendaTextFr={event.agenda_text_fr} isAr={isAr} isFr={isFr} title={t('eventProgram')} isAdmin={isAdmin} eventId={event.id} />
 
-            {event.agenda_file && (
-              <div className="bg-feps-surface border-2 border-feps-navy p-8 md:p-12 mb-8">
-                <div className="flex items-center gap-4 mb-8 border-b-2 border-feps-navy pb-4">
-                  <h2 className={`text-2xl font-sans uppercase tracking-wider font-bold text-feps-navy ${isAr ? 'font-arabic' : ''}`}>
-                    {t('officialAgenda')}
-                  </h2>
+            {event.agenda_file && (() => {
+              const isImageAgenda = /\.(jpg|jpeg|png|webp|gif)($|\?)/i.test(event.agenda_file)
+              return (
+                <div className="bg-feps-surface border-2 border-feps-navy p-8 md:p-12 mb-8">
+                  <div className="flex items-center gap-4 mb-8 border-b-2 border-feps-navy pb-4">
+                    <h2 className={`text-2xl font-sans uppercase tracking-wider font-bold text-feps-navy ${isAr ? 'font-arabic' : ''}`}>
+                      {t('officialAgenda')}
+                    </h2>
+                  </div>
+                  <div className="w-full overflow-hidden border-2 border-feps-navy bg-white flex items-center justify-center">
+                    {isImageAgenda ? (
+                      // eslint-disable-next-line @next/next/no-img-element
+                      <img
+                        src={event.agenda_file}
+                        alt={t('officialAgenda')}
+                        className="w-full h-auto max-h-[800px] object-contain block mx-auto"
+                      />
+                    ) : (
+                      <iframe
+                        src={`${event.agenda_file}#toolbar=0&navpanes=0`}
+                        width="100%"
+                        height="100%"
+                        className="w-full h-[500px] md:h-[700px] border-none block"
+                        title={t('officialAgenda')}
+                      />
+                    )}
+                  </div>
+                  <div className="flex justify-between items-center mt-8 pt-6 border-t-2 border-feps-navy/20 flex-wrap gap-4">
+                    <span className="text-sm font-sans text-feps-navy font-bold uppercase tracking-wider">
+                      {t('downloadFallback')}
+                    </span>
+                    <a
+                      href={event.agenda_file}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      download
+                      className="flex items-center justify-center gap-2 px-6 py-3 bg-feps-navy hover:bg-white border-2 border-feps-navy hover:text-feps-navy text-white font-bold transition-colors"
+                    >
+                      <Download size={18} />
+                      <span>{t('downloadFile')}</span>
+                    </a>
+                  </div>
                 </div>
-                <div className="w-full h-[500px] md:h-[700px] overflow-hidden border-2 border-feps-navy">
-                  <iframe
-                    src={`${event.agenda_file}#toolbar=0&navpanes=0`}
-                    width="100%"
-                    height="100%"
-                    className="border-none block"
-                    title={t('officialAgenda')}
-                  />
-                </div>
-                <div className="flex justify-between items-center mt-8 pt-6 border-t-2 border-feps-navy/20 flex-wrap gap-4">
-                  <span className="text-sm font-sans text-feps-navy font-bold uppercase tracking-wider">
-                    {t('downloadFallback')}
-                  </span>
-                  <a href={event.agenda_file} download className="flex items-center justify-center gap-2 px-6 py-3 bg-feps-navy hover:bg-white border-2 border-feps-navy hover:text-feps-navy text-white font-bold transition-colors">
-                    <Download size={18} />
-                    <span>{t('downloadFile')}</span>
-                  </a>
-                </div>
-              </div>
-            )}
+              )
+            })()}
           </div>
 
           <div className="md:col-span-1">
