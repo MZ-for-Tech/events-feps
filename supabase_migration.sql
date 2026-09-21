@@ -158,9 +158,9 @@ CREATE INDEX IF NOT EXISTS idx_survey_responses_event ON survey_responses(event_
 
 -- Users (password is 'admin123' for all)
 INSERT INTO users (id, name, email, password, role, permissions) VALUES
-('usr_1', 'Super Admin', 'admin@feps.edu.eg', '$2b$10$qRS2zH9epo6o1qiJZWvAy.vzTgKxsp2zar2LwEgCBDXPXLs24oisi', 'SUPERADMIN', '["events:create","events:publish","events:delete","events:reports","events:invitation","users:manage","categories:manage","logs:view","trivia:manage"]'),
-('usr_2', 'Events Manager', 'manager@feps.edu.eg', '$2b$10$qRS2zH9epo6o1qiJZWvAy.vzTgKxsp2zar2LwEgCBDXPXLs24oisi', 'MANAGER', '["events:create","events:publish","events:reports","events:invitation","trivia:manage"]'),
-('usr_3', 'Content Editor', 'editor@feps.edu.eg', '$2b$10$qRS2zH9epo6o1qiJZWvAy.vzTgKxsp2zar2LwEgCBDXPXLs24oisi', 'EDITOR', '["events:create"]')
+('usr_1', 'Super Admin', 'admin@feps.edu.eg', '$2b$10$8oBzjU8Ywye6UTKsfa0eOed/Nb.elgvILw5.LIEV4w42g6PD1SHZ2', 'SUPERADMIN', '["events:create","events:publish","events:delete","events:reports","events:invitation","users:manage","categories:manage","logs:view","trivia:manage"]'),
+('usr_2', 'Events Manager', 'manager@feps.edu.eg', '$2b$10$8oBzjU8Ywye6UTKsfa0eOed/Nb.elgvILw5.LIEV4w42g6PD1SHZ2', 'MANAGER', '["events:create","events:publish","events:reports","events:invitation","trivia:manage"]'),
+('usr_3', 'Content Editor', 'editor@feps.edu.eg', '$2b$10$8oBzjU8Ywye6UTKsfa0eOed/Nb.elgvILw5.LIEV4w42g6PD1SHZ2', 'EDITOR', '["events:create"]')
 ON CONFLICT (email) DO NOTHING;
 
 -- Default Event Categories
