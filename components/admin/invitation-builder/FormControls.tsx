@@ -30,9 +30,10 @@ export function Textarea(props: TextareaHTMLAttributes<HTMLTextAreaElement>) {
 export function Toggle({ checked, onChange, label }: { checked: boolean; onChange: (value: boolean) => void; label: string }) {
   return (
     <label className="mb-5 flex cursor-pointer select-none items-center gap-3 border border-feps-ink/10 bg-feps-ink/[0.03] p-4">
-      <span className="relative">
+      <span className="relative block h-6 w-11 shrink-0">
         <input type="checkbox" className="peer sr-only" checked={checked} onChange={event => onChange(event.target.checked)} />
-        <span className="block h-6 w-11 rounded-full bg-feps-ink/15 transition-colors after:absolute after:right-[2px] after:top-[2px] after:h-5 after:w-5 after:rounded-full after:border after:border-feps-ink/20 after:bg-white after:content-[''] after:transition-all peer-checked:bg-feps-navy peer-checked:after:-translate-x-full rtl:peer-checked:after:translate-x-full" />
+        <span aria-hidden="true" className={`absolute inset-0 rounded-full transition-colors peer-focus-visible:ring-2 peer-focus-visible:ring-feps-gold peer-focus-visible:ring-offset-2 ${checked ? 'bg-feps-navy' : 'bg-feps-ink/15'}`} />
+        <span aria-hidden="true" className={`absolute start-0.5 top-0.5 h-5 w-5 rounded-full border border-feps-ink/20 bg-white shadow-sm transition-transform ${checked ? 'translate-x-5 rtl:-translate-x-5' : ''}`} />
       </span>
       <span className="text-sm font-bold text-feps-ink">{label}</span>
     </label>
