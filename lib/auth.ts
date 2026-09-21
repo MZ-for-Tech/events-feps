@@ -6,7 +6,7 @@ import type { Role } from '@/lib/types'
 
 export const { handlers, signIn, signOut, auth } = NextAuth({
   trustHost: true,
-  secret: process.env.AUTH_SECRET,
+  secret: process.env.AUTH_SECRET || process.env.NEXTAUTH_SECRET,
   providers: [
     Credentials({
       name: 'credentials',
@@ -15,39 +15,63 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
         password: { label: 'Password', type: 'password' },
       },
       async authorize(credentials) {
-        console.log('[Auth] Authorize called with:', credentials?.email)
-        if (!credentials?.email || !credentials?.password) {
-          console.log('[Auth] Missing credentials')
+        try {
+          const rawEmail = credentials?.email as string | undefined
+          const rawPassword = credentials?.password as string | undefined
+
+          if (!rawEmail || !rawPassword) {
+            console.log('[Auth] Missing credentials')
+            return null
+          }
+
+          const email = rawEmail.trim().toLowerCase()
+          console.log('[Auth] Authorizing for email:', email)
+
+          const { data: user, error } = await supabase
+            .from('users')
+            .select('id, name, email, password, role, permissions')
+            .ilike('email', email)
+            .single()
+
+          if (error) {
+            console.error('[Auth] Supabase query error:', error.message, error)
+            return null
+          }
+
+          if (!user) {
+            console.log('[Auth] User not found for email:', email)
+            return null
+          }
+
+          console.log('[Auth] User found:', user.email, 'Checking password...')
+          const valid = await bcrypt.compare(rawPassword, user.password)
+          if (!valid) {
+            console.log('[Auth] Invalid password for email:', email)
+            return null
+          }
+
+          let parsedPermissions: string[] = []
+          try {
+            if (Array.isArray(user.permissions)) {
+              parsedPermissions = user.permissions
+            } else if (typeof user.permissions === 'string') {
+              parsedPermissions = JSON.parse(user.permissions)
+            }
+          } catch {
+            parsedPermissions = []
+          }
+
+          console.log('[Auth] Login successful for user:', user.email, 'Role:', user.role)
+          return {
+            id: user.id,
+            name: user.name,
+            email: user.email,
+            role: user.role,
+            permissions: parsedPermissions,
+          }
+        } catch (err) {
+          console.error('[Auth] Unhandled exception in authorize:', err)
           return null
-        }
-
-        const { data: user, error } = await supabase
-          .from('users')
-          .select('id, name, email, password, role, permissions')
-          .eq('email', credentials.email as string)
-          .single()
-
-        if (error || !user) {
-          console.log('[Auth] User not found')
-          return null
-        }
-
-        const valid = await bcrypt.compare(
-          credentials.password as string,
-          user.password
-        )
-        if (!valid) {
-          console.log('[Auth] Invalid password')
-          return null
-        }
-
-        console.log('[Auth] Success for user:', user.email)
-        return {
-          id: user.id,
-          name: user.name,
-          email: user.email,
-          role: user.role,
-          permissions: user.permissions ? JSON.parse(user.permissions) : []
         }
       },
     }),

@@ -21,18 +21,24 @@ export default function LoginForm() {
     setLoading(true)
     setError('')
 
-    const res = await signIn('credentials', {
-      email,
-      password,
-      redirect: false,
-    })
+    try {
+      const res = await signIn('credentials', {
+        email: email.trim().toLowerCase(),
+        password,
+        redirect: false,
+      })
 
-    setLoading(false)
-    if (res?.error) {
+      if (res?.error) {
+        console.error('[LoginForm] Sign in error:', res.error)
+        setError(t('error'))
+        setLoading(false)
+      } else {
+        window.location.href = `/${locale}/admin/events`
+      }
+    } catch (err) {
+      console.error('[LoginForm] Sign in exception:', err)
       setError(t('error'))
-    } else {
-      router.push(`/${locale}`)
-      router.refresh()
+      setLoading(false)
     }
   }
 
@@ -76,7 +82,7 @@ export default function LoginForm() {
         <button
           type="submit"
           disabled={loading}
-          className="w-full mt-2 inline-flex justify-center items-center px-6 py-4 bg-feps-ink text-feps-paper font-sans text-xs uppercase tracking-widest font-semibold hover:bg-feps-navy transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+          className="w-full mt-2 inline-flex justify-center items-center px-6 py-4 bg-feps-ink text-feps-paper font-sans text-xs uppercase tracking-widest font-semibold hover:bg-feps-navy transition-colors disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer"
         >
           {loading ? t('signingIn') : t('signIn')}
         </button>
@@ -97,21 +103,27 @@ export default function LoginForm() {
               key={role.label}
               type="button"
               disabled={loading}
-              className="px-3 py-2 border border-feps-border text-feps-ink font-sans text-[0.65rem] uppercase tracking-widest hover:bg-feps-ink hover:text-feps-paper hover:border-feps-ink transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+              className="px-3 py-2 border border-feps-border text-feps-ink font-sans text-[0.65rem] uppercase tracking-widest hover:bg-feps-ink hover:text-feps-paper hover:border-feps-ink transition-colors disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer"
               onClick={async () => {
                 setLoading(true)
                 setError('')
-                const res = await signIn('credentials', {
-                  email: role.email,
-                  password: role.pass,
-                  redirect: false,
-                })
-                setLoading(false)
-                if (res?.error) {
+                try {
+                  const res = await signIn('credentials', {
+                    email: role.email,
+                    password: role.pass,
+                    redirect: false,
+                  })
+                  if (res?.error) {
+                    console.error('[LoginForm] Quick login error:', res.error)
+                    setError(t('error'))
+                    setLoading(false)
+                  } else {
+                    window.location.href = `/${locale}/admin/events`
+                  }
+                } catch (err) {
+                  console.error('[LoginForm] Quick login exception:', err)
                   setError(t('error'))
-                } else {
-                  router.push(`/${locale}/admin/events`)
-                  router.refresh()
+                  setLoading(false)
                 }
               }}
             >
