@@ -89,9 +89,9 @@ export default function LoginForm() {
         </p>
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
           {[
-            { label: 'Superadmin', email: 'admin@feps.edu.eg', pass: 'admin1234' },
-            { label: 'Manager', email: 'manager@feps.edu.eg', pass: 'manager123' },
-            { label: 'Editor', email: 'editor@feps.edu.eg', pass: 'editor123' },
+            { label: 'Superadmin', email: 'admin@feps.edu.eg', pass: 'admin123' },
+            { label: 'Manager', email: 'manager@feps.edu.eg', pass: 'admin123' },
+            { label: 'Editor', email: 'editor@feps.edu.eg', pass: 'admin123' },
           ].map(role => (
             <button
               key={role.label}
