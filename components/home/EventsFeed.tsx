@@ -3,12 +3,30 @@ import Link from 'next/link'
 import { ArrowRight, Calendar } from 'lucide-react'
 import { useTranslations } from 'next-intl'
 import EventRow from '@/components/EventRow'
-import type { Event } from '@prisma/client'
 import type { EventCategoryData } from '@/components/EventCard'
+
+interface FeedEvent {
+  id: string
+  title: string
+  titleAr?: string | null
+  titleFr?: string | null
+  startDate: string
+  endDate?: string | null
+  location?: string | null
+  locationAr?: string | null
+  locationFr?: string | null
+  description?: string | null
+  descriptionAr?: string | null
+  descriptionFr?: string | null
+  imageUrl?: string | null
+  published: boolean
+  status: string
+  category: EventCategoryData
+}
 
 interface EventsFeedProps {
   locale: string
-  upcomingEvents: (Event & { category: EventCategoryData })[]
+  upcomingEvents: FeedEvent[]
 }
 
 export default function EventsFeed({ locale, upcomingEvents }: EventsFeedProps) {

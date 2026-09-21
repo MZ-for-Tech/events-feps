@@ -1,22 +1,32 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { auth } from '@/lib/auth'
-import { prisma } from '@/lib/prisma'
+import { supabase } from '@/lib/supabase'
 import { hasPermission, PERMISSIONS } from '@/lib/permissions'
 import { translate } from 'google-translate-api-x'
 import { logAction } from '@/lib/logger'
 
 export async function GET() {
   const session = await auth()
-  
   if (!session?.user || !hasPermission(session, PERMISSIONS.TRIVIA_MANAGE)) {
     return new NextResponse('Forbidden', { status: 403 })
   }
 
   try {
-    const questions = await prisma.triviaQuestion.findMany({
-      orderBy: { createdAt: 'desc' }
-    })
-    return NextResponse.json(questions)
+    const { data: questions, error } = await supabase
+      .from('trivia_questions')
+      .select('*')
+      .order('created_at', { ascending: false })
+
+    if (error) throw error
+
+    const mapped = (questions ?? []).map(q => ({
+      id: q.id, categoryId: q.category_id,
+      textEn: q.text_en, textAr: q.text_ar, textFr: q.text_fr,
+      options: q.options,
+      explanation: q.explanation, explanationAr: q.explanation_ar, explanationFr: q.explanation_fr,
+      createdAt: q.created_at,
+    }))
+    return NextResponse.json(mapped)
   } catch {
     return new NextResponse('Internal Server Error', { status: 500 })
   }
@@ -24,18 +34,14 @@ export async function GET() {
 
 export async function POST(req: NextRequest) {
   const session = await auth()
-  
   if (!session?.user || !hasPermission(session, PERMISSIONS.TRIVIA_MANAGE)) {
     return new NextResponse('Forbidden', { status: 403 })
   }
 
   try {
     const data = await req.json()
-    
     const baseText = data.textEn || data.textAr || data.textFr
-    if (!baseText || !data.options) {
-      return new NextResponse('Missing required fields', { status: 400 })
-    }
+    if (!baseText || !data.options) return new NextResponse('Missing required fields', { status: 400 })
 
     let textEn = data.textEn
     let textAr = data.textAr
@@ -56,22 +62,29 @@ export async function POST(req: NextRequest) {
       if (!explanationFr) { try { explanationFr = ((await translate(baseExp, { to: 'fr' })) as { text: string }).text } catch (e) { console.error(e) } }
     }
 
-    const question = await prisma.triviaQuestion.create({
-      data: {
-        textEn: textEn || '',
-        textAr: textAr || '',
-        textFr: textFr || '',
-        categoryId: data.categoryId || null,
-        options: data.options,
-        explanation: explanationEn || null,
-        explanationAr: explanationAr || null,
-        explanationFr: explanationFr || null,
-      }
+    const { data: question, error } = await supabase
+      .from('trivia_questions')
+      .insert({
+        text_en:        textEn || '',
+        text_ar:        textAr || '',
+        text_fr:        textFr || '',
+        category_id:    data.categoryId || null,
+        options:        data.options,
+        explanation:    explanationEn || null,
+        explanation_ar: explanationAr || null,
+        explanation_fr: explanationFr || null,
+      })
+      .select()
+      .single()
+
+    if (error) throw error
+
+    await logAction(session.user.id, 'CREATE', 'TRIVIA', question.id, JSON.stringify({ action: `Created trivia question: ${question.text_en}` }))
+    return NextResponse.json({
+      id: question.id, categoryId: question.category_id,
+      textEn: question.text_en, textAr: question.text_ar, textFr: question.text_fr,
+      options: question.options,
     })
-
-    await logAction(session.user.id, 'CREATE', 'TRIVIA', question.id, JSON.stringify({ action: `Created trivia question: ${question.textEn}` }))
-
-    return NextResponse.json(question)
   } catch (error) {
     console.error('Create trivia error:', error)
     return new NextResponse('Internal Server Error', { status: 500 })

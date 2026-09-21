@@ -9,12 +9,35 @@ import dynamic from 'next/dynamic'
 import SingleEventReportDocument from '@/components/admin/SingleEventReportDocument'
 import SurveyAnalytics from '@/components/admin/SurveyAnalytics'
 import RegistrationAdmin from '@/components/admin/RegistrationAdmin'
+import InvitationBuilder from '@/components/admin/InvitationBuilder'
 import { AdminPageHeader } from '@/components/admin/AdminPageHeader'
 import { ConfirmModal } from '@/components/admin/ConfirmModal'
 import { AdminButton } from '@/components/admin/AdminButton'
-import { Event, SurveyResponse, EventCategory } from '@prisma/client'
 import { useSession } from 'next-auth/react'
 import type { SurveyQuestion } from '@/types/survey'
+import type { InvitationConfig } from '@/types/invitation'
+
+// ── Local type replacements for Prisma types ──
+interface EventCategory { id: string; nameEn: string; nameAr: string; nameFr: string; color: string; bg: string }
+interface SurveyResponse { id: string; eventId: string; registrationId?: string | null; answers: string; createdAt: string }
+interface Event {
+  [key: string]: unknown
+  id: string; title: string; titleAr?: string | null; titleFr?: string | null;
+  categoryId: string; category?: EventCategory | null;
+  startDate: string; endDate?: string | null;
+  location?: string | null; locationAr?: string | null;
+  description?: string | null; descriptionAr?: string | null;
+  agendaText?: string | null; agendaTextAr?: string | null;
+  agendaFile?: string | null; imageUrl?: string | null;
+  published: boolean; status: string;
+  reportSummary?: string | null; reportResults?: string | null;
+  reportRecommendations?: string | null; reportCustomFields?: string | null;
+  surveyQuestions?: string | null; surveyEnabled: boolean;
+  registrationEnabled: boolean; registrationOpen: boolean; registrationMode: string;
+  invitationConfig?: string | null;
+  createdAt?: string; updatedAt?: string;
+  _count?: { registrations?: number };
+}
 
 const PDFDownloadLink = dynamic(() => import('@react-pdf/renderer').then(mod => mod.PDFDownloadLink), {
   ssr: false
@@ -33,11 +56,12 @@ export default function AdminEventDetailClient({ event, locale, surveyResponses 
   const role = session?.user?.role
   const permissions = (session?.user as { permissions?: string[] })?.permissions || []
   
-  const canManageReports = role === 'SUPERADMIN' || role === 'MANAGER' || permissions.includes('events:reports')
-  const canManageSurveys = role === 'SUPERADMIN' || role === 'MANAGER' || permissions.includes('events:reports')
+  const canManageReports     = role === 'SUPERADMIN' || role === 'MANAGER' || permissions.includes('events:reports')
+  const canManageSurveys     = role === 'SUPERADMIN' || role === 'MANAGER' || permissions.includes('events:reports')
+  const canManageInvitation  = role === 'SUPERADMIN' || role === 'MANAGER' || permissions.includes('events:invitation')
   const isAr = locale === 'ar'
   const t = useTranslations('AdminEventDetail')
-  const [activeTab, setActiveTab] = useState<'details' | 'report' | 'survey' | 'analytics' | 'history' | 'registration'>('report')
+  const [activeTab, setActiveTab] = useState<'details' | 'report' | 'survey' | 'analytics' | 'history' | 'registration' | 'invitation'>('report')
 
   const lsKeyReport = `feps_draft_report_${event.id}`
   const lsKeySurvey = `feps_draft_survey_${event.id}`
@@ -360,18 +384,19 @@ export default function AdminEventDetailClient({ event, locale, surveyResponses 
       <div className="border border-feps-ink/20 bg-feps-paper overflow-hidden">
         <div className="flex border-b border-feps-ink/20 overflow-x-auto">
           {[
-            { id: 'details', icon: <FileText size={16} />, label: t('details') },
-            { id: 'registration', icon: <Users size={16} />, label: isAr ? 'التسجيل والتحضير' : 'Registration & Attendance' },
+            { id: 'details',      icon: <FileText size={16} />,  label: t('details') },
+            { id: 'registration', icon: <Users size={16} />,     label: isAr ? 'التسجيل والتحضير' : 'Registration & Attendance' },
             ...(canManageReports ? [{ id: 'report', icon: <FileText size={16} />, label: t('reportBuilder') }] : []),
             ...(canManageSurveys ? [
-              { id: 'survey', icon: <HelpCircle size={16} />, label: t('surveyBuilder') },
-              { id: 'analytics', icon: <BarChart3 size={16} />, label: t('surveyAnalytics') }
+              { id: 'survey',    icon: <HelpCircle size={16} />, label: t('surveyBuilder') },
+              { id: 'analytics', icon: <BarChart3 size={16} />,  label: t('surveyAnalytics') }
             ] : []),
-            { id: 'history', icon: <Clock size={16} />, label: t('historyNotes') },
+            { id: 'history',    icon: <Clock size={16} />,       label: t('historyNotes') },
+            ...(canManageInvitation ? [{ id: 'invitation', icon: <Mail size={16} />, label: isAr ? 'الدعوة' : 'Invitation' }] : []),
           ].map(tab => (
             <button
               key={tab.id}
-              onClick={() => setActiveTab(tab.id as 'details' | 'report' | 'survey' | 'analytics' | 'history' | 'registration')}
+              onClick={() => setActiveTab(tab.id as 'details' | 'report' | 'survey' | 'analytics' | 'history' | 'registration' | 'invitation')}
               className={`flex items-center gap-2 px-6 py-4 text-sm font-bold uppercase tracking-widest border-b-2 transition-colors whitespace-nowrap ${activeTab === tab.id ? 'border-feps-navy text-feps-navy bg-feps-navy/5' : 'border-transparent text-feps-ink-secondary hover:text-feps-ink'}`}
             >
               {tab.icon}
@@ -688,6 +713,17 @@ export default function AdminEventDetailClient({ event, locale, surveyResponses 
                 )}
               </div>
             </div>
+          )}
+
+          {activeTab === 'invitation' && (
+            <InvitationBuilder
+              eventId={event.id}
+              eventTitleAr={event.titleAr ?? event.title}
+              eventLocation={event.locationAr ?? event.location ?? ''}
+              eventStartDate={event.startDate}
+              isAr={isAr}
+              initialConfig={event.invitationConfig ? JSON.parse(event.invitationConfig) as InvitationConfig : null}
+            />
           )}
 
         </div>

@@ -10,8 +10,6 @@ const withPWA = withPWAInit({
 
 /** @type {import('next').NextConfig} */
 const nextConfig = {
-  // Required for Prisma Compute deployment
-  output: 'standalone',
   async headers() {
     return [
       {
@@ -48,8 +46,8 @@ const nextConfig = {
               "font-src 'self' https://fonts.gstatic.com",
               // Images: self + data URIs (for base64 images)
               "img-src 'self' data: blob:",
-              // Fetch/XHR: self only (all API calls go to same origin)
-              "connect-src 'self'",
+              // Fetch/XHR: self + Supabase
+              "connect-src 'self' https://ullguucwgaclitfitsvy.supabase.co",
               // Frames: nothing allowed
               "frame-src 'none'",
               // Media: self only

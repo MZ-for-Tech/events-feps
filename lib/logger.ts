@@ -1,4 +1,4 @@
-import { prisma } from '@/lib/prisma'
+import { supabase } from '@/lib/supabase'
 
 export async function logAction(
   userId: string | undefined,
@@ -8,14 +8,12 @@ export async function logAction(
   details?: string
 ) {
   try {
-    await prisma.auditLog.create({
-      data: {
-        action,
-        userId,
-        entityType,
-        entityId,
-        details
-      }
+    await supabase.from('audit_logs').insert({
+      action,
+      user_id: userId ?? null,
+      entity_type: entityType ?? null,
+      entity_id: entityId ?? null,
+      details: details ?? null,
     })
   } catch (error) {
     console.error('Failed to write audit log:', error)

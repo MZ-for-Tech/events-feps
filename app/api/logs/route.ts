@@ -1,28 +1,34 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { auth } from '@/lib/auth'
-import { prisma } from '@/lib/prisma'
+import { supabase } from '@/lib/supabase'
 import { hasPermission, PERMISSIONS } from '@/lib/permissions'
 
 export async function GET() {
   const session = await auth()
-  // Super Admin inherently has all permissions if handled logically, 
-  // but to be safe we use the explicit hasPermission check.
   if (!session?.user || (!hasPermission(session, PERMISSIONS.LOGS_VIEW) && session.user.role !== 'SUPERADMIN')) {
     return new NextResponse('Forbidden', { status: 403 })
   }
 
   try {
-    const logs = await prisma.auditLog.findMany({
-      orderBy: { timestamp: 'desc' },
-      take: 1000,
-      include: {
-        user: {
-          select: { name: true, email: true, role: true }
-        }
-      }
-    })
+    const { data: logs, error } = await supabase
+      .from('audit_logs')
+      .select('*, users(name, email, role)')
+      .order('timestamp', { ascending: false })
+      .limit(1000)
 
-    return NextResponse.json(logs)
+    if (error) throw error
+
+    const mapped = (logs ?? []).map(l => ({
+      id: l.id,
+      timestamp: l.timestamp,
+      action: l.action,
+      userId: l.user_id,
+      entityType: l.entity_type,
+      entityId: l.entity_id,
+      details: l.details,
+      user: l.users ?? null,
+    }))
+    return NextResponse.json(mapped)
   } catch {
     return new NextResponse('Internal Server Error', { status: 500 })
   }
@@ -30,20 +36,16 @@ export async function GET() {
 
 export async function POST(req: NextRequest) {
   const session = await auth()
-  if (!session?.user) {
-    return new NextResponse('Unauthorized', { status: 401 })
-  }
+  if (!session?.user) return new NextResponse('Unauthorized', { status: 401 })
 
   try {
     const data = await req.json()
     if (data.action === 'PAGE_VIEW') {
-      await prisma.auditLog.create({
-        data: {
-          action: 'PAGE_VIEW',
-          userId: session.user.id,
-          entityType: 'SYSTEM',
-          details: JSON.stringify({ path: data.details })
-        }
+      await supabase.from('audit_logs').insert({
+        action: 'PAGE_VIEW',
+        user_id: session.user.id,
+        entity_type: 'SYSTEM',
+        details: JSON.stringify({ path: data.details })
       })
       return new NextResponse(null, { status: 204 })
     }

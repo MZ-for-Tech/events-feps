@@ -1,5 +1,5 @@
 import type { Metadata } from 'next'
-import { prisma } from '@/lib/prisma'
+import { supabase } from '@/lib/supabase'
 import { auth } from '@/lib/auth'
 import { notFound } from 'next/navigation'
 import Link from 'next/link'
@@ -16,12 +16,12 @@ export async function generateMetadata(
 ): Promise<Metadata> {
   const { locale, id } = await params
   const t = await getTranslations({ locale, namespace: 'SurveyPage' })
-  const event = await prisma.event.findUnique({ where: { id } })
+  const { data: event } = await supabase.from('events').select('*').eq('id', id).single()
   if (!event) return {}
 
   const isAr = locale === 'ar'
   const isFr = locale === 'fr'
-  const title = isAr && event.titleAr ? event.titleAr : (isFr && event.titleFr ? event.titleFr : event.title)
+  const title = isAr && event.title_ar ? event.title_ar : (isFr && event.title_fr ? event.title_fr : event.title)
 
   return {
     title: `${t('pageTitle', { fallback: 'Event Survey' })} | ${title}`,
@@ -36,7 +36,7 @@ export default async function SurveyPage({ params }: PageProps) {
   const session = await auth()
   const isAdmin = !!session?.user
 
-  const event = await prisma.event.findUnique({ where: { id } })
+  const { data: event } = await supabase.from('events').select('*').eq('id', id).single()
 
   if (!event || (!event.published && !isAdmin)) {
     notFound()
@@ -44,13 +44,12 @@ export default async function SurveyPage({ params }: PageProps) {
 
   const direction = isAr ? 'rtl' : 'ltr'
   
-  const questions = event.surveyQuestions ? JSON.parse(event.surveyQuestions) : []
-  const isSurveyOpen = event.surveyEnabled && questions.length > 0
+  const questions = event.survey_questions ? JSON.parse(event.survey_questions) : []
+  const isSurveyOpen = event.survey_enabled && questions.length > 0
 
   return (
     <div className={`min-h-screen bg-feps-paper ${direction} pb-16`}>
       <div className="container max-w-3xl mx-auto pt-12">
-        {/* Navigation */}
         <div className="flex items-center gap-4 mb-8">
           <Link href={`/${locale}/events/${event.id}`} className="back-link">
             <ArrowLeft size={16} className={isAr ? 'rotate-180' : ''} />
@@ -72,7 +71,7 @@ export default async function SurveyPage({ params }: PageProps) {
                eventId={event.id}
                questions={questions}
                isAr={isAr}
-               registrationEnabled={event.registrationEnabled}
+               registrationEnabled={event.registration_enabled}
              />
           </div>
         ) : (

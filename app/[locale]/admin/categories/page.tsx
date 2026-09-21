@@ -1,4 +1,4 @@
-import { prisma } from '@/lib/prisma'
+import { supabase } from '@/lib/supabase'
 import { auth } from '@/lib/auth'
 import { redirect } from 'next/navigation'
 import AdminCategoriesClient from './AdminCategoriesClient'
@@ -17,9 +17,19 @@ export default async function AdminCategoriesPage({ params }: PageProps) {
 
   const { locale } = await params
 
-  const categories = await prisma.eventCategory.findMany({
-    orderBy: { nameEn: 'asc' },
-  })
+  const { data: rawCategories } = await supabase
+    .from('event_categories')
+    .select('*')
+    .order('name_en', { ascending: true })
+
+  const categories = (rawCategories ?? []).map(c => ({
+    id: c.id,
+    nameEn: c.name_en,
+    nameAr: c.name_ar,
+    nameFr: c.name_fr,
+    color: c.color,
+    bg: c.bg
+  }))
 
   return <AdminCategoriesClient initialCategories={categories} locale={locale} />
 }

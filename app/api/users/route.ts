@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { auth } from '@/lib/auth'
-import { prisma } from '@/lib/prisma'
+import { supabase } from '@/lib/supabase'
 import { hasPermission, PERMISSIONS } from '@/lib/permissions'
 import bcrypt from 'bcryptjs'
 import { logAction } from '@/lib/logger'
@@ -13,11 +13,19 @@ export async function GET() {
   }
 
   try {
-    const users = await prisma.user.findMany({
-      select: { id: true, name: true, email: true, role: true, permissions: true, createdAt: true },
-      orderBy: { createdAt: 'desc' }
-    })
-    return NextResponse.json(users)
+    const { data: users, error } = await supabase
+      .from('users')
+      .select('id, name, email, role, permissions, created_at')
+      .order('created_at', { ascending: false })
+
+    if (error) throw error
+
+    const mapped = (users ?? []).map(u => ({
+      id: u.id, name: u.name, email: u.email, role: u.role,
+      permissions: u.permissions ? JSON.parse(u.permissions) : [],
+      createdAt: u.created_at,
+    }))
+    return NextResponse.json(mapped)
   } catch {
     return new NextResponse('Internal Server Error', { status: 500 })
   }
@@ -31,37 +39,26 @@ export async function POST(req: NextRequest) {
 
   try {
     const body = await req.json()
-
-    // Validate with Zod — enforces password min length, email format, role whitelist, permission whitelist
     const parsed = UserCreateSchema.safeParse(body)
-    if (!parsed.success) {
-      return new NextResponse(formatZodError(parsed.error), { status: 400 })
-    }
+    if (!parsed.success) return new NextResponse(formatZodError(parsed.error), { status: 400 })
 
     const { name, email, password, role, permissions } = parsed.data
 
-    const exists = await prisma.user.findUnique({ where: { email } })
-    if (exists) {
-      return new NextResponse('User already exists', { status: 400 })
-    }
+    const { data: exists } = await supabase.from('users').select('id').eq('email', email).single()
+    if (exists) return new NextResponse('User already exists', { status: 400 })
 
-    // Use bcrypt rounds of 12 for stronger hashing
     const hashedPassword = await bcrypt.hash(password, 12)
 
-    const user = await prisma.user.create({
-      data: {
-        name,
-        email,
-        password: hashedPassword,
-        role,
-        permissions: JSON.stringify(permissions)
-      },
-      select: { id: true, name: true, email: true, role: true, permissions: true }
-    })
+    const { data: user, error } = await supabase
+      .from('users')
+      .insert({ name, email, password: hashedPassword, role, permissions: JSON.stringify(permissions) })
+      .select('id, name, email, role, permissions')
+      .single()
+
+    if (error) throw error
 
     await logAction(session.user.id, 'USER_CREATED', 'USER', user.id, JSON.stringify({ email: user.email, role: user.role }))
-
-    return NextResponse.json(user, { status: 201 })
+    return NextResponse.json({ id: user.id, name: user.name, email: user.email, role: user.role, permissions: JSON.parse(user.permissions || '[]') }, { status: 201 })
   } catch {
     return new NextResponse('Internal Server Error', { status: 500 })
   }

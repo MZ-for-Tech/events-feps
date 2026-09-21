@@ -2,7 +2,7 @@ export const dynamic = 'force-dynamic'
 
 import type { Metadata } from 'next'
 
-import { prisma } from '@/lib/prisma'
+import { supabase } from '@/lib/supabase'
 import { auth } from '@/lib/auth'
 import { notFound } from 'next/navigation'
 import Link from 'next/link'
@@ -27,17 +27,20 @@ export async function generateMetadata(
   const { locale, id } = await params
   const t = await getTranslations({ locale, namespace: 'EventDetail' })
 
-  const event = await prisma.event.findUnique({
-    where: { id },
-    include: { category: true }
-  })
+  const { data: event } = await supabase
+    .from('events')
+    .select('*, event_categories(*)')
+    .eq('id', id)
+    .single()
 
   if (!event) return {}
 
   const isAr = locale === 'ar'
   const isFr = locale === 'fr'
-  const title = isAr && event.titleAr ? event.titleAr : (isFr && event.titleFr ? event.titleFr : event.title)
-  const categoryLabel = event.category ? (isAr ? event.category.nameAr : locale === 'fr' ? event.category.nameFr : event.category.nameEn) : t('event')
+  const title = isAr && event.title_ar ? event.title_ar : (isFr && event.title_fr ? event.title_fr : event.title)
+  
+  const cat = event.event_categories as Record<string, any> | null
+  const categoryLabel = cat ? (isAr ? cat.name_ar : locale === 'fr' ? cat.name_fr : cat.name_en) : t('event')
 
   const searchParams = new URLSearchParams()
   searchParams.set('title', title)
@@ -69,7 +72,6 @@ export async function generateMetadata(
   }
 }
 
-
 export default async function EventDetailPage({ params }: PageProps) {
   const { locale, id } = await params
   const isAr = locale === 'ar'
@@ -80,16 +82,17 @@ export default async function EventDetailPage({ params }: PageProps) {
   const session = await auth()
   const isAdmin = !!session?.user
 
-  const event = await prisma.event.findUnique({
-    where: { id },
-    include: { category: true }
-  })
+  const { data: event } = await supabase
+    .from('events')
+    .select('*, event_categories(*)')
+    .eq('id', id)
+    .single()
 
   let categoryOptions: { label: string; value: string }[] = []
   if (isAdmin) {
-    const categories = await prisma.eventCategory.findMany()
-    categoryOptions = categories.map((c) => ({
-      label: isAr ? c.nameAr : locale === 'fr' ? c.nameFr : c.nameEn,
+    const { data: categories } = await supabase.from('event_categories').select('*')
+    categoryOptions = (categories ?? []).map((c) => ({
+      label: isAr ? c.name_ar : locale === 'fr' ? c.name_fr : c.name_en,
       value: c.id
     }))
   }
@@ -98,10 +101,11 @@ export default async function EventDetailPage({ params }: PageProps) {
     notFound()
   }
 
-  const categoryLabel = event.category ? (isAr ? event.category.nameAr : locale === 'fr' ? event.category.nameFr : event.category.nameEn) : t('unknownCategory')
+  const cat = event.event_categories as Record<string, any> | null
+  const categoryLabel = cat ? (isAr ? cat.name_ar : locale === 'fr' ? cat.name_fr : cat.name_en) : t('unknownCategory')
 
-  const start = new Date(event.startDate)
-  const end = event.endDate ? new Date(event.endDate) : null
+  const start = new Date(event.start_date)
+  const end = event.end_date ? new Date(event.end_date) : null
 
   const formattedStartDate = start.toLocaleDateString(isAr ? 'ar-EG-u-nu-latn' : isFr ? 'fr-FR' : 'en-GB', {
     weekday: 'long', day: 'numeric', month: 'long', year: 'numeric',
@@ -120,7 +124,6 @@ export default async function EventDetailPage({ params }: PageProps) {
     })
     : null
 
-  // Helper to format Date for <input type="datetime-local"> in server's local time
   const toLocalDatetimeString = (date: Date | null) => {
     if (!date) return null
     const offset = date.getTimezoneOffset() * 60000
@@ -132,8 +135,6 @@ export default async function EventDetailPage({ params }: PageProps) {
   return (
     <div className={`min-h-screen bg-feps-paper ${direction} pb-16`}>
       <div className="container max-w-5xl pt-8">
-
-        {/* Navigation & Admin Mode */}
         <div className="flex items-center gap-4 mb-6">
           <Link href={`/${locale}/events`} className="back-link">
             <ArrowLeft size={16} className={isAr ? 'rotate-180' : ''} />
@@ -146,32 +147,29 @@ export default async function EventDetailPage({ params }: PageProps) {
           )}
         </div>
 
-        {/* Cover Image */}
-        <EventBanner imageUrl={event.imageUrl || ''} title={event.title} />
+        <EventBanner imageUrl={event.image_url || ''} title={event.title} />
 
-        {/* Header Info */}
         <EventHeader
           isAr={isAr}
           isFr={isFr}
           title={event.title}
-          titleAr={event.titleAr}
-          titleFr={event.titleFr}
+          titleAr={event.title_ar}
+          titleFr={event.title_fr}
           location={event.location}
-          locationAr={event.locationAr}
-          locationFr={event.locationFr}
+          locationAr={event.location_ar}
+          locationFr={event.location_fr}
           formattedStartDate={formattedStartDate}
           formattedStartTime={formattedStartTime}
           formattedEndTime={formattedEndTime}
           categoryLabel={categoryLabel}
           isAdmin={isAdmin}
           eventId={event.id}
-          categoryId={event.categoryId}
+          categoryId={event.category_id}
           categories={categoryOptions}
-          rawStartDate={toLocalDatetimeString(event.startDate ? new Date(event.startDate) : null)}
-          rawEndDate={toLocalDatetimeString(event.endDate ? new Date(event.endDate) : null)}
+          rawStartDate={toLocalDatetimeString(event.start_date ? new Date(event.start_date) : null)}
+          rawEndDate={toLocalDatetimeString(event.end_date ? new Date(event.end_date) : null)}
         />
 
-        {/* Draft Notice */}
         {!event.published && (
           <div className="bg-feps-warning/10 border-l-4 border-feps-warning p-4 rounded-r-lg text-feps-warning-dark font-sans text-sm font-bold mb-8 flex items-center gap-3">
             <span className="w-2 h-2 bg-feps-warning rounded-full animate-pulse" />
@@ -179,14 +177,12 @@ export default async function EventDetailPage({ params }: PageProps) {
           </div>
         )}
 
-        {/* Main Content Layout Grid */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-8 md:gap-12 mt-12 pt-8">
           <div className="md:col-span-2 flex flex-col md:border-e-2 md:border-feps-ink/20 md:pe-8 lg:pe-12 rtl:md:border-e-0 rtl:md:border-s-2 rtl:md:ps-8 rtl:lg:ps-12">
-            <EventAbout description={event.description} descriptionAr={event.descriptionAr} descriptionFr={event.descriptionFr} isAr={isAr} isFr={isFr} title={t('eventDetails')} isAdmin={isAdmin} eventId={event.id} />
-            <EventAgenda agendaText={event.agendaText} agendaTextAr={event.agendaTextAr} agendaTextFr={event.agendaTextFr} isAr={isAr} isFr={isFr} title={t('eventProgram')} isAdmin={isAdmin} eventId={event.id} />
+            <EventAbout description={event.description} descriptionAr={event.description_ar} descriptionFr={event.description_fr} isAr={isAr} isFr={isFr} title={t('eventDetails')} isAdmin={isAdmin} eventId={event.id} />
+            <EventAgenda agendaText={event.agenda_text} agendaTextAr={event.agenda_text_ar} agendaTextFr={event.agenda_text_fr} isAr={isAr} isFr={isFr} title={t('eventProgram')} isAdmin={isAdmin} eventId={event.id} />
 
-            {/* PDF Agenda Preview Card */}
-            {event.agendaFile && (
+            {event.agenda_file && (
               <div className="bg-feps-surface border-2 border-feps-navy p-8 md:p-12 mb-8">
                 <div className="flex items-center gap-4 mb-8 border-b-2 border-feps-navy pb-4">
                   <h2 className={`text-2xl font-sans uppercase tracking-wider font-bold text-feps-navy ${isAr ? 'font-arabic' : ''}`}>
@@ -195,7 +191,7 @@ export default async function EventDetailPage({ params }: PageProps) {
                 </div>
                 <div className="w-full h-[500px] md:h-[700px] overflow-hidden border-2 border-feps-navy">
                   <iframe
-                    src={`${event.agendaFile}#toolbar=0&navpanes=0`}
+                    src={`${event.agenda_file}#toolbar=0&navpanes=0`}
                     width="100%"
                     height="100%"
                     className="border-none block"
@@ -206,7 +202,7 @@ export default async function EventDetailPage({ params }: PageProps) {
                   <span className="text-sm font-sans text-feps-navy font-bold uppercase tracking-wider">
                     {t('downloadFallback')}
                   </span>
-                  <a href={event.agendaFile} download className="flex items-center justify-center gap-2 px-6 py-3 bg-feps-navy hover:bg-white border-2 border-feps-navy hover:text-feps-navy text-white font-bold transition-colors">
+                  <a href={event.agenda_file} download className="flex items-center justify-center gap-2 px-6 py-3 bg-feps-navy hover:bg-white border-2 border-feps-navy hover:text-feps-navy text-white font-bold transition-colors">
                     <Download size={18} />
                     <span>{t('downloadFile')}</span>
                   </a>
@@ -225,9 +221,9 @@ export default async function EventDetailPage({ params }: PageProps) {
               formattedStartTime={formattedStartTime}
               formattedEndTime={formattedEndTime}
               location={event.location}
-              locationAr={event.locationAr}
-              locationFr={event.locationFr}
-              agendaFile={event.agendaFile}
+              locationAr={event.location_ar}
+              locationFr={event.location_fr}
+              agendaFile={event.agenda_file}
               labels={{
                 quickFacts: t('quickFacts'),
                 date: t('date'),
@@ -239,22 +235,22 @@ export default async function EventDetailPage({ params }: PageProps) {
               }}
               isAdmin={isAdmin}
               eventId={event.id}
-              rawStartDate={toLocalDatetimeString(event.startDate ? new Date(event.startDate) : null)}
-              rawEndDate={toLocalDatetimeString(event.endDate ? new Date(event.endDate) : null)}
+              rawStartDate={toLocalDatetimeString(event.start_date ? new Date(event.start_date) : null)}
+              rawEndDate={toLocalDatetimeString(event.end_date ? new Date(event.end_date) : null)}
             />
           </div>
         </div>
 
-        {event.registrationEnabled && (
+        {event.registration_enabled && (
           <EventRegistrationForm
             eventId={event.id}
-            registrationMode={event.registrationMode}
-            registrationOpen={event.registrationOpen}
+            registrationMode={event.registration_mode}
+            registrationOpen={event.registration_open}
             isAr={isAr}
           />
         )}
 
-        {event.surveyEnabled && event.surveyQuestions && JSON.parse(event.surveyQuestions).length > 0 && (
+        {event.survey_enabled && event.survey_questions && JSON.parse(event.survey_questions).length > 0 && (
           <div className="bg-feps-surface border-2 border-feps-navy p-8 md:p-12 mb-16 text-center mt-16">
             <h2 className={`text-2xl font-sans uppercase tracking-wider font-bold text-feps-navy mb-4 ${isAr ? 'font-arabic' : ''}`}>
               {tSurvey('feedbackTitle')}

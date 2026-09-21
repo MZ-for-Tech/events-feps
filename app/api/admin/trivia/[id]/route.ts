@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { auth } from '@/lib/auth'
-import { prisma } from '@/lib/prisma'
+import { supabase } from '@/lib/supabase'
 import { hasPermission, PERMISSIONS } from '@/lib/permissions'
 import { translate } from 'google-translate-api-x'
 import { logAction } from '@/lib/logger'
@@ -44,21 +44,26 @@ export async function PATCH(req: NextRequest, { params }: { params: Promise<{ id
       }
     }
 
-    const question = await prisma.triviaQuestion.update({
-      where: { id },
-      data: {
-        textEn: textEn !== undefined ? textEn : undefined,
-        textAr: textAr !== undefined ? textAr : undefined,
-        textFr: textFr !== undefined ? textFr : undefined,
-        categoryId: data.categoryId !== undefined ? data.categoryId : undefined,
-        options: data.options !== undefined ? data.options : undefined,
-        explanation: explanationEn !== undefined ? explanationEn : undefined,
-        explanationAr: explanationAr !== undefined ? explanationAr : undefined,
-        explanationFr: explanationFr !== undefined ? explanationFr : undefined,
-      }
-    })
+    const updates: Record<string, any> = {}
+    if (textEn !== undefined) updates.text_en = textEn
+    if (textAr !== undefined) updates.text_ar = textAr
+    if (textFr !== undefined) updates.text_fr = textFr
+    if (data.categoryId !== undefined) updates.category_id = data.categoryId
+    if (data.options !== undefined) updates.options = typeof data.options === 'string' ? data.options : JSON.stringify(data.options)
+    if (explanationEn !== undefined) updates.explanation = explanationEn
+    if (explanationAr !== undefined) updates.explanation_ar = explanationAr
+    if (explanationFr !== undefined) updates.explanation_fr = explanationFr
 
-    await logAction(session.user.id, 'UPDATE', 'TRIVIA', question.id, JSON.stringify({ action: `Updated trivia question: ${question.textEn}` }))
+    const { data: question } = await supabase
+      .from('trivia_questions')
+      .update(updates)
+      .eq('id', id)
+      .select()
+      .single()
+
+    if (question) {
+      await logAction(session.user.id, 'UPDATE', 'TRIVIA', question.id, JSON.stringify({ action: `Updated trivia question: ${question.text_en}` }))
+    }
 
     return NextResponse.json(question)
   } catch (error) {
@@ -76,11 +81,16 @@ export async function DELETE(req: NextRequest, { params }: { params: Promise<{ i
   }
 
   try {
-    const question = await prisma.triviaQuestion.delete({
-      where: { id }
-    })
+    const { data: question } = await supabase
+      .from('trivia_questions')
+      .delete()
+      .eq('id', id)
+      .select()
+      .single()
 
-    await logAction(session.user.id, 'DELETE', 'TRIVIA', id, JSON.stringify({ action: `Deleted trivia question: ${question.textEn}` }))
+    if (question) {
+      await logAction(session.user.id, 'DELETE', 'TRIVIA', id, JSON.stringify({ action: `Deleted trivia question: ${question.text_en}` }))
+    }
 
     return NextResponse.json({ success: true })
   } catch (error) {

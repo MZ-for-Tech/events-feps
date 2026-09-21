@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { auth } from '@/lib/auth'
-import { prisma } from '@/lib/prisma'
+import { supabase } from '@/lib/supabase'
 import { hasPermission, PERMISSIONS } from '@/lib/permissions'
 import { translate } from 'google-translate-api-x'
 import { logAction } from '@/lib/logger'
@@ -10,22 +10,19 @@ export async function PATCH(
   { params }: { params: Promise<{ id: string }> }
 ) {
   const session = await auth()
-  
   if (!session?.user || !hasPermission(session, PERMISSIONS.CATEGORIES_MANAGE)) {
     return new NextResponse('Forbidden', { status: 403 })
   }
 
   const { id } = await params
-
   try {
     const data = await req.json()
-    
+
     let nameEn = data.nameEn
     let nameAr = data.nameAr
     let nameFr = data.nameFr
 
     const isUpdatingName = nameEn !== undefined || nameAr !== undefined || nameFr !== undefined
-    
     if (isUpdatingName) {
       const baseName = (nameEn || nameAr || nameFr) || undefined
       if (baseName && typeof baseName === 'string') {
@@ -35,20 +32,24 @@ export async function PATCH(
       }
     }
 
-    const category = await prisma.eventCategory.update({
-      where: { id },
-      data: {
-        nameEn: nameEn !== undefined ? nameEn : undefined,
-        nameAr: nameAr !== undefined ? nameAr : undefined,
-        nameFr: nameFr !== undefined ? nameFr : undefined,
-        color: data.color !== undefined ? data.color : undefined,
-        bg: data.bg !== undefined ? data.bg : undefined,
-      }
-    })
+    const updateData: Record<string, unknown> = {}
+    if (nameEn !== undefined) updateData.name_en = nameEn
+    if (nameAr !== undefined) updateData.name_ar = nameAr
+    if (nameFr !== undefined) updateData.name_fr = nameFr
+    if (data.color !== undefined) updateData.color = data.color
+    if (data.bg !== undefined)    updateData.bg    = data.bg
 
-    await logAction(session.user.id, 'CATEGORY_UPDATED', 'CATEGORY', category.id, JSON.stringify({ action: `Updated category: ${category.nameEn}` }))
+    const { data: category, error } = await supabase
+      .from('event_categories')
+      .update(updateData)
+      .eq('id', id)
+      .select()
+      .single()
 
-    return NextResponse.json(category)
+    if (error) throw error
+
+    await logAction(session.user.id, 'CATEGORY_UPDATED', 'CATEGORY', category.id, JSON.stringify({ action: `Updated category: ${category.name_en}` }))
+    return NextResponse.json({ id: category.id, nameEn: category.name_en, nameAr: category.name_ar, nameFr: category.name_fr, color: category.color, bg: category.bg })
   } catch {
     return new NextResponse('Internal Server Error', { status: 500 })
   }
@@ -59,23 +60,25 @@ export async function DELETE(
   { params }: { params: Promise<{ id: string }> }
 ) {
   const session = await auth()
-  
   if (!session?.user || !hasPermission(session, PERMISSIONS.CATEGORIES_MANAGE)) {
     return new NextResponse('Forbidden', { status: 403 })
   }
 
   const { id } = await params
-
   try {
-    // Check if category is used
-    const eventsWithCategory = await prisma.event.count({ where: { categoryId: id } })
-    if (eventsWithCategory > 0) {
+    const { count } = await supabase
+      .from('events')
+      .select('*', { count: 'exact', head: true })
+      .eq('category_id', id)
+
+    if ((count ?? 0) > 0) {
       return new NextResponse('Cannot delete category that is assigned to events.', { status: 400 })
     }
 
-    await prisma.eventCategory.delete({ where: { id } })
-    await logAction(session.user.id, 'CATEGORY_DELETED', 'CATEGORY', id, JSON.stringify({ action: 'Deleted category' }))
+    const { error } = await supabase.from('event_categories').delete().eq('id', id)
+    if (error) throw error
 
+    await logAction(session.user.id, 'CATEGORY_DELETED', 'CATEGORY', id, JSON.stringify({ action: 'Deleted category' }))
     return new NextResponse(null, { status: 204 })
   } catch {
     return new NextResponse('Internal Server Error', { status: 500 })

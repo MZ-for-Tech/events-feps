@@ -1,36 +1,41 @@
 import { NextResponse } from 'next/server'
-import { prisma } from '@/lib/prisma'
+import { supabase } from '@/lib/supabase'
 
 export async function GET(req: Request) {
   try {
     const url = new URL(req.url)
     const categoryId = url.searchParams.get('categoryId')
 
-    let whereClause: import('@prisma/client').Prisma.TriviaQuestionWhereInput = {}
+    let query = supabase.from('trivia_questions').select('*')
+
     if (categoryId === 'uncategorized') {
-      whereClause = { categoryId: null }
+      query = query.is('category_id', null)
     } else if (categoryId) {
-      whereClause = { categoryId }
+      query = query.eq('category_id', categoryId)
     }
 
-    const questions = await prisma.triviaQuestion.findMany({ where: whereClause })
-    
-    if (questions.length === 0) {
-      return NextResponse.json([])
-    }
+    const { data: questions, error } = await query
+    if (error) throw error
+    if (!questions || questions.length === 0) return NextResponse.json([])
 
-    // Shuffle questions
+    // Shuffle and pick 5
     const shuffled = [...questions].sort(() => 0.5 - Math.random())
-    
-    // Pick exactly 5 questions (or all if less than 5)
-    const count = Math.min(5, questions.length)
-    const selected = shuffled.slice(0, count)
+    const selected = shuffled.slice(0, Math.min(5, questions.length))
 
-    // For public API, we don't return which one is correct to prevent cheating via devtools
-    // Actually, we can return it because this is a simple trivia game, not an exam.
-    // Let's just return the whole object, the options contain `isCorrect`.
-    
-    return NextResponse.json(selected)
+    const mapped = selected.map(q => ({
+      id: q.id,
+      categoryId: q.category_id,
+      textEn: q.text_en,
+      textAr: q.text_ar,
+      textFr: q.text_fr,
+      options: q.options,
+      explanation: q.explanation,
+      explanationAr: q.explanation_ar,
+      explanationFr: q.explanation_fr,
+      createdAt: q.created_at,
+    }))
+
+    return NextResponse.json(mapped)
   } catch (error) {
     console.error('Failed to fetch trivia:', error)
     return new NextResponse('Internal Server Error', { status: 500 })

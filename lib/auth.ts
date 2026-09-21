@@ -1,11 +1,10 @@
 import NextAuth from 'next-auth'
 import Credentials from 'next-auth/providers/credentials'
-import { prisma } from '@/lib/prisma'
+import { supabase } from '@/lib/supabase'
 import bcrypt from 'bcryptjs'
 import type { Role } from '@/lib/types'
 
 export const { handlers, signIn, signOut, auth } = NextAuth({
-  // Required for non-Vercel deployments (Prisma Online, custom domains, etc.)
   trustHost: true,
   secret: process.env.AUTH_SECRET,
   providers: [
@@ -16,19 +15,21 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
         password: { label: 'Password', type: 'password' },
       },
       async authorize(credentials) {
-        console.log('[Auth] Authorize called with:', credentials?.email);
+        console.log('[Auth] Authorize called with:', credentials?.email)
         if (!credentials?.email || !credentials?.password) {
-          console.log('[Auth] Missing credentials');
-          return null;
+          console.log('[Auth] Missing credentials')
+          return null
         }
 
-        const user = await prisma.user.findUnique({
-          where: { email: credentials.email as string }
-        })
-        
-        if (!user) {
-          console.log('[Auth] User not found');
-          return null;
+        const { data: user, error } = await supabase
+          .from('users')
+          .select('id, name, email, password, role, permissions')
+          .eq('email', credentials.email as string)
+          .single()
+
+        if (error || !user) {
+          console.log('[Auth] User not found')
+          return null
         }
 
         const valid = await bcrypt.compare(
@@ -36,17 +37,17 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
           user.password
         )
         if (!valid) {
-          console.log('[Auth] Invalid password');
-          return null;
+          console.log('[Auth] Invalid password')
+          return null
         }
 
-        console.log('[Auth] Success for user:', user.email);
-        return { 
-          id: user.id, 
-          name: user.name, 
-          email: user.email, 
+        console.log('[Auth] Success for user:', user.email)
+        return {
+          id: user.id,
+          name: user.name,
+          email: user.email,
           role: user.role,
-          permissions: (user as unknown as { permissions?: string | null }).permissions ? JSON.parse((user as unknown as { permissions: string }).permissions) : []
+          permissions: user.permissions ? JSON.parse(user.permissions) : []
         }
       },
     }),
