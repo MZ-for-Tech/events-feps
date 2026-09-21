@@ -37,13 +37,14 @@ export default function EventRow({
   const categoryLabel = locale === 'ar' ? category.nameAr : locale === 'fr' ? category.nameFr : category.nameEn
   const localizedLocation = isAr && locationAr ? locationAr : (locale === 'fr' && locationFr ? locationFr : location)
 
-  const month = start.toLocaleDateString(isAr ? 'ar-EG-u-nu-latn' : locale === 'fr' ? 'fr-FR' : 'en-US', { month: 'short' })
-  const day = start.toLocaleDateString(isAr ? 'ar-EG-u-nu-latn' : locale === 'fr' ? 'fr-FR' : 'en-US', { day: '2-digit' })
-  const year = start.getFullYear()
+  const month = start.toLocaleDateString(isAr ? 'ar-EG-u-nu-latn' : locale === 'fr' ? 'fr-FR' : 'en-US', { month: 'short', timeZone: 'Africa/Cairo' })
+  const day = start.toLocaleDateString(isAr ? 'ar-EG-u-nu-latn' : locale === 'fr' ? 'fr-FR' : 'en-US', { day: '2-digit', timeZone: 'Africa/Cairo' })
+  const year = new Intl.DateTimeFormat('en-US', { year: 'numeric', timeZone: 'Africa/Cairo' }).format(start)
 
   const formattedTime = start.toLocaleTimeString(isAr ? 'ar-EG-u-nu-latn' : locale === 'fr' ? 'fr-FR' : 'en-US', {
     hour: '2-digit',
     minute: '2-digit',
+    timeZone: 'Africa/Cairo',
   })
 
   // Calculate animation delay based on index (cap at 5 items for the delay classes we have)

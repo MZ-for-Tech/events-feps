@@ -31,12 +31,13 @@ export default function CalendarAgenda({ events, locale, isAr, isFr }: Props) {
             const meta = ev.category || { nameAr: 'غير محدد', nameEn: 'Unknown', nameFr: 'Inconnu', color: 'var(--feps-navy)', bg: 'rgba(26,58,110,0.1)' }
             const dateObj = new Date(ev.startDate)
             const dayNum = dateObj.getDate()
-            const dayName = dateObj.toLocaleDateString(locale, { weekday: 'short' })
-            const monthShort = dateObj.toLocaleDateString(locale, { month: 'short' })
+            const dayName = dateObj.toLocaleDateString(locale, { weekday: 'short', timeZone: 'Africa/Cairo' })
+            const monthShort = dateObj.toLocaleDateString(locale, { month: 'short', timeZone: 'Africa/Cairo' })
             const eventTime = ev.startDate
               ? new Date(ev.startDate).toLocaleTimeString(locale, {
                   hour: '2-digit',
                   minute: '2-digit',
+                  timeZone: 'Africa/Cairo',
                 })
               : null
             

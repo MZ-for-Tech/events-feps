@@ -73,6 +73,7 @@ export default function CalendarSidebar({
               ? new Date(ev.startDate).toLocaleTimeString(locale, {
                   hour: '2-digit',
                   minute: '2-digit',
+                  timeZone: 'Africa/Cairo',
                 })
               : null
 

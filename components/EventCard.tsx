@@ -55,11 +55,13 @@ export default function EventCard({
     day: 'numeric',
     month: 'short',
     year: 'numeric',
+    timeZone: 'Africa/Cairo',
   })
 
   const formattedTime = start.toLocaleTimeString(isAr ? 'ar-EG-u-nu-latn' : locale === 'fr' ? 'fr-FR' : 'en-US', {
     hour: '2-digit',
     minute: '2-digit',
+    timeZone: 'Africa/Cairo',
   })
 
   return (

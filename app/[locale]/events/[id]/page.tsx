@@ -109,25 +109,39 @@ export default async function EventDetailPage({ params }: PageProps) {
 
   const formattedStartDate = start.toLocaleDateString(isAr ? 'ar-EG-u-nu-latn' : isFr ? 'fr-FR' : 'en-GB', {
     weekday: 'long', day: 'numeric', month: 'long', year: 'numeric',
+    timeZone: 'Africa/Cairo',
   })
   const formattedStartTime = start.toLocaleTimeString(isAr ? 'ar-EG-u-nu-latn' : isFr ? 'fr-FR' : 'en-US', {
     hour: '2-digit', minute: '2-digit',
+    timeZone: 'Africa/Cairo',
   })
   const formattedEndDate = end
     ? end.toLocaleDateString(isAr ? 'ar-EG-u-nu-latn' : isFr ? 'fr-FR' : 'en-GB', {
       weekday: 'long', day: 'numeric', month: 'long', year: 'numeric',
+      timeZone: 'Africa/Cairo',
     })
     : null
   const formattedEndTime = end
     ? end.toLocaleTimeString(isAr ? 'ar-EG-u-nu-latn' : isFr ? 'fr-FR' : 'en-US', {
       hour: '2-digit', minute: '2-digit',
+      timeZone: 'Africa/Cairo',
     })
     : null
 
   const toLocalDatetimeString = (date: Date | null) => {
     if (!date) return null
-    const offset = date.getTimezoneOffset() * 60000
-    return new Date(date.getTime() - offset).toISOString().slice(0, 16)
+    const formatter = new Intl.DateTimeFormat('en-CA', {
+      timeZone: 'Africa/Cairo',
+      year: 'numeric',
+      month: '2-digit',
+      day: '2-digit',
+      hour: '2-digit',
+      minute: '2-digit',
+      hour12: false,
+    })
+    const parts = formatter.formatToParts(date)
+    const getPart = (type: string) => parts.find(p => p.type === type)?.value || ''
+    return `${getPart('year')}-${getPart('month')}-${getPart('day')}T${getPart('hour')}:${getPart('minute')}`
   }
 
   const direction = isAr ? 'rtl' : 'ltr'

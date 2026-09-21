@@ -110,10 +110,12 @@ export function AdminEventsTable({
                   month: 'short',
                   day: 'numeric',
                   year: 'numeric',
+                  timeZone: 'Africa/Cairo',
                 })
                 const formattedTime = date.toLocaleTimeString(isAr ? 'ar-EG-u-nu-latn' : 'en-US', {
                   hour: '2-digit',
                   minute: '2-digit',
+                  timeZone: 'Africa/Cairo',
                 })
 
                 return (
@@ -252,10 +254,12 @@ export function AdminEventsTable({
                 month: 'short',
                 day: 'numeric',
                 year: 'numeric',
+                timeZone: 'Africa/Cairo',
               })
               const formattedTime = date.toLocaleTimeString(isAr ? 'ar-EG-u-nu-latn' : 'en-US', {
                 hour: '2-digit',
                 minute: '2-digit',
+                timeZone: 'Africa/Cairo',
               })
 
               return (
