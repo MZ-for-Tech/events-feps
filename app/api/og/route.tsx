@@ -1,6 +1,5 @@
 import { ImageResponse } from 'next/og'
 
-export const runtime = 'edge'
 
 const cairoRegular = fetch(new URL('../../../public/fonts/Cairo-Regular.ttf', import.meta.url)).then((res) => res.arrayBuffer())
 const amiriBold = fetch(new URL('../../../public/fonts/Amiri-Bold.ttf', import.meta.url)).then((res) => res.arrayBuffer())
