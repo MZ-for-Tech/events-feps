@@ -2,29 +2,36 @@
 
 import { useState } from 'react'
 import { signIn } from 'next-auth/react'
-import { useRouter } from 'next/navigation'
-
 import { useTranslations, useLocale } from 'next-intl'
+import { Loader2 } from 'lucide-react'
 
+const QUICK_ROLES = [
+  { label: 'Superadmin', email: 'admin@feps.edu.eg', pass: 'admin123' },
+  { label: 'Manager', email: 'manager@feps.edu.eg', pass: 'admin123' },
+  { label: 'Editor', email: 'editor@feps.edu.eg', pass: 'admin123' },
+]
 
 export default function LoginForm() {
-  const router = useRouter()
   const locale = useLocale()
   const t = useTranslations('Login')
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const [error, setError] = useState('')
   const [loading, setLoading] = useState(false)
+  const [activeRole, setActiveRole] = useState<string | null>(null)
 
-  async function handleSubmit(e: React.FormEvent) {
-    e.preventDefault()
+  async function performLogin(targetEmail: string, targetPass: string, roleLabel?: string) {
+    setEmail(targetEmail)
+    setPassword(targetPass)
     setLoading(true)
     setError('')
+    if (roleLabel) setActiveRole(roleLabel)
 
     try {
+      const cleanEmail = targetEmail.trim().toLowerCase()
       const res = await signIn('credentials', {
-        email: email.trim().toLowerCase(),
-        password,
+        email: cleanEmail,
+        password: targetPass,
         redirect: false,
       })
 
@@ -32,6 +39,7 @@ export default function LoginForm() {
         console.error('[LoginForm] Sign in error:', res.error)
         setError(t('error'))
         setLoading(false)
+        setActiveRole(null)
       } else {
         window.location.href = `/${locale}/admin/events`
       }
@@ -39,7 +47,13 @@ export default function LoginForm() {
       console.error('[LoginForm] Sign in exception:', err)
       setError(t('error'))
       setLoading(false)
+      setActiveRole(null)
     }
+  }
+
+  async function handleSubmit(e: React.FormEvent) {
+    e.preventDefault()
+    await performLogin(email, password)
   }
 
   return (
@@ -84,7 +98,14 @@ export default function LoginForm() {
           disabled={loading}
           className="w-full mt-2 inline-flex justify-center items-center px-6 py-4 bg-feps-ink text-feps-paper font-sans text-xs uppercase tracking-widest font-semibold hover:bg-feps-navy transition-colors disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer"
         >
-          {loading ? t('signingIn') : t('signIn')}
+          {loading && !activeRole ? (
+            <span className="inline-flex items-center gap-2">
+              <Loader2 className="w-4 h-4 animate-spin" />
+              {t('signingIn')}
+            </span>
+          ) : (
+            t('signIn')
+          )}
         </button>
       </form>
 
@@ -94,42 +115,21 @@ export default function LoginForm() {
           {t('quickLogin')}
         </p>
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
-          {[
-            { label: 'Superadmin', email: 'admin@feps.edu.eg', pass: 'admin123' },
-            { label: 'Manager', email: 'manager@feps.edu.eg', pass: 'admin123' },
-            { label: 'Editor', email: 'editor@feps.edu.eg', pass: 'admin123' },
-          ].map(role => (
-            <button
-              key={role.label}
-              type="button"
-              disabled={loading}
-              className="px-3 py-2 border border-feps-border text-feps-ink font-sans text-[0.65rem] uppercase tracking-widest hover:bg-feps-ink hover:text-feps-paper hover:border-feps-ink transition-colors disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer"
-              onClick={async () => {
-                setLoading(true)
-                setError('')
-                try {
-                  const res = await signIn('credentials', {
-                    email: role.email,
-                    password: role.pass,
-                    redirect: false,
-                  })
-                  if (res?.error) {
-                    console.error('[LoginForm] Quick login error:', res.error)
-                    setError(t('error'))
-                    setLoading(false)
-                  } else {
-                    window.location.href = `/${locale}/admin/events`
-                  }
-                } catch (err) {
-                  console.error('[LoginForm] Quick login exception:', err)
-                  setError(t('error'))
-                  setLoading(false)
-                }
-              }}
-            >
-              {role.label}
-            </button>
-          ))}
+          {QUICK_ROLES.map(role => {
+            const isThisLoading = loading && activeRole === role.label
+            return (
+              <button
+                key={role.label}
+                type="button"
+                disabled={loading}
+                className="px-3 py-2.5 border border-feps-border text-feps-ink font-sans text-xs uppercase tracking-wider hover:bg-feps-ink hover:text-feps-paper hover:border-feps-ink transition-all disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer flex items-center justify-center gap-1.5 font-semibold"
+                onClick={() => performLogin(role.email, role.pass, role.label)}
+              >
+                {isThisLoading && <Loader2 className="w-3.5 h-3.5 animate-spin" />}
+                {isThisLoading ? t('signingIn') : role.label}
+              </button>
+            )
+          })}
         </div>
       </div>
     </div>
